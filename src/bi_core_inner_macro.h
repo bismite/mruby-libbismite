@@ -7,7 +7,8 @@
 #define _GET_(STRUCT,ATTR,FUNC) \
   static mrb_value mrb_##STRUCT##_get_##ATTR (mrb_state *mrb, mrb_value self) \
   { \
-    STRUCT* p = DATA_PTR(self); \
+    STRUCT* p; \
+    p = DATA_PTR(self); \
     return FUNC(mrb,p->ATTR); \
   }
 
@@ -15,8 +16,9 @@
   static mrb_value mrb_##STRUCT##_set_##ATTR (mrb_state *mrb, mrb_value self) \
   { \
     TYPE obj; \
+    STRUCT* p; \
     mrb_get_args(mrb, #SYMBOL, &obj ); \
-    STRUCT* p = DATA_PTR(self); \
+    p = DATA_PTR(self); \
     p->ATTR = obj; \
     return self; \
   }
