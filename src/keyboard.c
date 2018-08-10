@@ -1,7 +1,6 @@
 #include <mruby.h>
 #include <mruby/class.h>
-
-#include <SDL2/SDL.h>
+#include <bi/bi_sdl.h>
 
 void mrb_init_key(mrb_state *mrb, struct RClass *bi)
 {
