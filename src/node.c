@@ -208,8 +208,7 @@ static mrb_value mrb_node_set_size(mrb_state *mrb, mrb_value self)
     mrb_int w,h;
     mrb_get_args(mrb, "ii", &w, &h );
     BiNode* node = DATA_PTR(self);
-    node->w = w;
-    node->h = h;
+    bi_node_set_size(node,w,h);
     return self;
 }
 
