@@ -122,11 +122,10 @@ static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
     BiNode* node = DATA_PTR(self);
 
     // remove
-    node = bi_remove_node(node,child);
-    if(node==NULL) {
-      printf("remove error\n");
+    child = bi_remove_node(node,child);
+    if(child!=NULL) {
+      child->parent = NULL;
     }
-    node->parent = NULL;
 
     return self;
 }
