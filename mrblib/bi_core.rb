@@ -10,9 +10,14 @@ def rand(n)
 end
 
 class Bi
+  @@bi = nil
   attr_accessor :timers, :layers
   def self.init(w,h,fps,title)
-    @@bi ||= Bi.new(w,h,fps,title)
+    unless @bi
+      @@bi = Bi.new(w,h,fps,title)
+      @@bi.layers = []
+      @@bi.timers = []
+    end
     @@bi
   end
   def self.w
@@ -33,28 +38,27 @@ class Bi
   def self.debug=(debug)
     @@bi.debug = debug
   end
+  def self.debug
+    @@bi.debug
+  end
   def self.title=(title)
     @@bi.set_title title
   end
   def self.add_layer(layer)
-    @@bi.layers ||= []
     @@bi.layers << layer
     @@bi.add_layer layer
     layer
   end
   def self.remove_layer(layer)
-    @@bi.layers ||= []
     @@bi.layers.delete layer
     @@bi.remove_layer layer
   end
   def self.add_timer(timer)
-    @@bi.timers ||= []
     @@bi.timers << timer
     @@bi.add_timer timer
     timer
   end
   def self.remove_timer(timer)
-    @@bi.timers ||= []
     @@bi.timers.delete timer
     @@bi.remove_timer timer
   end

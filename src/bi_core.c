@@ -5,6 +5,7 @@
 #include <bi/context.h>
 #include <bi/main_loop.h>
 #include <time.h>
+#include "bi_core_inner_macro.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -46,20 +47,6 @@ static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
     return self;
 }
 
-static mrb_value mrb_bi_w(mrb_state *mrb, mrb_value self)
-{
-    // XXX: error check
-    BiContext* c = DATA_PTR(self);
-    return mrb_fixnum_value(c->w);
-}
-
-static mrb_value mrb_bi_h(mrb_state *mrb, mrb_value self)
-{
-    // XXX: error check
-    BiContext* c = DATA_PTR(self);
-    return mrb_fixnum_value(c->h);
-}
-
 static mrb_value mrb_bi_now(mrb_state *mrb, mrb_value self)
 {
     // XXX: error check
@@ -85,17 +72,13 @@ static mrb_value mrb_bi_start_run_loop(mrb_state *mrb, mrb_value self)
     return self;
 }
 
-static mrb_value mrb_bi_set_debug(mrb_state *mrb, mrb_value self)
-{
-    mrb_bool debug;
-    mrb_get_args(mrb, "b", &debug );
+// window width, height
+_GET_(BiContext,w,bi_mrb_fixnum_value);
+_GET_(BiContext,h,bi_mrb_fixnum_value);
 
-    // TODO: error check?
-    BiContext* c = DATA_PTR(self);
-    c->debug = debug;
+_GET_(BiContext,debug,bi_mrb_bool_value);
+_SET_(BiContext,debug,mrb_bool,b);
 
-    return self;
-}
 
 static mrb_value mrb_bi_set_title(mrb_state *mrb, mrb_value self)
 {
@@ -183,12 +166,13 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
 
   mrb_define_method(mrb, bi, "initialize", mrb_bi_initialize, MRB_ARGS_REQ(4));
 
-  mrb_define_method(mrb, bi, "w", mrb_bi_w, MRB_ARGS_NONE());
-  mrb_define_method(mrb, bi, "h", mrb_bi_h, MRB_ARGS_NONE());
+  mrb_define_method(mrb, bi, "w", mrb_BiContext_get_w, MRB_ARGS_NONE());
+  mrb_define_method(mrb, bi, "h", mrb_BiContext_get_h, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "now", mrb_bi_now, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "fps", mrb_bi_fps, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "start_run_loop", mrb_bi_start_run_loop, MRB_ARGS_NONE());
-  mrb_define_method(mrb, bi, "debug=", mrb_bi_set_debug, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, bi, "debug=", mrb_BiContext_set_debug, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, bi, "debug", mrb_BiContext_get_debug, MRB_ARGS_NONE());
 
   mrb_define_method(mrb, bi, "set_title", mrb_bi_set_title, MRB_ARGS_REQ(1));
 
