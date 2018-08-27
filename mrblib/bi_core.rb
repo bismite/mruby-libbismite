@@ -105,6 +105,9 @@ class Bi::Node
     node.parent = nil
     self.remove_child node
   end
+  def remove_from_parent
+    self.parent&.remove self
+  end
   def add_timer(interval,repeat,&block)
     timer = Bi::Timer.new(self,interval,repeat,&block)
     Bi.add_timer( timer )
