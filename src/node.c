@@ -74,6 +74,18 @@ static bool _on_key_input_callback_(BiNode* node, void *callback_context, uint16
   return mrb_bool( mrb_yield_argv(mrb, block, 5, argv) );
 }
 
+static bool _on_touch_callback_(BiNode* node, void *callback_context, float x, float y, bool pressed)
+{
+  mrb_state *mrb = callback_context;
+  mrb_value self = mrb_obj_value(node->userdata);
+  mrb_value block = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_touch_callback_") );
+  mrb_value _x = mrb_float_value(mrb,x);
+  mrb_value _y = mrb_float_value(mrb,y);
+  mrb_value _pressed = mrb_bool_value(pressed);
+  mrb_value argv[4] = { self, _x, _y, _pressed };
+  return mrb_bool( mrb_yield_argv(mrb, block, 4, argv) );
+}
+
 //
 // node functions
 //
@@ -319,6 +331,19 @@ static mrb_value mrb_node_on_key_input(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+static mrb_value mrb_node_on_touch(mrb_state *mrb, mrb_value self)
+{
+    mrb_value block;
+    mrb_get_args(mrb, "&", &block );
+
+    BiNode* node = DATA_PTR(self);
+    node->userdata = mrb_ptr(self);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_touch_callback_"), block);
+    bi_set_on_touch(node, _on_touch_callback_, mrb);
+
+    return self;
+}
+
 // gem
 
 void mrb_init_node(mrb_state *mrb, struct RClass *bi)
@@ -361,4 +386,5 @@ void mrb_init_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "on_click", mrb_node_on_click, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "on_move_cursor", mrb_node_on_move_cursor, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "on_key_input", mrb_node_on_key_input, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "on_touch", mrb_node_on_touch, MRB_ARGS_REQ(1));
 }
