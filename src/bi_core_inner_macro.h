@@ -23,5 +23,15 @@
     return self; \
   }
 
+#define _SET_FUNC_(STRUCT,ATTR,TYPE,SYMBOL,FUNC) \
+  static mrb_value mrb_##STRUCT##_set_##ATTR (mrb_state *mrb, mrb_value self) \
+  { \
+    TYPE obj; \
+    STRUCT* p; \
+    mrb_get_args(mrb, #SYMBOL, &obj ); \
+    p = DATA_PTR(self); \
+    FUNC(p,obj); \
+    return self; \
+  }
 
 #endif
