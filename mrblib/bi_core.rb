@@ -62,10 +62,6 @@ class Bi
     @@bi.timers.delete timer
     @@bi.remove_timer timer
   end
-  def root=(node)
-    @root = node
-    set_root_node node
-  end
 end
 
 class Bi::Texture
