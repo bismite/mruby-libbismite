@@ -34,18 +34,20 @@ static mrb_value mrb_timer_initialize(mrb_state *mrb, mrb_value self)
     mrb_float interval;
     mrb_int repeat;
     mrb_value callback;
+    BiNode* node;
+    BiTimer* timer;
+
     mrb_get_args(mrb, "ofi&", &node_obj, &interval, &repeat, &callback );
 
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_callback_"), callback);
 
-    BiNode* node = DATA_PTR(node_obj);
+    node = DATA_PTR(node_obj);
     node->userdata = mrb_ptr(node_obj);
 
-    BiTimer* timer = mrb_malloc(mrb,sizeof(BiTimer));
+    timer = mrb_malloc(mrb,sizeof(BiTimer));
     bi_timer_init(timer,node,_timer_callback_,interval,repeat,mrb_ptr(self));
 
-    DATA_PTR(self) = timer;
-    DATA_TYPE(self) = &mrb_timer_data_type;
+    mrb_data_init(self, timer, &mrb_timer_data_type);
 
     return self;
 }

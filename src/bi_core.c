@@ -41,8 +41,7 @@ static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
     bi_init_context(c, width, height, fps, title_str, NULL);
     c->userdata = mrb; // XXX: hold mrb_state
 
-    DATA_PTR(self) = c;
-    DATA_TYPE(self) = &mrb_bi_data_type;
+    mrb_data_init(self, c, &mrb_bi_data_type);
 
     return self;
 }

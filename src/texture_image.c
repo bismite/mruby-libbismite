@@ -17,10 +17,10 @@ static mrb_value mrb_texture_image_initialize(mrb_state *mrb, mrb_value self)
     BiTextureImage *img = mrb_malloc(mrb,sizeof(BiTextureImage));
 
     if( bi_load_texture( mrb_string_value_cstr(mrb,&obj), img, antialiase, texture_unit ) ) {
-      DATA_PTR(self) = img;
-      DATA_TYPE(self) = &mrb_texture_image_data_type;
+      mrb_data_init(self, img, &mrb_texture_image_data_type);
     }else{
       // XXX: raise!
+      mrb_raise(mrb, E_RUNTIME_ERROR, "texture load error.");
     }
 
     return self;

@@ -92,19 +92,15 @@ static bool _on_touch_callback_(BiNode* node, void *callback_context, float x, f
 
 static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
 {
-    BiNode* node = DATA_PTR(self);
+    BiNode* node;
 
-    if (node == NULL) {
-      node = mrb_malloc(mrb, sizeof(BiNode));
-      if (NULL == node) {
-        mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
-      }
+    node = mrb_malloc(mrb, sizeof(BiNode));
+    if (NULL == node) {
+      mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
     }
 
     bi_node_init(node);
-
-    DATA_PTR(self) = node;
-    DATA_TYPE(self) = &mrb_node_data_type;
+    mrb_data_init(self, node, &mrb_node_data_type);
 
     return self;
 }
@@ -361,7 +357,7 @@ void mrb_init_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "anchor_x=",mrb_BiNode_set_anchor_x, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "anchor_x", mrb_BiNode_get_anchor_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "anchor_y=",mrb_BiNode_set_anchor_y, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "anchor_y", mrb_BiNode_get_anchor_x, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "anchor_y", mrb_BiNode_get_anchor_y, MRB_ARGS_NONE());
 
   mrb_define_method(mrb, node, "angle", mrb_node_angle, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "angle=", mrb_BiNode_set_angle, MRB_ARGS_REQ(1));

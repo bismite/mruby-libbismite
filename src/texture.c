@@ -20,8 +20,7 @@ static mrb_value mrb_texture_initialize(mrb_state *mrb, mrb_value self)
     texture->texture_image = DATA_PTR(obj);
     bi_set_texture_boundary(texture,x,y,w,h);
 
-    DATA_PTR(self) = texture;
-    DATA_TYPE(self) = &mrb_texture_data_type;
+    mrb_data_init(self, texture, &mrb_texture_data_type);
 
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@texture_image"), obj);
 

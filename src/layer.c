@@ -14,11 +14,15 @@ static struct mrb_data_type const mrb_layer_data_type = { "Layer", mrb_free };
 
 static mrb_value mrb_layer_initialize(mrb_state *mrb, mrb_value self)
 {
-    BiLayer* layer = mrb_malloc(mrb,sizeof(BiLayer));
-    bi_layer_init(layer);
+    BiLayer* layer;
 
-    DATA_PTR(self) = layer;
-    DATA_TYPE(self) = &mrb_layer_data_type;
+    layer = mrb_malloc(mrb,sizeof(BiLayer));
+    if (NULL == layer) {
+      mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
+    }
+
+    bi_layer_init(layer);
+    mrb_data_init(self, layer, &mrb_layer_data_type);
 
     return self;
 }
