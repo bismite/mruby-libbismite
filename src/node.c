@@ -41,49 +41,73 @@ static bool _on_click_callback_(BiNode* node, void *callback_context, int x, int
 {
   mrb_state *mrb = callback_context;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value block = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_click_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_click_callback_") );
   mrb_value _x = mrb_fixnum_value(x);
   mrb_value _y = mrb_fixnum_value(y);
   mrb_value _button = mrb_fixnum_value(button);
   mrb_value _pressed = mrb_bool_value(pressed);
   mrb_value argv[5] = { self, _x, _y, _button, _pressed };
-  return mrb_bool( mrb_yield_argv(mrb, block, 5, argv) );
+
+  if( mrb_symbol_p(obj) ){
+    return mrb_bool( mrb_funcall_argv(mrb,self,mrb_symbol(obj),5,argv) );
+  }else if( mrb_type(obj) == MRB_TT_PROC ) {
+    return mrb_bool( mrb_yield_argv(mrb, obj, 5, argv) );
+  }
+  return false;
 }
 
 static bool _on_move_cursor_callback_(BiNode* node, void *callback_context, int x, int y)
 {
   mrb_state *mrb = callback_context;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value block = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_move_cursor_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_move_cursor_callback_") );
   mrb_value _x = mrb_fixnum_value(x);
   mrb_value _y = mrb_fixnum_value(y);
   mrb_value argv[3] = { self, _x, _y };
-  return mrb_bool( mrb_yield_argv(mrb, block, 3, argv) );
+
+  if( mrb_symbol_p(obj) ){
+    return mrb_bool( mrb_funcall_argv(mrb,self,mrb_symbol(obj),3,argv) );
+  }else if( mrb_type(obj) == MRB_TT_PROC ) {
+    return mrb_bool( mrb_yield_argv(mrb, obj, 3, argv) );
+  }
+  return false;
 }
 
 static bool _on_key_input_callback_(BiNode* node, void *callback_context, uint16_t scancode, uint32_t keycode, uint16_t mod, bool pressed)
 {
   mrb_state *mrb = callback_context;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value block = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_key_input_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_key_input_callback_") );
   mrb_value _scancode = mrb_fixnum_value(scancode);
   mrb_value _keycode = mrb_fixnum_value(keycode);
   mrb_value _mod = mrb_fixnum_value(mod);
   mrb_value _pressed = mrb_bool_value(pressed);
   mrb_value argv[5] = { self, _scancode, _keycode, _mod, _pressed };
-  return mrb_bool( mrb_yield_argv(mrb, block, 5, argv) );
+
+  if( mrb_symbol_p(obj) ){
+    return mrb_bool( mrb_funcall_argv(mrb,self,mrb_symbol(obj),5,argv) );
+  }else if( mrb_type(obj) == MRB_TT_PROC ) {
+    return mrb_bool( mrb_yield_argv(mrb, obj, 5, argv) );
+  }
+  return false;
 }
 
 static bool _on_touch_callback_(BiNode* node, void *callback_context, float x, float y, bool pressed)
 {
   mrb_state *mrb = callback_context;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value block = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_touch_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_touch_callback_") );
   mrb_value _x = mrb_float_value(mrb,x);
   mrb_value _y = mrb_float_value(mrb,y);
   mrb_value _pressed = mrb_bool_value(pressed);
   mrb_value argv[4] = { self, _x, _y, _pressed };
-  return mrb_bool( mrb_yield_argv(mrb, block, 4, argv) );
+
+  if( mrb_symbol_p(obj) ){
+    return mrb_bool( mrb_funcall_argv(mrb,self,mrb_symbol(obj),4,argv) );
+  }else if( mrb_type(obj) == MRB_TT_PROC ) {
+    return mrb_bool( mrb_yield_argv(mrb, obj, 4, argv) );
+  }
+  return false;
 }
 
 //
@@ -277,12 +301,12 @@ static mrb_value mrb_node_on_update(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_node_on_click(mrb_state *mrb, mrb_value self)
 {
-    mrb_value block;
-    mrb_get_args(mrb, "&", &block );
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
     node->userdata = mrb_ptr(self);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_click_callback_"), block);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_click_callback_"), obj);
     bi_set_on_click(node, _on_click_callback_, mrb);
 
     return self;
@@ -290,12 +314,12 @@ static mrb_value mrb_node_on_click(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_node_on_move_cursor(mrb_state *mrb, mrb_value self)
 {
-    mrb_value block;
-    mrb_get_args(mrb, "&", &block );
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
     node->userdata = mrb_ptr(self);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_move_cursor_callback_"), block);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_move_cursor_callback_"), obj);
     bi_set_on_move_cursor(node, _on_move_cursor_callback_, mrb);
 
     return self;
@@ -303,12 +327,12 @@ static mrb_value mrb_node_on_move_cursor(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_node_on_key_input(mrb_state *mrb, mrb_value self)
 {
-    mrb_value block;
-    mrb_get_args(mrb, "&", &block );
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
     node->userdata = mrb_ptr(self);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_key_input_callback_"), block);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_key_input_callback_"), obj);
     bi_set_on_keyinput(node, _on_key_input_callback_, mrb);
 
     return self;
@@ -316,12 +340,12 @@ static mrb_value mrb_node_on_key_input(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_node_on_touch(mrb_state *mrb, mrb_value self)
 {
-    mrb_value block;
-    mrb_get_args(mrb, "&", &block );
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
     node->userdata = mrb_ptr(self);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_touch_callback_"), block);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_touch_callback_"), obj);
     bi_set_on_touch(node, _on_touch_callback_, mrb);
 
     return self;
@@ -370,8 +394,8 @@ void mrb_init_node(mrb_state *mrb, struct RClass *bi)
 
   // callback
   mrb_define_method(mrb, node, "_on_update_", mrb_node_on_update, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "on_click", mrb_node_on_click, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "on_move_cursor", mrb_node_on_move_cursor, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "on_key_input", mrb_node_on_key_input, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "on_touch", mrb_node_on_touch, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_on_click_", mrb_node_on_click, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_on_move_cursor_", mrb_node_on_move_cursor, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_on_key_input_", mrb_node_on_key_input, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_on_touch_", mrb_node_on_touch, MRB_ARGS_REQ(1));
 }

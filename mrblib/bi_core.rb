@@ -115,8 +115,24 @@ class Bi::Node
   def remove_timer(timer)
     Bi.remove_timer timer
   end
+
+  #
+  # callbacks
+  #
   def on_update(callback=nil,&blk)
     self._on_update_( callback || blk )
+  end
+  def on_click(callback=nil,&blk)
+    self._on_click_( callback || blk )
+  end
+  def on_move_cursor(callback=nil,&blk)
+    self._on_move_cursor_( callback || blk )
+  end
+  def on_key_input(callback=nil,&blk)
+    self._on_key_input_( callback || blk )
+  end
+  def on_touch(callback=nil,&blk)
+    self._on_touch_( callback || blk )
   end
 end
 
