@@ -2,6 +2,7 @@
 #include <mruby/data.h>
 #include <mruby/class.h>
 #include <mruby/variable.h>
+#include <mruby/array.h>
 #include <bi/node.h>
 #include <bi/util.h>
 #include <stdlib.h>
@@ -244,6 +245,22 @@ static mrb_value mrb_node_is_include(mrb_state *mrb, mrb_value self)
     return mrb_bool_value(bi_node_inside(node,x,y));
 }
 
+static mrb_value mrb_node_transform_local(mrb_state *mrb, mrb_value self)
+{
+    mrb_int x,y;
+    int lx,ly;
+    BiNode* node;
+    mrb_value v[2];
+
+    mrb_get_args(mrb, "ii", &x, &y );
+    node = (BiNode*)DATA_PTR(self);
+    bi_node_transform_local(node, x, y, &lx, &ly);
+
+    v[0] = mrb_fixnum_value(lx);
+    v[1] = mrb_fixnum_value(ly);
+    return mrb_ary_new_from_values(mrb,2,v);
+}
+
 
 //
 // visual
@@ -386,6 +403,7 @@ void mrb_init_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "angle", mrb_node_angle, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "angle=", mrb_BiNode_set_angle, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "include?", mrb_node_is_include, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, node, "transform_local", mrb_node_transform_local, MRB_ARGS_REQ(2));
 
   // visual
   mrb_define_method(mrb, node, "set_texture", mrb_node_set_texture, MRB_ARGS_REQ(1));
