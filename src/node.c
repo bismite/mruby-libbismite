@@ -299,6 +299,21 @@ static mrb_value mrb_node_set_alpha(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+static mrb_value mrb_node_set_visible(mrb_state *mrb, mrb_value self)
+{
+    mrb_bool visible;
+    mrb_get_args(mrb, "b", &visible );
+    BiNode* node = DATA_PTR(self);
+    node->visible = visible;
+    return self;
+}
+
+static mrb_value mrb_node_get_visible(mrb_state *mrb, mrb_value self)
+{
+    BiNode* node = DATA_PTR(self);
+    return mrb_bool_value(node->visible);
+}
+
 //
 // callback
 //
@@ -409,6 +424,8 @@ void mrb_init_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "set_texture", mrb_node_set_texture, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "set_color", mrb_node_set_color, MRB_ARGS_REQ(4));
   mrb_define_method(mrb, node, "set_alpha", mrb_node_set_alpha, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "visible=", mrb_node_set_visible, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "visible", mrb_node_get_visible, MRB_ARGS_NONE());
 
   // callback
   mrb_define_method(mrb, node, "_on_update_", mrb_node_on_update, MRB_ARGS_REQ(1));
