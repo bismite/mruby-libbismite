@@ -111,6 +111,22 @@ static bool _on_touch_callback_(BiNode* node, void *callback_context, float x, f
   return false;
 }
 
+static bool _on_text_input_callback_(BiNode* node, void *callback_context, char* text)
+{
+  mrb_state *mrb = callback_context;
+  mrb_value self = mrb_obj_value(node->userdata);
+  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_text_input_callback_") );
+  mrb_value _text = mrb_str_new_cstr(mrb,text);
+  mrb_value argv[2] = { self, _text };
+
+  if( mrb_symbol_p(obj) ){
+    return mrb_bool( mrb_funcall_argv(mrb,self,mrb_symbol(obj),2,argv) );
+  }else if( mrb_type(obj) == MRB_TT_PROC ) {
+    return mrb_bool( mrb_yield_argv(mrb, obj, 2, argv) );
+  }
+  return false;
+}
+
 //
 // node functions
 //
@@ -383,6 +399,19 @@ static mrb_value mrb_node_on_touch(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+static mrb_value mrb_node_on_text_input(mrb_state *mrb, mrb_value self)
+{
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
+
+    BiNode* node = DATA_PTR(self);
+    node->userdata = mrb_ptr(self);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_text_input_callback_"), obj);
+    bi_set_on_textinput(node, _on_text_input_callback_, mrb);
+
+    return self;
+}
+
 // gem
 
 void mrb_init_node(mrb_state *mrb, struct RClass *bi)
@@ -433,4 +462,5 @@ void mrb_init_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "_on_move_cursor_", mrb_node_on_move_cursor, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_key_input_", mrb_node_on_key_input, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_touch_", mrb_node_on_touch, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_on_text_input_", mrb_node_on_text_input, MRB_ARGS_REQ(1));
 }

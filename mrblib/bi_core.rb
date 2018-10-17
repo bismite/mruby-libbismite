@@ -134,6 +134,9 @@ class Bi::Node
   def on_touch(callback=nil,&blk)
     self._on_touch_( callback || blk )
   end
+  def on_text_input(callback=nil,&blk)
+    self._on_text_input_( callback || blk )
+  end
 end
 
 class Bi::Sprite < Bi::Node
