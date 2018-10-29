@@ -58,9 +58,9 @@ class Bi
     @@bi.add_timer timer
     timer
   end
-  def self.remove_timer(timer)
+  def self.finish_timer(timer)
     @@bi.timers.delete timer
-    @@bi.remove_timer timer
+    @@bi.finish_timer timer
   end
 end
 

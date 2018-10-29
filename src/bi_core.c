@@ -143,7 +143,7 @@ static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
     return self;
 }
 
-static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_bi_finish_timer(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
     mrb_get_args(mrb, "o", &obj );
@@ -152,7 +152,7 @@ static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
     BiContext* c = DATA_PTR(self);
     BiTimer* timer = DATA_PTR(obj);
 
-    bi_remove_timer(c,timer);
+    bi_finish_timer(c,timer);
 
     return self;
 }
@@ -179,7 +179,7 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, bi, "remove_layer", mrb_bi_remove_layer, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, bi, "add_timer", mrb_bi_add_timer, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, bi, "remove_timer", mrb_bi_remove_timer, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, bi, "finish_timer", mrb_bi_finish_timer, MRB_ARGS_REQ(1));
 
 #define DONE mrb_gc_arena_restore(mrb, 0)
   mrb_init_node(mrb,bi); DONE;

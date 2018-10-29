@@ -26,7 +26,7 @@ static bool _timer_callback_(BiContext* context,BiNode* node,double now,BiTimer*
 // Bi::Timer class
 //
 
-static struct mrb_data_type const mrb_timer_data_type = { "Timer", mrb_free };
+static struct mrb_data_type const mrb_timer_data_type = { "Timer", NULL };
 
 static mrb_value mrb_timer_initialize(mrb_state *mrb, mrb_value self)
 {
@@ -44,9 +44,7 @@ static mrb_value mrb_timer_initialize(mrb_state *mrb, mrb_value self)
     node = DATA_PTR(node_obj);
     node->userdata = mrb_ptr(node_obj);
 
-    timer = mrb_malloc(mrb,sizeof(BiTimer));
-    bi_timer_init(timer,node,_timer_callback_,interval,repeat,mrb_ptr(self));
-
+    timer = bi_timer_alloc(node,_timer_callback_,interval,repeat,mrb_ptr(self));
     mrb_data_init(self, timer, &mrb_timer_data_type);
 
     return self;
