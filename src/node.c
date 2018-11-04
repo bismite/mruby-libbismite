@@ -142,6 +142,7 @@ static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
 
     bi_node_init(node);
     mrb_data_init(self, node, &mrb_node_data_type);
+    node->userdata = mrb_ptr(self);
 
     return self;
 }
@@ -340,7 +341,6 @@ static mrb_value mrb_node_on_update(mrb_state *mrb, mrb_value self)
     mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
-    node->userdata = mrb_ptr(self);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_update_callback_"), obj);
     bi_set_on_update(node, _update_callback_, mrb);
 
@@ -353,7 +353,6 @@ static mrb_value mrb_node_on_click(mrb_state *mrb, mrb_value self)
     mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
-    node->userdata = mrb_ptr(self);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_click_callback_"), obj);
     bi_set_on_click(node, _on_click_callback_, mrb);
 
@@ -366,7 +365,6 @@ static mrb_value mrb_node_on_move_cursor(mrb_state *mrb, mrb_value self)
     mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
-    node->userdata = mrb_ptr(self);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_move_cursor_callback_"), obj);
     bi_set_on_move_cursor(node, _on_move_cursor_callback_, mrb);
 
@@ -379,7 +377,6 @@ static mrb_value mrb_node_on_key_input(mrb_state *mrb, mrb_value self)
     mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
-    node->userdata = mrb_ptr(self);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_key_input_callback_"), obj);
     bi_set_on_keyinput(node, _on_key_input_callback_, mrb);
 
@@ -392,7 +389,6 @@ static mrb_value mrb_node_on_touch(mrb_state *mrb, mrb_value self)
     mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
-    node->userdata = mrb_ptr(self);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_touch_callback_"), obj);
     bi_set_on_touch(node, _on_touch_callback_, mrb);
 
@@ -405,9 +401,43 @@ static mrb_value mrb_node_on_text_input(mrb_state *mrb, mrb_value self)
     mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
-    node->userdata = mrb_ptr(self);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_text_input_callback_"), obj);
     bi_set_on_textinput(node, _on_text_input_callback_, mrb);
+
+    return self;
+}
+
+// Timer
+
+
+//
+// Timer
+//
+
+static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
+{
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
+
+    // TODO: error check
+    BiNode* node = DATA_PTR(self);
+    BiTimer* timer = DATA_PTR(obj);
+
+    bi_node_add_timer(node,timer);
+
+    return self;
+}
+
+static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
+{
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
+
+    // TODO: error check
+    BiNode* node = DATA_PTR(self);
+    BiTimer* timer = DATA_PTR(obj);
+
+    bi_node_remove_timer(node,timer);
 
     return self;
 }
@@ -463,4 +493,9 @@ void mrb_init_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "_on_key_input_", mrb_node_on_key_input, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_touch_", mrb_node_on_touch, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_text_input_", mrb_node_on_text_input, MRB_ARGS_REQ(1));
+
+  // timer
+  mrb_define_method(mrb, node, "_add_timer", mrb_bi_add_timer, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_remove_timer", mrb_bi_remove_timer, MRB_ARGS_REQ(1));
+
 }

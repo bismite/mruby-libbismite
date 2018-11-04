@@ -124,39 +124,6 @@ static mrb_value mrb_bi_remove_layer(mrb_state *mrb, mrb_value self)
     return self;
 }
 
-
-//
-// Timer
-//
-
-static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
-{
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-
-    // TODO: error check
-    BiContext* c = DATA_PTR(self);
-    BiTimer* timer = DATA_PTR(obj);
-
-    bi_add_timer(c,timer);
-
-    return self;
-}
-
-static mrb_value mrb_bi_finish_timer(mrb_state *mrb, mrb_value self)
-{
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-
-    // TODO: error check
-    BiContext* c = DATA_PTR(self);
-    BiTimer* timer = DATA_PTR(obj);
-
-    bi_finish_timer(c,timer);
-
-    return self;
-}
-
 void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
 {
   struct RClass *bi;
@@ -177,9 +144,6 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
 
   mrb_define_method(mrb, bi, "add_layer", mrb_bi_add_layer, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, bi, "remove_layer", mrb_bi_remove_layer, MRB_ARGS_REQ(1));
-
-  mrb_define_method(mrb, bi, "add_timer", mrb_bi_add_timer, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, bi, "finish_timer", mrb_bi_finish_timer, MRB_ARGS_REQ(1));
 
 #define DONE mrb_gc_arena_restore(mrb, 0)
   mrb_init_node(mrb,bi); DONE;

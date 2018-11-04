@@ -53,15 +53,6 @@ class Bi
     @@bi.layers.delete layer
     @@bi.remove_layer layer
   end
-  def self.add_timer(timer)
-    @@bi.timers << timer
-    @@bi.add_timer timer
-    timer
-  end
-  def self.finish_timer(timer)
-    @@bi.timers.delete timer
-    @@bi.finish_timer timer
-  end
 end
 
 class Bi::Texture
@@ -136,6 +127,20 @@ class Bi::Node
   end
   def on_text_input(callback=nil,&blk)
     self._on_text_input_( callback || blk )
+  end
+
+  # Timer
+  def add_timer(timer)
+    @timers ||= []
+    @timers << timer
+    self._add_timer timer
+    timer
+  end
+  def remove_timer(timer)
+    @timers ||= []
+    @timers.delete timer
+    self._finish_timer timer
+    timer
   end
 end
 
