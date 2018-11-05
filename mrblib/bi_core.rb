@@ -130,8 +130,9 @@ class Bi::Node
   end
 
   # Timer
-  def add_timer(timer)
+  def add_timer(duration,repeat,&callback)
     @timers ||= []
+    timer = Bi::Timer.new self, duration, repeat, &callback
     @timers << timer
     self._add_timer timer
     timer
