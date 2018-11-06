@@ -12,9 +12,9 @@ end
 class Bi
   @@bi = nil
   attr_accessor :timers, :layers
-  def self.init(w,h,fps,title)
+  def self.init(w,h,fps,title,scale=1.0)
     unless @bi
-      @@bi = Bi.new(w,h,fps,title)
+      @@bi = Bi.new(w,h,scale,fps,title)
       @@bi.layers = []
       @@bi.timers = []
     end
