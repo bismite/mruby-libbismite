@@ -33,12 +33,13 @@ static struct mrb_data_type const mrb_bi_data_type = { "Bi", mrb_free };
 static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
 {
     mrb_int width, height, fps;
+    mrb_bool highdpi;
     mrb_value title_obj;
-    mrb_get_args(mrb, "iiiS", &width, &height, &fps, &title_obj );
+    mrb_get_args(mrb, "iiibS", &width, &height, &fps, &highdpi, &title_obj );
     const char* title_str = mrb_string_value_cstr(mrb,&title_obj);
 
     BiContext* c = mrb_malloc(mrb,sizeof(BiContext));
-    bi_init_context(c, width, height, fps, title_str);
+    bi_init_context(c, width, height, fps, highdpi, title_str);
     c->userdata = mrb; // XXX: hold mrb_state
 
     mrb_data_init(self, c, &mrb_bi_data_type);
@@ -130,7 +131,7 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   bi = mrb_define_class(mrb, "Bi", mrb->object_class);
   MRB_SET_INSTANCE_TT(bi, MRB_TT_DATA);
 
-  mrb_define_method(mrb, bi, "initialize", mrb_bi_initialize, MRB_ARGS_REQ(4));
+  mrb_define_method(mrb, bi, "initialize", mrb_bi_initialize, MRB_ARGS_REQ(5));
 
   mrb_define_method(mrb, bi, "w", mrb_BiContext_get_w, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "h", mrb_BiContext_get_h, MRB_ARGS_NONE());
