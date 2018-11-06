@@ -33,13 +33,12 @@ static struct mrb_data_type const mrb_bi_data_type = { "Bi", mrb_free };
 static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
 {
     mrb_int width, height, fps;
-    mrb_float scale;
     mrb_value title_obj;
-    mrb_get_args(mrb, "iifiS", &width, &height, &scale, &fps, &title_obj );
+    mrb_get_args(mrb, "iiiS", &width, &height, &fps, &title_obj );
     const char* title_str = mrb_string_value_cstr(mrb,&title_obj);
 
     BiContext* c = mrb_malloc(mrb,sizeof(BiContext));
-    bi_init_context(c, width, height, scale, fps, title_str);
+    bi_init_context(c, width, height, fps, title_str);
     c->userdata = mrb; // XXX: hold mrb_state
 
     mrb_data_init(self, c, &mrb_bi_data_type);
