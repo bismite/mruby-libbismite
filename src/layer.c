@@ -61,6 +61,24 @@ static mrb_value mrb_BiLayer_get_root(mrb_state *mrb, mrb_value self)
     return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@root"));
 }
 
+static mrb_value mrb_BiLayer_set_texture_image(mrb_state *mrb, mrb_value self)
+{
+    mrb_int index;
+    mrb_value texture_image_obj;
+    mrb_get_args(mrb, "io", &index, &texture_image_obj );
+
+    BiLayer* layer = DATA_PTR(self);
+    BiTextureImage* img = DATA_PTR(texture_image_obj);
+
+    if( 0 <= index && index < 8 ) {
+      layer->textures[index] = img;
+    }
+
+    return self;
+}
+
+
+
 void mrb_init_layer(mrb_state *mrb,struct RClass *bi)
 {
   struct RClass *layer;
@@ -75,13 +93,15 @@ void mrb_init_layer(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, layer, "camera_y=",mrb_BiLayer_set_camera_y, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer, "projection_centering", mrb_BiLayer_get_projection_centering, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "projection_centering=", mrb_BiLayer_set_projection_centering, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, layer, "root", mrb_BiLayer_get_root, MRB_ARGS_NONE());
-  mrb_define_method(mrb, layer, "root=",mrb_BiLayer_set_root, MRB_ARGS_REQ(1));
-
   mrb_define_method(mrb, layer, "blend_src", mrb_BiLayer_get_blend_src, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "blend_src=",mrb_BiLayer_set_blend_src, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer, "blend_dst", mrb_BiLayer_get_blend_dst, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "blend_dst=",mrb_BiLayer_set_blend_dst, MRB_ARGS_REQ(1));
+
+  mrb_define_method(mrb, layer, "root", mrb_BiLayer_get_root, MRB_ARGS_NONE());
+  mrb_define_method(mrb, layer, "root=",mrb_BiLayer_set_root, MRB_ARGS_REQ(1));
+
+  mrb_define_method(mrb, layer, "set_texture_image",mrb_BiLayer_set_texture_image, MRB_ARGS_REQ(2));
 
   // blend functions
   // source: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendFunc.xhtml
