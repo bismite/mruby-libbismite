@@ -152,7 +152,8 @@ class Bi::Sprite < Bi::Node
   def initialize(texture)
     super
     self.texture = texture
-    self.set_bound 0, 0, texture.w, texture.h
+    self.set_position 0, 0
+    self.set_size texture.w, texture.h
     self.set_color 0xff,0xff,0xff,0xff
   end
 end

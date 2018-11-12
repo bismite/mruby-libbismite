@@ -220,39 +220,15 @@ static mrb_value mrb_node_set_size(mrb_state *mrb, mrb_value self)
     return self;
 }
 
-static mrb_value mrb_node_set_scale_x(mrb_state *mrb, mrb_value self)
-{
-    mrb_float x;
-    mrb_get_args(mrb, "f", &x );
-    BiNode* node = DATA_PTR(self);
-    node->scale_x = x;
-    return self;
-}
-
-static mrb_value mrb_node_set_scale_y(mrb_state *mrb, mrb_value self)
-{
-    mrb_float y;
-    mrb_get_args(mrb, "f", &y );
-    BiNode* node = DATA_PTR(self);
-    node->scale_y = y;
-    return self;
-}
+_GET_(BiNode,scale_x,mrb_float_value);
+_GET_(BiNode,scale_y,mrb_float_value);
+_SET_FUNC_(BiNode,scale_x,mrb_float,f,bi_node_set_scale_x);
+_SET_FUNC_(BiNode,scale_y,mrb_float,f,bi_node_set_scale_y);
 
 _GET_(BiNode,anchor_x,mrb_float_value);
 _GET_(BiNode,anchor_y,mrb_float_value);
 _SET_(BiNode,anchor_x,mrb_float,f);
 _SET_(BiNode,anchor_y,mrb_float,f);
-
-static mrb_value mrb_node_set_bound(mrb_state *mrb, mrb_value self)
-{
-    mrb_int x,y,w,h;
-    mrb_get_args(mrb, "iiii", &x, &y, &w, &h );
-    BiNode* node = DATA_PTR(self);
-    bi_node_set_position(node,x,y);
-    node->w = w;
-    node->h = h;
-    return self;
-}
 
 static mrb_value mrb_node_is_include(mrb_state *mrb, mrb_value self)
 {
@@ -465,9 +441,10 @@ void mrb_init_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "w", mrb_BiNode_get_w, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "h", mrb_BiNode_get_h, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "set_size", mrb_node_set_size, MRB_ARGS_REQ(2));
-  mrb_define_method(mrb, node, "scale_x=", mrb_node_set_scale_x, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "scale_y=", mrb_node_set_scale_y, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "set_bound", mrb_node_set_bound, MRB_ARGS_REQ(4));
+  mrb_define_method(mrb, node, "scale_x", mrb_BiNode_get_scale_x, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "scale_y", mrb_BiNode_get_scale_y, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "scale_x=", mrb_BiNode_set_scale_x, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "scale_y=", mrb_BiNode_set_scale_y, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, node, "anchor_x=",mrb_BiNode_set_anchor_x, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "anchor_x", mrb_BiNode_get_anchor_x, MRB_ARGS_NONE());
