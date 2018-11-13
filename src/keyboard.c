@@ -6,6 +6,7 @@ void mrb_init_key(mrb_state *mrb, struct RClass *bi)
 {
   struct RClass *keycode = mrb_define_module_under(mrb,bi,"KeyCode");
   struct RClass *scancode = mrb_define_module_under(mrb,bi,"ScanCode");
+  struct RClass *keymod = mrb_define_module_under(mrb,bi,"KeyMod");
 
   // keycode
 
@@ -489,4 +490,21 @@ void mrb_init_key(mrb_state *mrb, struct RClass *bi)
   mrb_define_const(mrb, scancode, "SLEEP", mrb_fixnum_value(SDL_SCANCODE_SLEEP));
   mrb_define_const(mrb, scancode, "APP1", mrb_fixnum_value(SDL_SCANCODE_APP1));
   mrb_define_const(mrb, scancode, "APP2", mrb_fixnum_value(SDL_SCANCODE_APP2));
+
+  mrb_define_const(mrb, keymod, "NONE", mrb_fixnum_value(KMOD_NONE));
+  mrb_define_const(mrb, keymod, "LSHIFT", mrb_fixnum_value(KMOD_LSHIFT));
+  mrb_define_const(mrb, keymod, "RSHIFT", mrb_fixnum_value(KMOD_RSHIFT));
+  mrb_define_const(mrb, keymod, "LCTRL", mrb_fixnum_value(KMOD_LCTRL));
+  mrb_define_const(mrb, keymod, "RCTRL", mrb_fixnum_value(KMOD_RCTRL));
+  mrb_define_const(mrb, keymod, "LALT", mrb_fixnum_value(KMOD_LALT));
+  mrb_define_const(mrb, keymod, "RALT", mrb_fixnum_value(KMOD_RALT));
+  mrb_define_const(mrb, keymod, "LGUI", mrb_fixnum_value(KMOD_LGUI));
+  mrb_define_const(mrb, keymod, "RGUI", mrb_fixnum_value(KMOD_RGUI));
+  mrb_define_const(mrb, keymod, "NUM", mrb_fixnum_value(KMOD_NUM));
+  mrb_define_const(mrb, keymod, "CAPS", mrb_fixnum_value(KMOD_CAPS));
+  mrb_define_const(mrb, keymod, "MODE", mrb_fixnum_value(KMOD_MODE));
+  mrb_define_const(mrb, keymod, "CTRL", mrb_fixnum_value(KMOD_CTRL));
+  mrb_define_const(mrb, keymod, "SHIFT", mrb_fixnum_value(KMOD_SHIFT));
+  mrb_define_const(mrb, keymod, "ALT", mrb_fixnum_value(KMOD_ALT));
+  mrb_define_const(mrb, keymod, "GUI", mrb_fixnum_value(KMOD_GUI));
 }

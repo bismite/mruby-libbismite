@@ -48,13 +48,20 @@ class Bi
     @@bi.set_title title
   end
   def self.add_layer(layer)
-    @@bi.layers << layer
-    @@bi.add_layer layer
+    unless @@bi.layers.include? layer
+      @@bi.layers << layer
+      @@bi.add_layer layer
+    end
     layer
   end
   def self.remove_layer(layer)
-    @@bi.layers.delete layer
-    @@bi.remove_layer layer
+    if @@bi.layers.delete layer
+      @@bi.remove_layer layer
+    end
+  end
+  def self.remove_all_layers
+    @@bi.layers.each{|l| @@bi.remove_layer l }
+    @@bi.layers.clear
   end
 end
 
