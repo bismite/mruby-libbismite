@@ -1,9 +1,9 @@
 
 alias :_original_rand_ :rand
-def rand(n)
+def rand(n=nil)
   if n.is_a? Range
     return n.min if n.min == n.max
-    n.min + _original_rand_(n.max-n.min)
+    n.min + _original_rand_(1+n.max-n.min)
   else
     _original_rand_(n)
   end
@@ -150,7 +150,7 @@ class Bi::Node
   def remove_timer(timer)
     @timers ||= []
     @timers.delete timer
-    self._finish_timer timer
+    self._remove_timer timer
     timer
   end
 end
