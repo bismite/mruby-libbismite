@@ -93,20 +93,39 @@ static bool _on_key_input_callback_(BiNode* node, void *callback_context, uint16
   return false;
 }
 
-static bool _on_touch_callback_(BiNode* node, void *callback_context, float x, float y, bool pressed)
+static bool _on_move_finger_callback_(BiNode* node, void *callback_context, float x, float y, int64_t finger)
+{
+  mrb_state *mrb = callback_context;
+  mrb_value self = mrb_obj_value(node->userdata);
+  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_move_finger_callback_") );
+  mrb_value _x = mrb_float_value(mrb,x);
+  mrb_value _y = mrb_float_value(mrb,y);
+  mrb_value _finger = mrb_fixnum_value(finger);
+  mrb_value argv[4] = { self, _x, _y, _finger };
+
+  if( mrb_symbol_p(obj) ){
+    return mrb_bool( mrb_funcall_argv(mrb,self,mrb_symbol(obj),4,argv) );
+  }else if( mrb_type(obj) == MRB_TT_PROC ) {
+    return mrb_bool( mrb_yield_argv(mrb, obj, 4, argv) );
+  }
+  return false;
+}
+
+static bool _on_touch_callback_(BiNode* node, void *callback_context, float x, float y, int64_t finger, bool pressed)
 {
   mrb_state *mrb = callback_context;
   mrb_value self = mrb_obj_value(node->userdata);
   mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_touch_callback_") );
   mrb_value _x = mrb_float_value(mrb,x);
   mrb_value _y = mrb_float_value(mrb,y);
+  mrb_value _finger = mrb_fixnum_value(finger);
   mrb_value _pressed = mrb_bool_value(pressed);
-  mrb_value argv[4] = { self, _x, _y, _pressed };
+  mrb_value argv[5] = { self, _x, _y, _finger, _pressed };
 
   if( mrb_symbol_p(obj) ){
-    return mrb_bool( mrb_funcall_argv(mrb,self,mrb_symbol(obj),4,argv) );
+    return mrb_bool( mrb_funcall_argv(mrb,self,mrb_symbol(obj),5,argv) );
   }else if( mrb_type(obj) == MRB_TT_PROC ) {
-    return mrb_bool( mrb_yield_argv(mrb, obj, 4, argv) );
+    return mrb_bool( mrb_yield_argv(mrb, obj, 5, argv) );
   }
   return false;
 }
@@ -359,6 +378,18 @@ static mrb_value mrb_node_on_key_input(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+static mrb_value mrb_node_on_move_finger(mrb_state *mrb, mrb_value self)
+{
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
+
+    BiNode* node = DATA_PTR(self);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_on_move_finger_callback_"), obj);
+    bi_set_on_move_finger(node, _on_move_finger_callback_, mrb);
+
+    return self;
+}
+
 static mrb_value mrb_node_on_touch(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
@@ -468,6 +499,7 @@ void mrb_init_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "_on_click_", mrb_node_on_click, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_move_cursor_", mrb_node_on_move_cursor, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_key_input_", mrb_node_on_key_input, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_on_move_finger_", mrb_node_on_move_finger, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_touch_", mrb_node_on_touch, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_text_input_", mrb_node_on_text_input, MRB_ARGS_REQ(1));
 

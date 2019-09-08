@@ -47,6 +47,9 @@ class Bi
   def self.title=(title)
     @@bi.set_title title
   end
+  def self.layers
+    @@bi.layers
+  end
   def self.add_layer(layer)
     unless @@bi.layers.include? layer
       @@bi.layers << layer
@@ -131,6 +134,9 @@ class Bi::Node
   end
   def on_key_input(callback=nil,&blk)
     self._on_key_input_( callback || blk )
+  end
+  def on_move_finger(callback=nil,&blk)
+    self._on_move_finger_( callback || blk )
   end
   def on_touch(callback=nil,&blk)
     self._on_touch_( callback || blk )
