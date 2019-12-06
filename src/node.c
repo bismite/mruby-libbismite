@@ -3,6 +3,7 @@
 #include <mruby/class.h>
 #include <mruby/variable.h>
 #include <mruby/array.h>
+#include <bi/context.h>
 #include <bi/node.h>
 #include <bi/util.h>
 #include <stdlib.h>
@@ -23,9 +24,10 @@ static struct mrb_data_type const mrb_node_data_type = { "Node", node_free };
 // callback function
 //
 
-static void _update_callback_(BiNode* node, void *context, void *callback_context, double delta)
+static void _update_callback_(BiContext* context, void *userdata, double delta)
 {
-  mrb_state *mrb = callback_context;
+  BiNode *node = userdata;
+  mrb_state *mrb = context->userdata;
   mrb_value self = mrb_obj_value(node->userdata);
   mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_update_callback_") );
   mrb_value delta_value = mrb_float_value(mrb,delta);
@@ -430,7 +432,7 @@ static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
     BiNode* node = DATA_PTR(self);
     BiTimer* timer = DATA_PTR(obj);
 
-    bi_node_add_timer(node,timer);
+    bi_add_timer(&node->timers,timer);
 
     return self;
 }
@@ -444,7 +446,7 @@ static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
     BiNode* node = DATA_PTR(self);
     BiTimer* timer = DATA_PTR(obj);
 
-    bi_node_remove_timer(node,timer);
+    bi_remove_timer(&node->timers,timer);
 
     return self;
 }

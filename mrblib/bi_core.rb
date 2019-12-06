@@ -12,6 +12,7 @@ end
 class Bi
   @@bi = nil
   attr_accessor :timers, :layers
+  attr_accessor :update_callbacks
   def self.init(w,h,opts={})
     unless @bi
       fps = opts[:fps] || 0
@@ -65,6 +66,11 @@ class Bi
   def self.remove_all_layers
     @@bi.layers.each{|l| @@bi.remove_layer l }
     @@bi.layers.clear
+  end
+  def self.add_update_callback(callback=nil,&block)
+    @@bi.update_callbacks ||= []
+    @@bi.update_callbacks << (callback || block)
+    @@bi.add_update_callback(callback || block)
   end
 end
 

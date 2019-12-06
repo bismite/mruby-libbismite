@@ -27,7 +27,26 @@ void mrb_init_timer(mrb_state *mrb, struct RClass *sg);
 void mrb_init_layer(mrb_state *mrb, struct RClass *sg);
 void mrb_init_key(mrb_state *mrb, struct RClass *sg);
 
+//
+// callback function
+//
+
+static void _update_callback_(BiContext* context, void *userdata, double delta)
+{
+  mrb_state *mrb = context->userdata;
+  mrb_value obj = mrb_obj_value(userdata);
+  mrb_value delta_value = mrb_float_value(mrb,delta);
+  mrb_value argv[1] = { delta_value };
+
+  if( mrb_type(obj) == MRB_TT_PROC ) {
+    mrb_yield_argv(mrb,obj,1,argv);
+  }
+}
+
+//
 // Bi class
+//
+
 static struct mrb_data_type const mrb_bi_data_type = { "Bi", mrb_free };
 
 static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
@@ -125,6 +144,20 @@ static mrb_value mrb_bi_remove_layer(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+static mrb_value mrb_bi_add_update_callback(mrb_state *mrb, mrb_value self)
+{
+    mrb_value callback;
+    mrb_get_args(mrb, "o", &callback );
+
+    BiContext *context = DATA_PTR(self);
+    int i = context->on_update_callbacks_size;
+    context->on_update_callbacks[i].callback = _update_callback_;
+    context->on_update_callbacks[i].userdata = mrb_ptr(callback);
+    context->on_update_callbacks_size += 1;
+
+    return self;
+}
+
 void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
 {
   struct RClass *bi;
@@ -145,6 +178,8 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
 
   mrb_define_method(mrb, bi, "add_layer", mrb_bi_add_layer, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, bi, "remove_layer", mrb_bi_remove_layer, MRB_ARGS_REQ(1));
+
+  mrb_define_method(mrb, bi, "add_update_callback", mrb_bi_add_update_callback, MRB_ARGS_REQ(1));
 
 #define DONE mrb_gc_arena_restore(mrb, 0)
   mrb_init_node(mrb,bi); DONE;
