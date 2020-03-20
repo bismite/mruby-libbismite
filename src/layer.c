@@ -79,7 +79,7 @@ static mrb_value mrb_BiLayer_set_texture_image(mrb_state *mrb, mrb_value self)
 
 
 
-void mrb_init_layer(mrb_state *mrb,struct RClass *bi)
+void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
 {
   struct RClass *layer;
   layer = mrb_define_class_under(mrb, bi, "Layer", mrb->object_class);

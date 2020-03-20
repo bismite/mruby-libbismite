@@ -453,7 +453,7 @@ static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
 
 // gem
 
-void mrb_init_node(mrb_state *mrb, struct RClass *bi)
+void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
 {
   struct RClass *node;
   node = mrb_define_class_under(mrb, bi, "Node", mrb->object_class);

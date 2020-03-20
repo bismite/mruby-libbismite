@@ -20,12 +20,13 @@ int timespec_get(struct timespec *ts, int base)
 #endif
 
 // modules
-void mrb_init_node(mrb_state *mrb, struct RClass *sg);
-void mrb_init_texture_image(mrb_state *mrb, struct RClass *sg);
-void mrb_init_texture(mrb_state *mrb, struct RClass *sg);
-void mrb_init_timer(mrb_state *mrb, struct RClass *sg);
-void mrb_init_layer(mrb_state *mrb, struct RClass *sg);
-void mrb_init_key(mrb_state *mrb, struct RClass *sg);
+extern void mrb_init_bi_node(mrb_state*, struct RClass*);
+extern void mrb_init_bi_texture_image(mrb_state*, struct RClass*);
+extern void mrb_init_bi_texture(mrb_state*, struct RClass*);
+extern void mrb_init_bi_timer(mrb_state*, struct RClass*);
+extern void mrb_init_bi_layer(mrb_state*, struct RClass*);
+extern void mrb_init_bi_key(mrb_state*, struct RClass*);
+extern void mrb_init_bi_version(mrb_state*, struct RClass*);
 
 //
 // callback function
@@ -182,12 +183,13 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, bi, "add_update_callback", mrb_bi_add_update_callback, MRB_ARGS_REQ(1));
 
 #define DONE mrb_gc_arena_restore(mrb, 0)
-  mrb_init_node(mrb,bi); DONE;
-  mrb_init_texture_image(mrb,bi); DONE;
-  mrb_init_texture(mrb,bi); DONE;
-  mrb_init_timer(mrb,bi); DONE;
-  mrb_init_layer(mrb,bi); DONE;
-  mrb_init_key(mrb,bi); DONE;
+  mrb_init_bi_node(mrb,bi); DONE;
+  mrb_init_bi_texture_image(mrb,bi); DONE;
+  mrb_init_bi_texture(mrb,bi); DONE;
+  mrb_init_bi_timer(mrb,bi); DONE;
+  mrb_init_bi_layer(mrb,bi); DONE;
+  mrb_init_bi_key(mrb,bi); DONE;
+  mrb_init_bi_version(mrb,bi); DONE;
 #undef DONE
 }
 

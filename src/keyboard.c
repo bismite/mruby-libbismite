@@ -2,7 +2,7 @@
 #include <mruby/class.h>
 #include <bi/bi_sdl.h>
 
-void mrb_init_key(mrb_state *mrb, struct RClass *bi)
+void mrb_init_bi_key(mrb_state *mrb, struct RClass *bi)
 {
   struct RClass *keycode = mrb_define_module_under(mrb,bi,"KeyCode");
   struct RClass *scancode = mrb_define_module_under(mrb,bi,"ScanCode");

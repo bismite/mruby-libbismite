@@ -71,7 +71,7 @@ static mrb_value mrb_texture_image_h(mrb_state *mrb, mrb_value self)
     return mrb_fixnum_value(img->h);
 }
 
-void mrb_init_texture_image(mrb_state *mrb,struct RClass *bi)
+void mrb_init_bi_texture_image(mrb_state *mrb,struct RClass *bi)
 {
   struct RClass *img;
   img = mrb_define_class_under(mrb, bi, "TextureImage", mrb->object_class);

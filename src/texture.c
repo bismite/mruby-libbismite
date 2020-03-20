@@ -51,7 +51,7 @@ _SET_(BiTexture,w,mrb_int,i);
 _GET_(BiTexture,h,bi_mrb_fixnum_value);
 _SET_(BiTexture,h,mrb_int,i);
 
-void mrb_init_texture(mrb_state *mrb,struct RClass *bi)
+void mrb_init_bi_texture(mrb_state *mrb,struct RClass *bi)
 {
   struct RClass *texture;
   texture = mrb_define_class_under(mrb, bi, "Texture", mrb->object_class);

@@ -65,7 +65,7 @@ static mrb_value mrb_timer_initialize(mrb_state *mrb, mrb_value self)
     return self;
 }
 
-void mrb_init_timer(mrb_state *mrb,struct RClass *bi)
+void mrb_init_bi_timer(mrb_state *mrb,struct RClass *bi)
 {
   struct RClass *timer;
   timer = mrb_define_class_under(mrb, bi, "Timer", mrb->object_class);
