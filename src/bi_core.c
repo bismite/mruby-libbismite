@@ -159,6 +159,23 @@ static mrb_value mrb_bi_add_update_callback(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+static mrb_value mrb_bi_messagebox(mrb_state *mrb, mrb_value self)
+{
+    mrb_value title,message;
+    mrb_sym dialog_type;
+    mrb_get_args(mrb, "SSn",  &title, &message, &dialog_type );
+    BiContext *context = DATA_PTR(self);
+    if(dialog_type == mrb_intern_lit(mrb,"error")){
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
+    }
+    else if(dialog_type==mrb_intern_lit(mrb,"warning")){
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
+    }else{
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
+    }
+    return self;
+}
+
 void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
 {
   struct RClass *bi;
@@ -181,6 +198,8 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, bi, "remove_layer", mrb_bi_remove_layer, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, bi, "add_update_callback", mrb_bi_add_update_callback, MRB_ARGS_REQ(1));
+
+  mrb_define_method(mrb, bi, "messagebox", mrb_bi_messagebox, MRB_ARGS_REQ(3));
 
 #define DONE mrb_gc_arena_restore(mrb, 0)
   mrb_init_bi_node(mrb,bi); DONE;

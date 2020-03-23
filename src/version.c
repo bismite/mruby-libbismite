@@ -24,6 +24,16 @@ static mrb_value mrb_bi_version_gl_vendor(mrb_state *mrb, mrb_value self)
     return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_VENDOR));
 }
 
+static mrb_value mrb_bi_version_gl_extensions(mrb_state *mrb, mrb_value self)
+{
+    return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_EXTENSIONS));
+}
+
+static mrb_value mrb_bi_version_glew_version(mrb_state *mrb, mrb_value self)
+{
+    return mrb_str_new_cstr(mrb, (const char*)glewGetString(GLEW_VERSION));
+}
+
 void mrb_init_bi_version(mrb_state *mrb, struct RClass *bi)
 {
   struct RClass *version = mrb_define_module_under(mrb,bi,"Version");
@@ -78,4 +88,6 @@ void mrb_init_bi_version(mrb_state *mrb, struct RClass *bi)
   mrb_define_class_method(mrb, version, "gl_renderer", mrb_bi_version_gl_renderer, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, version, "gl_shading_language_version", mrb_bi_version_gl_shading_language_version, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, version, "gl_vendor", mrb_bi_version_gl_vendor, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, version, "gl_extensions", mrb_bi_version_gl_extensions, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, version, "glew_version", mrb_bi_version_glew_version, MRB_ARGS_NONE());
 }

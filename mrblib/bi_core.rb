@@ -72,6 +72,11 @@ class Bi
     @@bi.update_callbacks << (callback || block)
     @@bi.add_update_callback(callback || block)
   end
+
+  def self.messagebox(title,message,dialog_type=:information)
+    @@bi.messagebox title, message,dialog_type
+  end
+
 end
 
 class Bi::Texture
@@ -201,7 +206,7 @@ module Bi::Version
   end
 
   def self.mruby_bicore
-    "0.4.0"
+    "0.5.0"
   end
 
   def self.emscripten
