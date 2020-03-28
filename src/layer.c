@@ -120,8 +120,9 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   mrb_define_const(mrb, layer, "GL_CONSTANT_ALPHA", mrb_fixnum_value(GL_CONSTANT_ALPHA));
   mrb_define_const(mrb, layer, "GL_ONE_MINUS_CONSTANT_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_CONSTANT_ALPHA));
   mrb_define_const(mrb, layer, "GL_SRC_ALPHA_SATURATE", mrb_fixnum_value(GL_SRC_ALPHA_SATURATE));
-  mrb_define_const(mrb, layer, "GL_SRC1_COLOR", mrb_fixnum_value(GL_SRC1_COLOR));
-  mrb_define_const(mrb, layer, "GL_ONE_MINUS_SRC1_COLOR", mrb_fixnum_value(GL_ONE_MINUS_SRC1_COLOR));
-  mrb_define_const(mrb, layer, "GL_SRC1_ALPHA", mrb_fixnum_value(GL_SRC1_ALPHA));
-  mrb_define_const(mrb, layer, "GL_ONE_MINUS_SRC1_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_SRC1_ALPHA));
+  // not supported in OpenGL ES
+  // mrb_define_const(mrb, layer, "GL_SRC1_COLOR", mrb_fixnum_value(GL_SRC1_COLOR));
+  // mrb_define_const(mrb, layer, "GL_ONE_MINUS_SRC1_COLOR", mrb_fixnum_value(GL_ONE_MINUS_SRC1_COLOR));
+  // mrb_define_const(mrb, layer, "GL_SRC1_ALPHA", mrb_fixnum_value(GL_SRC1_ALPHA));
+  // mrb_define_const(mrb, layer, "GL_ONE_MINUS_SRC1_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_SRC1_ALPHA));
 }

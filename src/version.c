@@ -1,8 +1,7 @@
 #include <mruby.h>
 #include <mruby/class.h>
 #include <bi/context.h>
-#include <GL/glew.h>
-
+#include <bi/bi_gl.h>
 
 static mrb_value mrb_bi_version_gl_version(mrb_state *mrb, mrb_value self)
 {
@@ -31,7 +30,11 @@ static mrb_value mrb_bi_version_gl_extensions(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_bi_version_glew_version(mrb_state *mrb, mrb_value self)
 {
+#ifdef __EMSCRIPTEN__
+    return mrb_nil_value();
+#else
     return mrb_str_new_cstr(mrb, (const char*)glewGetString(GLEW_VERSION));
+#endif
 }
 
 void mrb_init_bi_version(mrb_state *mrb, struct RClass *bi)
