@@ -11,14 +11,16 @@ end
 
 class Bi
   @@bi = nil
+  attr_accessor :title
   attr_accessor :timers, :layers
   attr_accessor :update_callbacks
   def self.init(w,h,opts={})
-    unless @bi
+    unless @@bi
       fps = opts[:fps] || 0
       title = opts[:title] || ""
       highdpi = opts[:highdpi] || false
       @@bi = Bi.new(w,h,fps,highdpi,title)
+      @@bi.title = title
       @@bi.layers = []
       @@bi.timers = []
     end
@@ -45,7 +47,11 @@ class Bi
   def self.debug
     @@bi.debug
   end
+  def self.title
+    @@bi.title
+  end
   def self.title=(title)
+    @@bi.title = title
     @@bi.set_title title
   end
   def self.layers
@@ -80,11 +86,21 @@ class Bi
 end
 
 class Bi::Texture
-  attr_reader :texture_image
+  def to_sprite(x=nil,y=nil,w=nil,h=nil)
+    if x and y and w and h
+      Bi::Sprite.new Bi::TextureMapping.new(self,x,y,w,h)
+    else
+      Bi::Sprite.new Bi::TextureMapping.new(self,0,0,self.w,self.h)
+    end
+  end
+end
+
+class Bi::TextureMapping
+  attr_reader :texture
 end
 
 class Bi::Node
-  attr_reader :texture
+  attr_reader :texture_mapping
   attr_accessor :parent
 
   # NW   N  NE
@@ -105,9 +121,9 @@ class Bi::Node
   def anchor=(anchor)
     self.anchor_x, self.anchor_y = ANCHOR_ALIAS[anchor]
   end
-  def texture=(texture)
-    @texture = texture
-    self.set_texture @texture
+  def texture_mapping=(texture_mapping)
+    @texture_mapping = texture_mapping
+    self.set_texture_mapping @texture_mapping
   end
   def add(node)
     @children ||= []
@@ -173,11 +189,11 @@ class Bi::Node
 end
 
 class Bi::Sprite < Bi::Node
-  def initialize(texture)
+  def initialize(texture_mapping)
     super
-    self.texture = texture
+    self.texture_mapping = texture_mapping
     self.set_position 0, 0
-    self.set_size texture.w, texture.h
+    self.set_size texture_mapping.w, texture_mapping.h
     self.set_color 0xff,0xff,0xff,0xff
   end
 end

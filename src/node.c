@@ -280,13 +280,13 @@ static mrb_value mrb_node_transform_local(mrb_state *mrb, mrb_value self)
 // visual
 //
 
-static mrb_value mrb_node_set_texture(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_node_set_texture_mapping(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
     mrb_get_args(mrb, "o", &obj );
 
     BiNode* node = DATA_PTR(self);
-    node->texture = DATA_PTR(obj);
+    node->texture_mapping = DATA_PTR(obj);
 
     return self;
 }
@@ -490,7 +490,7 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "transform_local", mrb_node_transform_local, MRB_ARGS_REQ(2));
 
   // visual
-  mrb_define_method(mrb, node, "set_texture", mrb_node_set_texture, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "set_texture_mapping", mrb_node_set_texture_mapping, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "set_color", mrb_node_set_color, MRB_ARGS_REQ(4));
   mrb_define_method(mrb, node, "set_alpha", mrb_node_set_alpha, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "visible=", mrb_node_set_visible, MRB_ARGS_REQ(1));
