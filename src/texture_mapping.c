@@ -57,7 +57,7 @@ void mrb_init_bi_texture_mapping(mrb_state *mrb,struct RClass *bi)
   mapping = mrb_define_class_under(mrb, bi, "TextureMapping", mrb->object_class);
   MRB_SET_INSTANCE_TT(mapping, MRB_TT_DATA);
 
-  mrb_define_method(mrb, mapping, "initialize", mrb_texture_mapping_initialize, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mapping, "initialize", mrb_texture_mapping_initialize, MRB_ARGS_REQ(5)); // texture,x,y,w,h
   mrb_define_method(mrb, mapping, "set_texture", mrb_texture_set_texture, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, mapping, "w", mrb_BiTextureMapping_get_w, MRB_ARGS_NONE());

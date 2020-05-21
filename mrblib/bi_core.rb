@@ -97,6 +97,9 @@ end
 
 class Bi::TextureMapping
   attr_reader :texture
+  def to_sprite
+    Bi::Sprite.new self
+  end
 end
 
 class Bi::Node
