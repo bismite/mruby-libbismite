@@ -40,6 +40,8 @@ _GET_(BiLayer,blend_src,bi_mrb_fixnum_value);
 _SET_(BiLayer,blend_src,mrb_int,i);
 _GET_(BiLayer,blend_dst,bi_mrb_fixnum_value);
 _SET_(BiLayer,blend_dst,mrb_int,i);
+_GET_(BiLayer,z_order,bi_mrb_fixnum_value);
+_SET_(BiLayer,z_order,mrb_int,i);
 
 static mrb_value mrb_BiLayer_set_root(mrb_state *mrb, mrb_value self)
 {
@@ -97,6 +99,8 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, layer, "blend_src=",mrb_BiLayer_set_blend_src, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer, "blend_dst", mrb_BiLayer_get_blend_dst, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "blend_dst=",mrb_BiLayer_set_blend_dst, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, layer, "z_order", mrb_BiLayer_get_z_order, MRB_ARGS_NONE());
+  mrb_define_method(mrb, layer, "z_order=",mrb_BiLayer_set_z_order, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, layer, "root", mrb_BiLayer_get_root, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "root=",mrb_BiLayer_set_root, MRB_ARGS_REQ(1));
