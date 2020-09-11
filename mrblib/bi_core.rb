@@ -35,9 +35,6 @@ class Bi
   def self.now
     @@bi.now
   end
-  def self.fps
-    @@bi.fps
-  end
   def self.start_run_loop
     @@bi.start_run_loop
   end
@@ -82,7 +79,12 @@ class Bi
   def self.messagebox(title,message,dialog_type=:information)
     @@bi.messagebox title, message,dialog_type
   end
-
+  def self.profile
+    @@bi.profile
+  end
+  def profile
+    @profile ||= Bi::Profile.new self
+  end
 end
 
 class Bi::Texture

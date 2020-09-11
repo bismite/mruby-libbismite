@@ -20,6 +20,7 @@ int timespec_get(struct timespec *ts, int base)
 #endif
 
 // modules
+extern void mrb_init_bi_profile(mrb_state*, struct RClass*);
 extern void mrb_init_bi_node(mrb_state*, struct RClass*);
 extern void mrb_init_bi_texture(mrb_state*, struct RClass*);
 extern void mrb_init_bi_texture_mapping(mrb_state*, struct RClass*);
@@ -69,16 +70,7 @@ static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_bi_now(mrb_state *mrb, mrb_value self)
 {
-    // XXX: error check
-    BiContext* c = DATA_PTR(self);
-    return mrb_float_value(mrb,c->profile.frame_start_at);
-}
-
-static mrb_value mrb_bi_fps(mrb_state *mrb, mrb_value self)
-{
-    // XXX: error check
-    BiContext* c = DATA_PTR(self);
-    return mrb_fixnum_value(c->profile.current_fps);
+    return mrb_fixnum_value( bi_get_now() );
 }
 
 static mrb_value mrb_bi_start_run_loop(mrb_state *mrb, mrb_value self)
@@ -187,7 +179,6 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, bi, "w", mrb_BiContext_get_w, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "h", mrb_BiContext_get_h, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "now", mrb_bi_now, MRB_ARGS_NONE());
-  mrb_define_method(mrb, bi, "fps", mrb_bi_fps, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "start_run_loop", mrb_bi_start_run_loop, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "debug=", mrb_BiContext_set_debug, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, bi, "debug", mrb_BiContext_get_debug, MRB_ARGS_NONE());
@@ -202,6 +193,7 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, bi, "messagebox", mrb_bi_messagebox, MRB_ARGS_REQ(3));
 
 #define DONE mrb_gc_arena_restore(mrb, 0)
+  mrb_init_bi_profile(mrb,bi); DONE;
   mrb_init_bi_node(mrb,bi); DONE;
   mrb_init_bi_texture(mrb,bi); DONE;
   mrb_init_bi_texture_mapping(mrb,bi); DONE;
