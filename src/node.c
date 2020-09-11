@@ -24,19 +24,18 @@ static struct mrb_data_type const mrb_node_data_type = { "Node", node_free };
 // callback function
 //
 
-static void _update_callback_(BiContext* context, void *userdata, double delta)
+static void _update_callback_(BiContext* context, void *userdata)
 {
   BiNode *node = userdata;
   mrb_state *mrb = context->userdata;
   mrb_value self = mrb_obj_value(node->userdata);
   mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_update_callback_") );
-  mrb_value delta_value = mrb_float_value(mrb,delta);
-  mrb_value argv[2] = { self, delta_value };
+  mrb_value argv[1] = {self};
 
   if( mrb_symbol_p(obj) ){
-    mrb_funcall_argv(mrb,self,mrb_symbol(obj),2,argv);
+    mrb_funcall_argv(mrb,self,mrb_symbol(obj),1,argv);
   }else if( mrb_type(obj) == MRB_TT_PROC ) {
-    mrb_yield_argv(mrb,obj,2,argv);
+    mrb_yield_argv(mrb,obj,1,argv);
   }
 }
 

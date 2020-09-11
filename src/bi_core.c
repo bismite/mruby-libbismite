@@ -33,13 +33,11 @@ extern void mrb_init_bi_version(mrb_state*, struct RClass*);
 // callback function
 //
 
-static void _update_callback_(BiContext* context, void *userdata, double delta)
+static void _update_callback_(BiContext* context, void *userdata)
 {
   mrb_state *mrb = context->userdata;
   mrb_value obj = mrb_obj_value(userdata);
-  mrb_value delta_value = mrb_float_value(mrb,delta);
-  mrb_value argv[1] = { delta_value };
-
+  mrb_value argv[1] = { mrb_nil_value() };
   if( mrb_type(obj) == MRB_TT_PROC ) {
     mrb_yield_argv(mrb,obj,1,argv);
   }
