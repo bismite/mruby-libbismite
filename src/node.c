@@ -207,9 +207,11 @@ static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
 
 _GET_(BiNode,x,bi_mrb_fixnum_value);
 _GET_(BiNode,y,bi_mrb_fixnum_value);
+_GET_(BiNode,z,bi_mrb_fixnum_value);
 
 _SET_FUNC_(BiNode,x,mrb_int,i,bi_node_set_x);
 _SET_FUNC_(BiNode,y,mrb_int,i,bi_node_set_y);
+_SET_FUNC_(BiNode,z,mrb_int,i,bi_node_set_z);
 
 static mrb_value mrb_node_set_position(mrb_state *mrb, mrb_value self)
 {
@@ -467,8 +469,10 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   // geometry
   mrb_define_method(mrb, node, "x", mrb_BiNode_get_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "y", mrb_BiNode_get_y, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "z", mrb_BiNode_get_z, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "x=", mrb_BiNode_set_x, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "y=", mrb_BiNode_set_y, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "z=", mrb_BiNode_set_z, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "set_position", mrb_node_set_position, MRB_ARGS_REQ(2));
   mrb_define_method(mrb, node, "w", mrb_BiNode_get_w, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "h", mrb_BiNode_get_h, MRB_ARGS_NONE());
