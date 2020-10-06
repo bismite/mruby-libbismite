@@ -15,6 +15,7 @@ static void node_free(mrb_state *mrb, void *p)
   BiNode* node = p;
   if (NULL != node) {
     if(node->children != NULL) free(node->children);
+    free(node->timers.timers);
     mrb_free(mrb, node);
   }
 }
@@ -416,9 +417,6 @@ static mrb_value mrb_node_on_text_input(mrb_state *mrb, mrb_value self)
 
     return self;
 }
-
-// Timer
-
 
 //
 // Timer

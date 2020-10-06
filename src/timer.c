@@ -7,7 +7,6 @@
 
 typedef struct {
   mrb_state *mrb;
-  mrb_value node;
   mrb_value timer;
 } BiTimerContainer;
 
@@ -15,14 +14,14 @@ typedef struct {
 // Timer callback
 //
 
-static bool _timer_callback_(double now,BiTimer* timer)
+static bool _timer_callback_(int64_t now,BiTimer* timer)
 {
   BiTimerContainer *container = timer->userdata;
   mrb_state *mrb = container->mrb;
-  mrb_value block = mrb_iv_get(mrb, container->timer, mrb_intern_cstr(mrb,"@_callback_") );
-  mrb_value now_value = mrb_float_value(mrb,now);
-  mrb_value argv[3] = { container->node, now_value, container->timer };
-  return mrb_bool( mrb_yield_argv(mrb, block, 3, argv) );
+  mrb_value block = mrb_iv_get(mrb, container->timer, mrb_intern_cstr(mrb,"@callback") );
+  mrb_value now_value = mrb_fixnum_value(now);
+  mrb_value argv[2] = { container->timer, now_value };
+  return mrb_bool( mrb_yield_argv(mrb, block, 2, argv) );
 }
 
 //
@@ -41,24 +40,24 @@ static struct mrb_data_type const mrb_timer_data_type = { "Timer", mrb_timer_fre
 
 static mrb_value mrb_timer_initialize(mrb_state *mrb, mrb_value self)
 {
-    mrb_value node_obj;
-    mrb_float interval;
+    mrb_value owner;
+    mrb_int interval;
     mrb_int repeat;
     mrb_value callback;
     BiNode* node;
     BiTimer* timer;
     BiTimerContainer* container;
 
-    mrb_get_args(mrb, "ofi&", &node_obj, &interval, &repeat, &callback );
+    mrb_get_args(mrb, "oii&", &owner, &interval, &repeat, &callback );
 
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_callback_"), callback);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@callback"), callback);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@owner"), owner);
 
-    node = DATA_PTR(node_obj);
+    node = DATA_PTR(owner);
     timer = mrb_malloc(mrb,sizeof(BiTimer));
     container = mrb_malloc(mrb,sizeof(BiTimerContainer));
     container->mrb = mrb;
     container->timer = self;
-    container->node = node_obj;
     bi_timer_init(timer,_timer_callback_,interval,repeat, container );
     mrb_data_init(self, timer, &mrb_timer_data_type);
 

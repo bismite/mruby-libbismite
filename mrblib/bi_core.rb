@@ -13,7 +13,7 @@ class Bi
   @@bi = nil
   attr_accessor :title
   attr_accessor :timers, :layers
-  attr_accessor :update_callbacks
+
   def self.init(w,h,opts={})
     unless @@bi
       fps = opts[:fps] || 0
@@ -51,6 +51,8 @@ class Bi
     @@bi.title = title
     @@bi.set_title title
   end
+
+  # Layer
   def self.layers
     @@bi.layers
   end
@@ -70,10 +72,20 @@ class Bi
     @@bi.layers.each{|l| @@bi.remove_layer l }
     @@bi.layers.clear
   end
-  def self.add_update_callback(callback=nil,&block)
-    @@bi.update_callbacks ||= []
-    @@bi.update_callbacks << (callback || block)
-    @@bi.add_update_callback(callback || block)
+
+  # Timer
+  def self.add_timer(duration,repeat,&callback)
+    @@bi.timers ||= []
+    timer = Bi::Timer.new @@bi, duration, repeat, &callback
+    @@bi.timers << timer
+    @@bi._add_timer timer
+    timer
+  end
+  def self.remove_timer(timer)
+    @@bi.timers ||= []
+    @@bi.timers.delete timer
+    @@bi._remove_timer timer
+    timer
   end
 
   def self.messagebox(title,message,dialog_type=:information)
@@ -144,13 +156,6 @@ class Bi::Node
   def remove_from_parent
     self.parent&.remove self
   end
-  def add_timer(interval,repeat,&block)
-    timer = Bi::Timer.new(self,interval,repeat,&block)
-    Bi.add_timer( timer )
-  end
-  def remove_timer(timer)
-    Bi.remove_timer timer
-  end
 
   #
   # callbacks
@@ -193,6 +198,11 @@ class Bi::Node
   end
 end
 
+class Bi::Timer
+  attr_reader :callback
+  attr_reader :owner
+end
+
 class Bi::Sprite < Bi::Node
   def initialize(texture_mapping)
     super
@@ -227,7 +237,7 @@ module Bi::Version
   end
 
   def self.mruby_bicore
-    "0.7.0"
+    "0.8.0"
   end
 
   def self.emscripten

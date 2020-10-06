@@ -30,20 +30,6 @@ extern void mrb_init_bi_key(mrb_state*, struct RClass*);
 extern void mrb_init_bi_version(mrb_state*, struct RClass*);
 
 //
-// callback function
-//
-
-static void _update_callback_(BiContext* context, void *userdata)
-{
-  mrb_state *mrb = context->userdata;
-  mrb_value obj = mrb_obj_value(userdata);
-  mrb_value argv[1] = { mrb_nil_value() };
-  if( mrb_type(obj) == MRB_TT_PROC ) {
-    mrb_yield_argv(mrb,obj,1,argv);
-  }
-}
-
-//
 // Bi class
 //
 
@@ -135,20 +121,33 @@ static mrb_value mrb_bi_remove_layer(mrb_state *mrb, mrb_value self)
     return self;
 }
 
-static mrb_value mrb_bi_add_update_callback(mrb_state *mrb, mrb_value self)
+//
+// Timer
+//
+
+static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
 {
-    mrb_value callback;
-    mrb_get_args(mrb, "o", &callback );
-
-    BiContext *context = DATA_PTR(self);
-    int i = context->on_update_callbacks_size;
-    context->on_update_callbacks[i].callback = _update_callback_;
-    context->on_update_callbacks[i].userdata = mrb_ptr(callback);
-    context->on_update_callbacks_size += 1;
-
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
+    BiContext* context = DATA_PTR(self);
+    BiTimer* timer = DATA_PTR(obj);
+    bi_add_timer(&context->timers,timer);
     return self;
 }
 
+static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
+{
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
+    BiContext* context = DATA_PTR(self);
+    BiTimer* timer = DATA_PTR(obj);
+    bi_remove_timer(&context->timers,timer);
+    return self;
+}
+
+//
+// misc
+//
 static mrb_value mrb_bi_messagebox(mrb_state *mrb, mrb_value self)
 {
     mrb_value title,message;
@@ -166,6 +165,9 @@ static mrb_value mrb_bi_messagebox(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+//
+// init
+//
 void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
 {
   struct RClass *bi;
@@ -186,7 +188,8 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, bi, "add_layer", mrb_bi_add_layer, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, bi, "remove_layer", mrb_bi_remove_layer, MRB_ARGS_REQ(1));
 
-  mrb_define_method(mrb, bi, "add_update_callback", mrb_bi_add_update_callback, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, bi, "_add_timer", mrb_bi_add_timer, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, bi, "_remove_timer", mrb_bi_remove_timer, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, bi, "messagebox", mrb_bi_messagebox, MRB_ARGS_REQ(3));
 
