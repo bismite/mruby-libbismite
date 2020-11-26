@@ -15,10 +15,11 @@ static mrb_value mrb_texture_mapping_initialize(mrb_state *mrb, mrb_value self)
     mrb_get_args(mrb, "oiiii", &obj, &x,&y,&w,&h );
 
     BiTextureMapping* mapping = mrb_malloc(mrb,sizeof(BiTextureMapping));
+    bi_texture_mapping_init(mapping);
 
     // XXX: check type
     mapping->texture = DATA_PTR(obj);
-    bi_set_texture_mapping(mapping,x,y,w,h);
+    bi_texture_mapping_set_bound(mapping,x,y,w,h);
 
     mrb_data_init(self, mapping, &mrb_texture_mapping_data_type);
 

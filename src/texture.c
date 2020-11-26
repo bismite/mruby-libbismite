@@ -13,28 +13,22 @@ static struct mrb_data_type const mrb_texture_data_type = { "Texture", mrb_free 
 
 mrb_value create_bi_texture(mrb_state *mrb, BiTexture* texture)
 {
-    BiTexture *new_texture = mrb_malloc(mrb,sizeof(BiTexture));
-    *new_texture = *texture;
-
     struct RClass *bi = mrb_class_get(mrb, "Bi");
     struct RClass *klass = mrb_class_get_under(mrb,bi,"Texture");
-
-    struct RData *data = mrb_data_object_alloc(mrb,klass,new_texture,&mrb_texture_data_type);
+    struct RData *data = mrb_data_object_alloc(mrb,klass,texture,&mrb_texture_data_type);
     mrb_value tmp = mrb_obj_value(data);
-
     return tmp;
 }
 
-mrb_value create_bi_texture_from_buffer(mrb_state *mrb, void* buffer, int size, bool antialias)
+mrb_value create_bi_texture_from_memory(mrb_state *mrb, void* buffer, int size, bool antialias)
 {
-    BiTexture texture;
-
-    if( ! bi_create_texture( buffer, size, &texture, antialias ) ) {
+    BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
+    bi_texture_init(texture);
+    if( ! bi_texture_load_from_memory(texture, buffer, size, antialias ) ) {
       // XXX: raise!
       mrb_raise(mrb, E_RUNTIME_ERROR, "texture load error.");
     }
-
-    return create_bi_texture(mrb,&texture);
+    return create_bi_texture(mrb,texture);
 }
 
 //
@@ -48,8 +42,8 @@ static mrb_value mrb_texture_initialize(mrb_state *mrb, mrb_value self)
     mrb_get_args(mrb, "Sb", &image_name, &antialias );
 
     BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-
-    if( bi_load_texture( mrb_string_value_cstr(mrb,&image_name), texture, antialias ) ) {
+    bi_texture_init(texture);
+    if( bi_texture_load_from_file(texture, mrb_string_value_cstr(mrb,&image_name), antialias ) ) {
       mrb_data_init(self, texture, &mrb_texture_data_type);
     }else{
       // XXX: raise!
