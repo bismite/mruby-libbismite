@@ -2,6 +2,7 @@
 #include <mruby/data.h>
 #include <mruby/class.h>
 #include <mruby/string.h>
+#include <mruby/variable.h>
 #include <bi/context.h>
 #include <bi/main_loop.h>
 #include <time.h>
@@ -123,6 +124,48 @@ static mrb_value mrb_bi_remove_layer(mrb_state *mrb, mrb_value self)
 }
 
 //
+// shader
+//
+
+static mrb_value mrb_bi_set_shader(mrb_state *mrb, mrb_value self)
+{
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
+
+    BiContext* c = DATA_PTR(self);
+    struct RClass *bi = mrb_class_get(mrb,"Bi");
+    struct RClass *shader_class = mrb_class_get_under(mrb,bi,"Shader");
+    if( mrb_obj_is_kind_of(mrb, obj, shader_class) ) {
+      BiShader* shader = DATA_PTR(obj);
+      c->post_processing.shader = shader;
+      mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), obj);
+    }else{
+      c->post_processing.shader = NULL;
+      mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), mrb_nil_value() );
+    }
+
+    return self;
+}
+
+static mrb_value mrb_bi_get_shader(mrb_state *mrb, mrb_value self)
+{
+    return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@shader"));
+}
+
+static mrb_value mrb_bi_set_optional_shader_attributes(mrb_state *mrb, mrb_value self)
+{
+    mrb_int index;
+    mrb_float value;
+    mrb_get_args(mrb, "if", &index, &value );
+    BiContext* c = DATA_PTR(self);
+    if( 0 <= index && index < 4 ) {
+      c->post_processing.optional_shader_attributes[index] = value;
+    }
+    return self;
+}
+
+
+//
 // Timer
 //
 
@@ -188,6 +231,10 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
 
   mrb_define_method(mrb, bi, "add_layer", mrb_bi_add_layer, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, bi, "remove_layer", mrb_bi_remove_layer, MRB_ARGS_REQ(1));
+
+  mrb_define_method(mrb, bi, "shader", mrb_bi_get_shader, MRB_ARGS_NONE());
+  mrb_define_method(mrb, bi, "shader=", mrb_bi_set_shader, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, bi, "set_optional_shader_attributes",mrb_bi_set_optional_shader_attributes, MRB_ARGS_REQ(2)); // index,value
 
   mrb_define_method(mrb, bi, "_add_timer", mrb_bi_add_timer, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, bi, "_remove_timer", mrb_bi_remove_timer, MRB_ARGS_REQ(1));

@@ -73,6 +73,17 @@ class Bi
     @@bi.layers.clear
   end
 
+  # shader
+  def self.shader
+    @@bi.shader
+  end
+  def self.shader=(shader)
+    @@bi.shader=shader
+  end
+  def self.set_optional_shader_attributes(index,value)
+    @@bi.set_optional_shader_attributes(index,value)
+  end
+
   # Timer
   def self.add_timer(duration,repeat,&callback)
     @@bi.timers ||= []
