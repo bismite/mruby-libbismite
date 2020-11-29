@@ -63,6 +63,43 @@ static mrb_value mrb_BiLayer_get_root(mrb_state *mrb, mrb_value self)
     return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@root"));
 }
 
+static mrb_value mrb_BiLayer_set_shader(mrb_state *mrb, mrb_value self)
+{
+    mrb_value obj;
+    mrb_get_args(mrb, "o", &obj );
+
+    BiLayer* layer = DATA_PTR(self);
+    struct RClass *bi = mrb_class_get(mrb,"Bi");
+    struct RClass *shader_class = mrb_class_get_under(mrb,bi,"Shader");
+    if( mrb_obj_is_kind_of(mrb, obj, shader_class) ) {
+      BiShader* shader = DATA_PTR(obj);
+      layer->shader = shader;
+      mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), obj);
+    }else{
+      layer->shader = NULL;
+      mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), mrb_nil_value() );
+    }
+
+    return self;
+}
+
+static mrb_value mrb_BiLayer_get_shader(mrb_state *mrb, mrb_value self)
+{
+    return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@shader"));
+}
+
+static mrb_value mrb_BiLayer_set_optional_shader_attributes(mrb_state *mrb, mrb_value self)
+{
+    mrb_int index;
+    mrb_float value;
+    mrb_get_args(mrb, "if", &index, &value );
+    BiLayer* layer = DATA_PTR(self);
+    if( 0 <= index && index < 4 ) {
+      layer->optional_shader_attributes[index] = value;
+    }
+    return self;
+}
+
 static mrb_value mrb_BiLayer_set_texture(mrb_state *mrb, mrb_value self)
 {
     mrb_int index;
@@ -79,8 +116,7 @@ static mrb_value mrb_BiLayer_set_texture(mrb_state *mrb, mrb_value self)
     return self;
 }
 
-
-
+//
 void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
 {
   struct RClass *layer;
@@ -104,6 +140,10 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
 
   mrb_define_method(mrb, layer, "root", mrb_BiLayer_get_root, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "root=",mrb_BiLayer_set_root, MRB_ARGS_REQ(1));
+
+  mrb_define_method(mrb, layer, "shader", mrb_BiLayer_get_shader, MRB_ARGS_NONE());
+  mrb_define_method(mrb, layer, "shader=",mrb_BiLayer_set_shader, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, layer, "set_optional_shader_attributes",mrb_BiLayer_set_optional_shader_attributes, MRB_ARGS_REQ(2)); // index,value
 
   mrb_define_method(mrb, layer, "set_texture",mrb_BiLayer_set_texture, MRB_ARGS_REQ(2));
 

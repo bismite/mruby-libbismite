@@ -26,6 +26,7 @@ extern void mrb_init_bi_texture(mrb_state*, struct RClass*);
 extern void mrb_init_bi_texture_mapping(mrb_state*, struct RClass*);
 extern void mrb_init_bi_timer(mrb_state*, struct RClass*);
 extern void mrb_init_bi_layer(mrb_state*, struct RClass*);
+extern void mrb_init_bi_shader(mrb_state*, struct RClass*);
 extern void mrb_init_bi_key(mrb_state*, struct RClass*);
 extern void mrb_init_bi_version(mrb_state*, struct RClass*);
 
@@ -200,6 +201,7 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   mrb_init_bi_texture_mapping(mrb,bi); DONE;
   mrb_init_bi_timer(mrb,bi); DONE;
   mrb_init_bi_layer(mrb,bi); DONE;
+  mrb_init_bi_shader(mrb,bi); DONE;
   mrb_init_bi_key(mrb,bi); DONE;
   mrb_init_bi_version(mrb,bi); DONE;
 #undef DONE
