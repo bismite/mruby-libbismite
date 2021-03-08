@@ -31,6 +31,17 @@ mrb_value create_bi_texture_from_memory(mrb_state *mrb, void* buffer, int size, 
     return create_bi_texture(mrb,texture);
 }
 
+mrb_value create_bi_texture_from_pixels(mrb_state *mrb, int w, int h, void* pixels, bool antialias)
+{
+    BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
+    bi_texture_init(texture);
+    if( ! bi_texture_load_from_pixels( texture, w, h, pixels, antialias ) ) {
+      // XXX: raise!
+      mrb_raise(mrb, E_RUNTIME_ERROR, "texture load error.");
+    }
+    return create_bi_texture(mrb,texture);
+}
+
 //
 // instance methods
 //
