@@ -30,10 +30,10 @@ static mrb_value mrb_bi_version_gl_extensions(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_bi_version_glew_version(mrb_state *mrb, mrb_value self)
 {
-#ifdef __EMSCRIPTEN__
-    return mrb_nil_value();
+#ifdef GLEW_VERSION
+  return mrb_str_new_cstr(mrb, (const char*)glewGetString(GLEW_VERSION));
 #else
-    return mrb_str_new_cstr(mrb, (const char*)glewGetString(GLEW_VERSION));
+  return mrb_nil_value();
 #endif
 }
 
