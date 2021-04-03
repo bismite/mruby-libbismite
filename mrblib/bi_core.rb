@@ -153,17 +153,6 @@ class Bi::Node
     @texture_mapping = texture_mapping
     self.set_texture_mapping @texture_mapping
   end
-  def add(node)
-    @children ||= []
-    @children << node
-    node.parent = self
-    self.add_child(node)
-  end
-  def remove(node)
-    @children.delete node
-    node.parent = nil
-    self.remove_child node
-  end
   def remove_from_parent
     self.parent&.remove self
   end

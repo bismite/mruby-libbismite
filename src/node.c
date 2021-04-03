@@ -1,6 +1,7 @@
 #include <mruby.h>
 #include <mruby/data.h>
 #include <mruby/class.h>
+#include <mruby/presym.h>
 #include <mruby/variable.h>
 #include <mruby/array.h>
 #include <bi/context.h>
@@ -172,15 +173,30 @@ static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
 // scene graph
 //
 
+static mrb_value _iv_children_(mrb_state *mrb, mrb_value self)
+{
+  mrb_sym iv_name = MRB_IVSYM(_children_);
+  mrb_value v = mrb_iv_get(mrb,self,iv_name);
+  if( mrb_nil_p(v) ) {
+    v = mrb_ary_new(mrb);
+    mrb_iv_set(mrb,self,iv_name,v);
+  }
+  return v;
+}
+
 static mrb_value mrb_node_add_child(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
     mrb_get_args(mrb, "o", &obj );
-    BiNode* child = DATA_PTR(obj);
+    BiNode* child = DATA_CHECK_GET_PTR(mrb,obj,&mrb_node_data_type,BiNode);
+    if(!child) {
+      return mrb_nil_value();
+    }
     BiNode* node = DATA_PTR(self);
-
     bi_add_node(node,child);
-
+    mrb_value iv_children = _iv_children_(mrb,self);
+    mrb_ary_push(mrb,iv_children,obj);
+    mrb_iv_set(mrb,obj,MRB_IVSYM(parent),self);
     return self;
 }
 
@@ -188,17 +204,18 @@ static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
     mrb_get_args(mrb, "o", &obj );
-
-    // XXX: error check
-    BiNode* child = DATA_PTR(obj);
+    BiNode* child = DATA_CHECK_GET_PTR(mrb,obj,&mrb_node_data_type,BiNode);
+    if(!child) {
+      return mrb_nil_value();
+    }
     BiNode* node = DATA_PTR(self);
-
-    // remove
+    mrb_value iv_children = _iv_children_(mrb,self);
+    mrb_iv_set(mrb,obj,MRB_IVSYM(parent),mrb_nil_value());
+    mrb_funcall(mrb,iv_children,"delete",1,obj);
     child = bi_remove_node(node,child);
     if(child!=NULL) {
       child->parent = NULL;
     }
-
     return self;
 }
 
@@ -461,8 +478,8 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "initialize", mrb_node_initialize, MRB_ARGS_NONE());
 
   // scene graph
-  mrb_define_method(mrb, node, "add_child", mrb_node_add_child, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "remove_child", mrb_node_remove_child, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "add", mrb_node_add_child, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "remove", mrb_node_remove_child, MRB_ARGS_REQ(1));
 
   // geometry
   mrb_define_method(mrb, node, "x", mrb_BiNode_get_x, MRB_ARGS_NONE());
