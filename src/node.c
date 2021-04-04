@@ -188,7 +188,12 @@ static mrb_value mrb_node_add_child(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
     mrb_get_args(mrb, "o", &obj );
-    BiNode* child = DATA_CHECK_GET_PTR(mrb,obj,&mrb_node_data_type,BiNode);
+
+    struct RClass* node_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Node");
+    if( ! mrb_obj_is_kind_of(mrb,obj,node_class) ) {
+      return mrb_nil_value();
+    }
+    BiNode* child = DATA_PTR(obj);
     if(!child) {
       return mrb_nil_value();
     }
@@ -204,7 +209,12 @@ static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
     mrb_get_args(mrb, "o", &obj );
-    BiNode* child = DATA_CHECK_GET_PTR(mrb,obj,&mrb_node_data_type,BiNode);
+
+    struct RClass* node_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Node");
+    if( ! mrb_obj_is_kind_of(mrb,obj,node_class) ) {
+      return mrb_nil_value();
+    }
+    BiNode* child = DATA_PTR(obj);
     if(!child) {
       return mrb_nil_value();
     }
