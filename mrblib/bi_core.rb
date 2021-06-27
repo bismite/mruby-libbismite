@@ -21,7 +21,6 @@ class Bi
       highdpi = opts[:highdpi] || false
       @@bi = Bi.new(w,h,fps,highdpi,title)
       @@bi.title = title
-      @@bi.layers = []
       @@bi.timers = []
     end
     @@bi
@@ -57,31 +56,17 @@ class Bi
     @@bi.layers
   end
   def self.add_layer(layer)
-    unless @@bi.layers.include? layer
-      @@bi.layers << layer
-      @@bi.add_layer layer
+    unless @@bi.layers.layers.include? layer
+      @@bi.layers.add_layer layer
     end
     layer
   end
   def self.remove_layer(layer)
-    if @@bi.layers.delete layer
-      @@bi.remove_layer layer
-    end
+    @@bi.layers.remove_layer layer
   end
   def self.remove_all_layers
-    @@bi.layers.each{|l| @@bi.remove_layer l }
+    @@bi.layers.layers.each{|l| @@bi.remove_layer l }
     @@bi.layers.clear
-  end
-
-  # shader
-  def self.shader
-    @@bi.shader
-  end
-  def self.shader=(shader)
-    @@bi.shader=shader
-  end
-  def self.set_optional_shader_attributes(index,value)
-    @@bi.set_optional_shader_attributes(index,value)
   end
 
   # Timer
@@ -107,6 +92,12 @@ class Bi
   end
   def profile
     @profile ||= Bi::Profile.new self
+  end
+end
+
+class Bi::LayerGroup
+  def layers
+    @layers
   end
 end
 
@@ -237,7 +228,7 @@ module Bi::Version
   end
 
   def self.mruby_bicore
-    "0.12.0"
+    "0.13.0"
   end
 
   def self.emscripten

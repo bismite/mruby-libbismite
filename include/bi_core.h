@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-struct _BiTexture;
 typedef struct _BiTexture BiTexture;
 
 extern mrb_value create_bi_texture(mrb_state *mrb, BiTexture* texture);

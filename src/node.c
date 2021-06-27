@@ -15,7 +15,7 @@ static void node_free(mrb_state *mrb, void *p)
 {
   BiNode* node = p;
   if (NULL != node) {
-    if(node->children != NULL) free(node->children);
+    free(node->children.objects);
     free(node->timers.timers);
     mrb_free(mrb, node);
   }
@@ -184,21 +184,25 @@ static mrb_value _iv_children_(mrb_state *mrb, mrb_value self)
   return v;
 }
 
+static BiNode* bi_node_from_obj(mrb_state *mrb,mrb_value obj)
+{
+  struct RClass* node_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Node");
+  if( ! mrb_obj_is_kind_of(mrb,obj,node_class) ) {
+    return NULL;
+  }
+  return DATA_PTR(obj);
+}
+
 static mrb_value mrb_node_add_child(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
     mrb_get_args(mrb, "o", &obj );
-
-    struct RClass* node_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Node");
-    if( ! mrb_obj_is_kind_of(mrb,obj,node_class) ) {
-      return mrb_nil_value();
-    }
-    BiNode* child = DATA_PTR(obj);
+    BiNode* child = bi_node_from_obj(mrb,obj);
     if(!child) {
       return mrb_nil_value();
     }
     BiNode* node = DATA_PTR(self);
-    bi_add_node(node,child);
+    bi_node_add_node(node,child);
     mrb_value iv_children = _iv_children_(mrb,self);
     mrb_ary_push(mrb,iv_children,obj);
     mrb_iv_set(mrb,obj,MRB_IVSYM(parent),self);
@@ -209,12 +213,7 @@ static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
     mrb_get_args(mrb, "o", &obj );
-
-    struct RClass* node_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Node");
-    if( ! mrb_obj_is_kind_of(mrb,obj,node_class) ) {
-      return mrb_nil_value();
-    }
-    BiNode* child = DATA_PTR(obj);
+    BiNode* child = bi_node_from_obj(mrb,obj);
     if(!child) {
       return mrb_nil_value();
     }
@@ -222,7 +221,7 @@ static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
     mrb_value iv_children = _iv_children_(mrb,self);
     mrb_iv_set(mrb,obj,MRB_IVSYM(parent),mrb_nil_value());
     mrb_funcall(mrb,iv_children,"delete",1,obj);
-    child = bi_remove_node(node,child);
+    child = bi_node_remove_node(node,child);
     if(child!=NULL) {
       child->parent = NULL;
     }

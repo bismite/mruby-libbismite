@@ -14,16 +14,12 @@ static struct mrb_data_type const mrb_layer_data_type = { "Layer", mrb_free };
 
 static mrb_value mrb_layer_initialize(mrb_state *mrb, mrb_value self)
 {
-    BiLayer* layer;
-
-    layer = mrb_malloc(mrb,sizeof(BiLayer));
+    BiLayer* layer = mrb_malloc(mrb,sizeof(BiLayer));
     if (NULL == layer) {
       mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
     }
-
     bi_layer_init(layer);
     mrb_data_init(self, layer, &mrb_layer_data_type);
-
     return self;
 }
 
@@ -40,21 +36,19 @@ _GET_(BiLayer,blend_src,bi_mrb_fixnum_value);
 _SET_(BiLayer,blend_src,mrb_int,i);
 _GET_(BiLayer,blend_dst,bi_mrb_fixnum_value);
 _SET_(BiLayer,blend_dst,mrb_int,i);
-_GET_(BiLayer,z_order,bi_mrb_fixnum_value);
-_SET_(BiLayer,z_order,mrb_int,i);
+
+_GET_FUNC_(BiLayer,z_order,bi_layer_get_z_order,bi_mrb_fixnum_value);
+_SET_FUNC_(BiLayer,z_order,mrb_int,i,bi_layer_set_z_order);
 
 static mrb_value mrb_BiLayer_set_root(mrb_state *mrb, mrb_value self)
 {
     mrb_value obj;
     mrb_get_args(mrb, "o", &obj );
-
     // TODO: error check
     BiLayer* layer = DATA_PTR(self);
     BiNode* node = DATA_PTR(obj);
-
     layer->root = node;
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@root"), obj);
-
     return self;
 }
 

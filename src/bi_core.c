@@ -3,6 +3,7 @@
 #include <mruby/class.h>
 #include <mruby/string.h>
 #include <mruby/variable.h>
+#include <mruby/array.h>
 #include <bi/context.h>
 #include <bi/main_loop.h>
 #include <time.h>
@@ -27,7 +28,9 @@ extern void mrb_init_bi_texture(mrb_state*, struct RClass*);
 extern void mrb_init_bi_texture_mapping(mrb_state*, struct RClass*);
 extern void mrb_init_bi_timer(mrb_state*, struct RClass*);
 extern void mrb_init_bi_layer(mrb_state*, struct RClass*);
+extern void mrb_init_bi_layer_group(mrb_state*, struct RClass*);
 extern void mrb_init_bi_shader(mrb_state*, struct RClass*);
+extern void mrb_init_bi_post_process(mrb_state*, struct RClass*);
 extern void mrb_init_bi_key(mrb_state*, struct RClass*);
 extern void mrb_init_bi_version(mrb_state*, struct RClass*);
 
@@ -36,6 +39,9 @@ extern void mrb_init_bi_version(mrb_state*, struct RClass*);
 //
 
 static struct mrb_data_type const mrb_bi_data_type = { "Bi", mrb_free };
+
+// XXX: for static layer group in context structure
+static struct mrb_data_type const mrb_layer_group_data_type = { "LayerGroup", NULL };
 
 static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
 {
@@ -48,8 +54,15 @@ static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
     BiContext* c = mrb_malloc(mrb,sizeof(BiContext));
     bi_init_context(c, width, height, fps, highdpi, title_str);
     c->userdata = mrb; // XXX: hold mrb_state
-
     mrb_data_init(self, c, &mrb_bi_data_type);
+
+    // layer group
+    struct RClass *klass = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"LayerGroup");
+    struct RData *data = mrb_data_object_alloc(mrb,klass,&c->layers,&mrb_layer_group_data_type);
+    mrb_value val = mrb_obj_value(data);
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@layers"), val);
+    mrb_iv_set(mrb, val, mrb_intern_cstr(mrb,"@layers"),mrb_ary_new(mrb));
+    mrb_iv_set(mrb, val, mrb_intern_cstr(mrb,"@post_processes"),mrb_ary_new(mrb));
 
     return self;
 }
@@ -90,80 +103,6 @@ static mrb_value mrb_bi_set_title(mrb_state *mrb, mrb_value self)
 
     return self;
 }
-
-//
-// Layer
-//
-
-static mrb_value mrb_bi_add_layer(mrb_state *mrb, mrb_value self)
-{
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-
-    // TODO: error check
-    BiContext* c = DATA_PTR(self);
-    BiLayer* layer = DATA_PTR(obj);
-
-    bi_add_layer(c,layer);
-
-    return self;
-}
-
-static mrb_value mrb_bi_remove_layer(mrb_state *mrb, mrb_value self)
-{
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-
-    // TODO: error check
-    BiContext* c = DATA_PTR(self);
-    BiLayer* layer = DATA_PTR(obj);
-
-    bi_remove_layer(c,layer);
-
-    return self;
-}
-
-//
-// shader
-//
-
-static mrb_value mrb_bi_set_shader(mrb_state *mrb, mrb_value self)
-{
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-
-    BiContext* c = DATA_PTR(self);
-    struct RClass *bi = mrb_class_get(mrb,"Bi");
-    struct RClass *shader_class = mrb_class_get_under(mrb,bi,"Shader");
-    if( mrb_obj_is_kind_of(mrb, obj, shader_class) ) {
-      BiShader* shader = DATA_PTR(obj);
-      c->post_processing.shader = shader;
-      mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), obj);
-    }else{
-      c->post_processing.shader = NULL;
-      mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), mrb_nil_value() );
-    }
-
-    return self;
-}
-
-static mrb_value mrb_bi_get_shader(mrb_state *mrb, mrb_value self)
-{
-    return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@shader"));
-}
-
-static mrb_value mrb_bi_set_optional_shader_attributes(mrb_state *mrb, mrb_value self)
-{
-    mrb_int index;
-    mrb_float value;
-    mrb_get_args(mrb, "if", &index, &value );
-    BiContext* c = DATA_PTR(self);
-    if( 0 <= index && index < 4 ) {
-      c->post_processing.optional_shader_attributes[index] = value;
-    }
-    return self;
-}
-
 
 //
 // Timer
@@ -229,13 +168,6 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
 
   mrb_define_method(mrb, bi, "set_title", mrb_bi_set_title, MRB_ARGS_REQ(1));
 
-  mrb_define_method(mrb, bi, "add_layer", mrb_bi_add_layer, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, bi, "remove_layer", mrb_bi_remove_layer, MRB_ARGS_REQ(1));
-
-  mrb_define_method(mrb, bi, "shader", mrb_bi_get_shader, MRB_ARGS_NONE());
-  mrb_define_method(mrb, bi, "shader=", mrb_bi_set_shader, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, bi, "set_optional_shader_attributes",mrb_bi_set_optional_shader_attributes, MRB_ARGS_REQ(2)); // index,value
-
   mrb_define_method(mrb, bi, "_add_timer", mrb_bi_add_timer, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, bi, "_remove_timer", mrb_bi_remove_timer, MRB_ARGS_REQ(1));
 
@@ -248,7 +180,9 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   mrb_init_bi_texture_mapping(mrb,bi); DONE;
   mrb_init_bi_timer(mrb,bi); DONE;
   mrb_init_bi_layer(mrb,bi); DONE;
+  mrb_init_bi_layer_group(mrb,bi); DONE;
   mrb_init_bi_shader(mrb,bi); DONE;
+  mrb_init_bi_post_process(mrb,bi); DONE;
   mrb_init_bi_key(mrb,bi); DONE;
   mrb_init_bi_version(mrb,bi); DONE;
 #undef DONE

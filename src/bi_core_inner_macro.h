@@ -23,6 +23,12 @@
     return self; \
   }
 
+#define _GET_FUNC_(STRUCT,ATTR,GET_FUNC,FUNC) \
+  static mrb_value mrb_##STRUCT##_get_##ATTR (mrb_state *mrb, mrb_value self) \
+  { \
+    return FUNC(mrb, GET_FUNC( DATA_PTR(self) ) ); \
+  }
+
 #define _SET_FUNC_(STRUCT,ATTR,TYPE,SYMBOL,FUNC) \
   static mrb_value mrb_##STRUCT##_set_##ATTR (mrb_state *mrb, mrb_value self) \
   { \
