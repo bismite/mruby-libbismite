@@ -66,7 +66,7 @@ static mrb_value mrb_layer_group_add_layer_group(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_layer_group_remove_layer_group(mrb_state *mrb, mrb_value self)
 {
-  _LAYER_GROUP_REMOVE_FUNCTION_(BiLayer,bi_layer_group_remove_layer_group,"@layers");
+  _LAYER_GROUP_REMOVE_FUNCTION_(BiLayerGroup,bi_layer_group_remove_layer_group,"@layers");
   return self;
 }
 
@@ -78,7 +78,7 @@ static mrb_value mrb_layer_group_add_post_process(mrb_state *mrb, mrb_value self
 
 static mrb_value mrb_layer_group_remove_post_process(mrb_state *mrb, mrb_value self)
 {
-  _LAYER_GROUP_REMOVE_FUNCTION_(BiLayer,bi_layer_group_remove_post_process,"@post_processes");
+  _LAYER_GROUP_REMOVE_FUNCTION_(BiPostProcess,bi_layer_group_remove_post_process,"@post_processes");
   return self;
 }
 
