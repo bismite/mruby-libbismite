@@ -5,22 +5,17 @@
 #include <bi/context.h>
 #include <bi/timer.h>
 
-typedef struct {
-  mrb_state *mrb;
-  mrb_value timer;
-} BiTimerContainer;
-
 //
 // Timer callback
 //
 
-static bool _timer_callback_(int64_t now,BiTimer* timer)
+static bool _timer_callback_(BiContext *context,BiTimer* timer)
 {
-  BiTimerContainer *container = timer->userdata;
-  mrb_state *mrb = container->mrb;
-  mrb_value block = mrb_iv_get(mrb, container->timer, mrb_intern_cstr(mrb,"@callback") );
-  mrb_value now_value = mrb_fixnum_value(now);
-  mrb_value argv[2] = { container->timer, now_value };
+  mrb_value self = mrb_obj_value(timer->userdata);
+  mrb_state *mrb = context->userdata;
+  mrb_value block = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@callback") );
+  mrb_value now_value = mrb_fixnum_value(context->frame_start_at);
+  mrb_value argv[2] = { self, now_value };
   return mrb_bool( mrb_yield_argv(mrb, block, 2, argv) );
 }
 
@@ -28,15 +23,7 @@ static bool _timer_callback_(int64_t now,BiTimer* timer)
 // Bi::Timer class
 //
 
-static void mrb_timer_free(mrb_state *mrb, void *p)
-{
-  BiTimer *timer = p;
-  BiTimerContainer *container = timer->userdata;
-  mrb_free(mrb,container);
-  mrb_free(mrb,p);
-}
-
-static struct mrb_data_type const mrb_timer_data_type = { "Timer", mrb_timer_free };
+static struct mrb_data_type const mrb_timer_data_type = { "Timer", mrb_free };
 
 static mrb_value mrb_timer_initialize(mrb_state *mrb, mrb_value self)
 {
@@ -44,23 +31,16 @@ static mrb_value mrb_timer_initialize(mrb_state *mrb, mrb_value self)
     mrb_int interval;
     mrb_int repeat;
     mrb_value callback;
-    BiNode* node;
     BiTimer* timer;
-    BiTimerContainer* container;
 
     mrb_get_args(mrb, "oii&", &owner, &interval, &repeat, &callback );
 
+    timer = mrb_malloc(mrb,sizeof(BiTimer));
+    mrb_data_init(self, timer, &mrb_timer_data_type);
+    bi_timer_init(timer,_timer_callback_,interval,repeat, mrb_ptr(self) );
+
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@callback"), callback);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@owner"), owner);
-
-    node = DATA_PTR(owner);
-    timer = mrb_malloc(mrb,sizeof(BiTimer));
-    container = mrb_malloc(mrb,sizeof(BiTimerContainer));
-    container->mrb = mrb;
-    container->timer = self;
-    bi_timer_init(timer,_timer_callback_,interval,repeat, container );
-    mrb_data_init(self, timer, &mrb_timer_data_type);
-
     return self;
 }
 

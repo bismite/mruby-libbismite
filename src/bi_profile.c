@@ -7,7 +7,7 @@
 // Bi::Profile
 //
 
-static struct mrb_data_type const mrb_profile_data_type = { "Profile", mrb_free };
+static struct mrb_data_type const mrb_profile_data_type = { "Profile", NULL };
 
 static mrb_value mrb_bi_profile_initialize(mrb_state *mrb, mrb_value self)
 {
