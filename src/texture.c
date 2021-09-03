@@ -23,22 +23,14 @@ mrb_value create_bi_texture(mrb_state *mrb, BiTexture* texture)
 mrb_value create_bi_texture_from_memory(mrb_state *mrb, void* buffer, int size, bool antialias)
 {
     BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-    bi_texture_init(texture);
-    if( ! bi_texture_load_from_memory(texture, buffer, size, antialias ) ) {
-      // XXX: raise!
-      mrb_raise(mrb, E_RUNTIME_ERROR, "texture load error.");
-    }
+    bi_texture_init_with_file(texture,buffer,size,antialias);
     return create_bi_texture(mrb,texture);
 }
 
 mrb_value create_bi_texture_from_pixels(mrb_state *mrb, int w, int h, void* pixels, bool antialias)
 {
     BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-    bi_texture_init(texture);
-    if( ! bi_texture_load_from_pixels( texture, w, h, pixels, antialias ) ) {
-      // XXX: raise!
-      mrb_raise(mrb, E_RUNTIME_ERROR, "texture load error.");
-    }
+    bi_texture_init_with_pixels(texture,w,h,pixels,antialias);
     return create_bi_texture(mrb,texture);
 }
 
@@ -51,16 +43,9 @@ static mrb_value mrb_texture_initialize(mrb_state *mrb, mrb_value self)
     mrb_value image_name;
     mrb_bool antialias;
     mrb_get_args(mrb, "Sb", &image_name, &antialias );
-
     BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-    bi_texture_init(texture);
-    if( bi_texture_load_from_file(texture, mrb_string_value_cstr(mrb,&image_name), antialias ) ) {
-      mrb_data_init(self, texture, &mrb_texture_data_type);
-    }else{
-      // XXX: raise!
-      mrb_raise(mrb, E_RUNTIME_ERROR, "texture load error.");
-    }
-
+    bi_texture_init_with_filename(texture,mrb_string_value_cstr(mrb,&image_name), antialias);
+    mrb_data_init(self, texture, &mrb_texture_data_type);
     return self;
 }
 

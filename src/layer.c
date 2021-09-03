@@ -2,6 +2,7 @@
 #include <mruby/data.h>
 #include <mruby/class.h>
 #include <mruby/variable.h>
+#include <mruby/array.h>
 #include <bi/context.h>
 #include <bi/layer.h>
 #include "bi_core_inner_macro.h"
@@ -32,10 +33,6 @@ _GET_(BiLayer,camera_y,bi_mrb_fixnum_value);
 _SET_(BiLayer,camera_y,mrb_int,i);
 _GET_(BiLayer,projection_centering,bi_mrb_bool_value);
 _SET_(BiLayer,projection_centering,mrb_bool,b);
-_GET_(BiLayer,blend_src,bi_mrb_fixnum_value);
-_SET_(BiLayer,blend_src,mrb_int,i);
-_GET_(BiLayer,blend_dst,bi_mrb_fixnum_value);
-_SET_(BiLayer,blend_dst,mrb_int,i);
 
 _GET_FUNC_(BiLayer,z_order,bi_layer_get_z_order,bi_mrb_fixnum_value);
 _SET_FUNC_(BiLayer,z_order,mrb_int,i,bi_layer_set_z_order);
@@ -82,14 +79,14 @@ static mrb_value mrb_BiLayer_get_shader(mrb_state *mrb, mrb_value self)
     return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@shader"));
 }
 
-static mrb_value mrb_BiLayer_set_optional_shader_attributes(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_BiLayer_set_shader_attribute(mrb_state *mrb, mrb_value self)
 {
     mrb_int index;
     mrb_float value;
     mrb_get_args(mrb, "if", &index, &value );
     BiLayer* layer = DATA_PTR(self);
     if( 0 <= index && index < 4 ) {
-      layer->optional_shader_attributes[index] = value;
+      layer->shader_attributes[index] = value;
     }
     return self;
 }
@@ -110,6 +107,89 @@ static mrb_value mrb_BiLayer_set_texture(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+static mrb_value mrb_BiLayer_set_blend_factor(mrb_state *mrb, mrb_value self)
+{
+  mrb_int src,dst,alpha_src,alpha_dst;
+  mrb_get_args(mrb, "iiii", &src, &dst, &alpha_src, &alpha_dst );
+  BiLayer* l = DATA_PTR(self);
+  bi_set_blend_factor(&l->blend_factor,src,dst,alpha_src,alpha_dst);
+  return self;
+}
+
+static mrb_value mrb_BiLayer_get_blend_factor(mrb_state *mrb, mrb_value self)
+{
+  BiLayer* l = DATA_PTR(self);
+  mrb_value v[4];
+  v[0] = mrb_fixnum_value(l->blend_factor.src);
+  v[1] = mrb_fixnum_value(l->blend_factor.dst);
+  v[2] = mrb_fixnum_value(l->blend_factor.alpha_src);
+  v[3] = mrb_fixnum_value(l->blend_factor.alpha_dst);
+  return mrb_ary_new_from_values(mrb,4,v);
+}
+
+//
+// post process
+//
+static mrb_value mrb_BiLayer_set_post_process_shader(mrb_state *mrb, mrb_value self)
+{
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
+
+  BiLayer* layer = DATA_PTR(self);
+  struct RClass *bi = mrb_class_get(mrb,"Bi");
+  struct RClass *shader_class = mrb_class_get_under(mrb,bi,"Shader");
+  if( mrb_obj_is_kind_of(mrb, obj, shader_class) ) {
+    BiShader* shader = DATA_PTR(obj);
+    layer->post_process.shader = shader;
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@post_process_shader"), obj);
+  }else{
+    layer->post_process.shader = NULL;
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@post_process_shader"), mrb_nil_value() );
+  }
+}
+
+static mrb_value mrb_BiLayer_set_post_process_shader_attribute(mrb_state *mrb, mrb_value self)
+{
+  mrb_int index;
+  mrb_float value;
+  mrb_get_args(mrb, "if", &index, &value );
+  BiLayer* layer = DATA_PTR(self);
+  if( 0 <= index && index < 4 ) {
+    layer->post_process.shader_attributes[index] = value;
+  }
+  return self;
+}
+
+static mrb_value mrb_BiLayer_set_post_process_framebuffer_enabled(mrb_state *mrb, mrb_value self)
+{
+  mrb_bool framebuffer_enabled;
+  mrb_get_args(mrb, "b", &framebuffer_enabled );
+  BiLayer* layer = DATA_PTR(self);
+  layer->post_process.framebuffer_enabled = framebuffer_enabled;
+  return self;
+}
+
+
+static mrb_value mrb_BiLayer_set_post_process_blend_factor(mrb_state *mrb, mrb_value self)
+{
+  mrb_int src,dst,alpha_src,alpha_dst;
+  mrb_get_args(mrb, "iiii", &src, &dst, &alpha_src, &alpha_dst );
+  BiLayer* l = DATA_PTR(self);
+  bi_set_blend_factor(&l->post_process.blend_factor,src,dst,alpha_src,alpha_dst);
+  return self;
+}
+
+static mrb_value mrb_BiLayer_get_post_process_blend_factor(mrb_state *mrb, mrb_value self)
+{
+  BiLayer* l = DATA_PTR(self);
+  mrb_value v[4];
+  v[0] = mrb_fixnum_value(l->post_process.blend_factor.src);
+  v[1] = mrb_fixnum_value(l->post_process.blend_factor.dst);
+  v[2] = mrb_fixnum_value(l->post_process.blend_factor.alpha_src);
+  v[3] = mrb_fixnum_value(l->post_process.blend_factor.alpha_dst);
+  return mrb_ary_new_from_values(mrb,4,v);
+}
+
 //
 void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
 {
@@ -125,10 +205,7 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, layer, "camera_y=",mrb_BiLayer_set_camera_y, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer, "projection_centering", mrb_BiLayer_get_projection_centering, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "projection_centering=", mrb_BiLayer_set_projection_centering, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, layer, "blend_src", mrb_BiLayer_get_blend_src, MRB_ARGS_NONE());
-  mrb_define_method(mrb, layer, "blend_src=",mrb_BiLayer_set_blend_src, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, layer, "blend_dst", mrb_BiLayer_get_blend_dst, MRB_ARGS_NONE());
-  mrb_define_method(mrb, layer, "blend_dst=",mrb_BiLayer_set_blend_dst, MRB_ARGS_REQ(1));
+
   mrb_define_method(mrb, layer, "z_order", mrb_BiLayer_get_z_order, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "z_order=",mrb_BiLayer_set_z_order, MRB_ARGS_REQ(1));
 
@@ -137,9 +214,18 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
 
   mrb_define_method(mrb, layer, "shader", mrb_BiLayer_get_shader, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "shader=",mrb_BiLayer_set_shader, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, layer, "set_optional_shader_attributes",mrb_BiLayer_set_optional_shader_attributes, MRB_ARGS_REQ(2)); // index,value
+  mrb_define_method(mrb, layer, "set_shader_attribute",mrb_BiLayer_set_shader_attribute, MRB_ARGS_REQ(2)); // index,value
 
   mrb_define_method(mrb, layer, "set_texture",mrb_BiLayer_set_texture, MRB_ARGS_REQ(2));
+
+  mrb_define_method(mrb, layer, "set_blend_factor", mrb_BiLayer_set_blend_factor, MRB_ARGS_REQ(4));
+  mrb_define_method(mrb, layer, "get_blend_factor", mrb_BiLayer_get_blend_factor, MRB_ARGS_NONE());
+
+  mrb_define_method(mrb, layer, "set_post_process_shader",mrb_BiLayer_set_post_process_shader, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, layer, "set_post_process_shader_attribute",mrb_BiLayer_set_post_process_shader_attribute, MRB_ARGS_REQ(2)); // index,value
+  mrb_define_method(mrb, layer, "set_post_process_framebuffer_enabled",mrb_BiLayer_set_post_process_framebuffer_enabled, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, layer, "set_post_process_blend_factor",mrb_BiLayer_set_post_process_blend_factor, MRB_ARGS_REQ(4));
+  mrb_define_method(mrb, layer, "get_post_process_blend_factor",mrb_BiLayer_get_post_process_blend_factor, MRB_ARGS_NONE());
 
   // blend functions
   // source: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendFunc.xhtml

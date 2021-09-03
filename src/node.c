@@ -363,7 +363,7 @@ static mrb_value mrb_node_get_visible(mrb_state *mrb, mrb_value self)
   mrb_value obj; \
   mrb_get_args(mrb, "o", &obj ); \
   mrb_iv_set(mrb, self, mrb_intern_cstr(mrb, "@_" #CALLBACK_NAME "_callback_" ), obj); \
-  bi_set_ ## CALLBACK_NAME (DATA_PTR(self),  CALLBACK_NAME ); \
+  bi_node_set_ ## CALLBACK_NAME (DATA_PTR(self),  CALLBACK_NAME ); \
   return self;
 
 static mrb_value mrb_node_on_update(mrb_state *mrb, mrb_value self) {

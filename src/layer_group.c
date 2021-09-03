@@ -25,6 +25,26 @@ static mrb_value mrb_layer_group_initialize(mrb_state *mrb, mrb_value self)
   return self;
 }
 
+static mrb_value mrb_layer_group_set_blend_factor(mrb_state *mrb, mrb_value self)
+{
+  mrb_int src,dst,alpha_src,alpha_dst;
+  mrb_get_args(mrb, "iiii", &src, &dst, &alpha_src, &alpha_dst );
+  BiLayerGroup* l = DATA_PTR(self);
+  bi_set_blend_factor(&l->blend_factor,src,dst,alpha_src,alpha_dst);
+  return self;
+}
+
+static mrb_value mrb_layer_group_get_blend_factor(mrb_state *mrb, mrb_value self)
+{
+  BiLayerGroup* l = DATA_PTR(self);
+  mrb_value v[4];
+  v[0] = mrb_fixnum_value(l->blend_factor.src);
+  v[1] = mrb_fixnum_value(l->blend_factor.dst);
+  v[2] = mrb_fixnum_value(l->blend_factor.alpha_src);
+  v[3] = mrb_fixnum_value(l->blend_factor.alpha_dst);
+  return mrb_ary_new_from_values(mrb,4,v);
+}
+
 // add macro
 #define _LAYER_GROUP_ADD_FUNCTION_(OBJ_STRUCT,FUNC,ATTR) \
   mrb_value obj; \
@@ -70,18 +90,6 @@ static mrb_value mrb_layer_group_remove_layer_group(mrb_state *mrb, mrb_value se
   return self;
 }
 
-static mrb_value mrb_layer_group_add_post_process(mrb_state *mrb, mrb_value self)
-{
-  _LAYER_GROUP_ADD_FUNCTION_(BiPostProcess,bi_layer_group_add_post_process,"@post_processes");
-  return self;
-}
-
-static mrb_value mrb_layer_group_remove_post_process(mrb_state *mrb, mrb_value self)
-{
-  _LAYER_GROUP_REMOVE_FUNCTION_(BiPostProcess,bi_layer_group_remove_post_process,"@post_processes");
-  return self;
-}
-
 //
 void mrb_init_bi_layer_group(mrb_state *mrb,struct RClass *bi)
 {
@@ -91,12 +99,12 @@ void mrb_init_bi_layer_group(mrb_state *mrb,struct RClass *bi)
 
   mrb_define_method(mrb, layer_group, "initialize", mrb_layer_group_initialize, MRB_ARGS_NONE());
 
+  mrb_define_method(mrb, layer_group, "set_blend_factor", mrb_layer_group_set_blend_factor, MRB_ARGS_REQ(4));
+  mrb_define_method(mrb, layer_group, "get_blend_factor", mrb_layer_group_get_blend_factor, MRB_ARGS_NONE());
+
   mrb_define_method(mrb, layer_group, "add_layer", mrb_layer_group_add_layer, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer_group, "remove_layer",mrb_layer_group_remove_layer, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, layer_group, "add_layer_group", mrb_layer_group_add_layer_group, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer_group, "remove_layer_group",mrb_layer_group_remove_layer_group, MRB_ARGS_REQ(1));
-
-  mrb_define_method(mrb, layer_group, "add_post_process", mrb_layer_group_add_post_process, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, layer_group, "remove_post_process",mrb_layer_group_remove_post_process, MRB_ARGS_REQ(1));
 }
