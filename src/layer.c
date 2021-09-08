@@ -146,6 +146,7 @@ static mrb_value mrb_BiLayer_set_post_process_shader(mrb_state *mrb, mrb_value s
     layer->post_process.shader = NULL;
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@post_process_shader"), mrb_nil_value() );
   }
+  return self;
 }
 
 static mrb_value mrb_BiLayer_set_post_process_shader_attribute(mrb_state *mrb, mrb_value self)
