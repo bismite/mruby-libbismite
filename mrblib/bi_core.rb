@@ -1,14 +1,4 @@
 
-alias :_original_rand_ :rand
-def rand(n=nil)
-  if n.is_a? Range
-    return n.min if n.min == n.max
-    n.min + _original_rand_(1+n.max-n.min)
-  else
-    _original_rand_(n)
-  end
-end
-
 class Bi
   @@bi = nil
   attr_accessor :title
@@ -228,7 +218,7 @@ module Bi::Version
   end
 
   def self.mruby_bicore
-    "0.14.1"
+    "0.14.2"
   end
 
   def self.emscripten
