@@ -3,38 +3,38 @@
 #include <mruby/class.h>
 #include <mruby/variable.h>
 #include <bi/texture.h>
-#include "bi_core_inner_macro.h"
+#include "_inner_macro.h"
 
 // Bi::Texture class
 static struct mrb_data_type const mrb_texture_mapping_data_type = { "TextureMapping", mrb_free };
 
 static mrb_value mrb_texture_mapping_initialize(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_int x,y,w,h;
-    mrb_get_args(mrb, "oiiii", &obj, &x,&y,&w,&h );
-    BiTextureMapping* mapping = mrb_malloc(mrb,sizeof(BiTextureMapping));
-    bi_texture_mapping_init(mapping, DATA_PTR(obj));
-    bi_texture_mapping_set_bound(mapping,x,y,w,h);
-    mrb_data_init(self, mapping, &mrb_texture_mapping_data_type);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@texture"), obj);
-    return self;
+  mrb_value obj;
+  mrb_int x,y,w,h;
+  mrb_get_args(mrb, "oiiii", &obj, &x,&y,&w,&h );
+  BiTextureMapping* mapping = mrb_malloc(mrb,sizeof(BiTextureMapping));
+  bi_texture_mapping_init(mapping, DATA_PTR(obj));
+  bi_texture_mapping_set_bound(mapping,x,y,w,h);
+  mrb_data_init(self, mapping, &mrb_texture_mapping_data_type);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@texture"), obj);
+  return self;
 }
 
 static mrb_value mrb_texture_set_texture(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
 
-    // TODO: error check
-    BiTextureMapping* mapping = DATA_PTR(self);
-    BiTexture* texture = DATA_PTR(obj);
+  // TODO: error check
+  BiTextureMapping* mapping = DATA_PTR(self);
+  BiTexture* texture = DATA_PTR(obj);
 
-    mapping->texture = texture;
+  mapping->texture = texture;
 
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@texture"), obj);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@texture"), obj);
 
-    return self;
+  return self;
 }
 
 //

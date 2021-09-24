@@ -4,27 +4,27 @@
 
 static mrb_value mrb_bi_version_gl_version(mrb_state *mrb, mrb_value self)
 {
-    return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_VERSION));
+  return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_VERSION));
 }
 
 static mrb_value mrb_bi_version_gl_renderer(mrb_state *mrb, mrb_value self)
 {
-    return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_RENDERER));
+  return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_RENDERER));
 }
 
 static mrb_value mrb_bi_version_gl_shading_language_version(mrb_state *mrb, mrb_value self)
 {
-    return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+  return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
 }
 
 static mrb_value mrb_bi_version_gl_vendor(mrb_state *mrb, mrb_value self)
 {
-    return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_VENDOR));
+  return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_VENDOR));
 }
 
 static mrb_value mrb_bi_version_gl_extensions(mrb_state *mrb, mrb_value self)
 {
-    return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_EXTENSIONS));
+  return mrb_str_new_cstr(mrb, (const char*)glGetString(GL_EXTENSIONS));
 }
 
 static mrb_value mrb_bi_version_glew_version(mrb_state *mrb, mrb_value self)
@@ -86,6 +86,7 @@ void mrb_init_bi_version(mrb_state *mrb, struct RClass *bi)
   mrb_define_const(mrb, version, "SDL_LINKED_MINOR", mrb_fixnum_value(linked.minor));
   mrb_define_const(mrb, version, "SDL_LINKED_PATCH", mrb_fixnum_value(linked.patch));
 
+  // XXX: require initialized OpenGL context.
   mrb_define_class_method(mrb, version, "gl_version", mrb_bi_version_gl_version, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, version, "gl_renderer", mrb_bi_version_gl_renderer, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, version, "gl_shading_language_version", mrb_bi_version_gl_shading_language_version, MRB_ARGS_NONE());

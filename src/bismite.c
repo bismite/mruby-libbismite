@@ -7,7 +7,7 @@
 #include <bi/context.h>
 #include <bi/main_loop.h>
 #include <time.h>
-#include "bi_core_inner_macro.h"
+#include "_inner_macro.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -49,42 +49,42 @@ static struct mrb_data_type const mrb_layer_group_data_type = { "LayerGroup", NU
 
 static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
 {
-    mrb_int width, height, fps;
-    mrb_bool highdpi;
-    mrb_value title_obj;
-    mrb_get_args(mrb, "iiibS", &width, &height, &fps, &highdpi, &title_obj );
-    const char* title_str = mrb_string_value_cstr(mrb,&title_obj);
+  mrb_int width, height, fps;
+  mrb_bool highdpi;
+  mrb_value title_obj;
+  mrb_get_args(mrb, "iiibS", &width, &height, &fps, &highdpi, &title_obj );
+  const char* title_str = mrb_string_value_cstr(mrb,&title_obj);
 
-    BiContext* c = mrb_malloc(mrb,sizeof(BiContext));
-    bi_init_context(c, width, height, fps, highdpi, title_str);
-    c->userdata = mrb; // XXX: hold mrb_state
-    mrb_data_init(self, c, &mrb_bi_data_type);
+  BiContext* c = mrb_malloc(mrb,sizeof(BiContext));
+  bi_init_context(c, width, height, fps, highdpi, title_str);
+  c->userdata = mrb; // XXX: hold mrb_state
+  mrb_data_init(self, c, &mrb_bi_data_type);
 
-    // layer group
-    struct RClass *klass = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"LayerGroup");
-    struct RData *data = mrb_data_object_alloc(mrb,klass,&c->layers,&mrb_layer_group_data_type);
-    mrb_value val = mrb_obj_value(data);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@layers"), val);
-    mrb_iv_set(mrb, val, mrb_intern_cstr(mrb,"@layers"),mrb_ary_new(mrb));
-    mrb_iv_set(mrb, val, mrb_intern_cstr(mrb,"@post_processes"),mrb_ary_new(mrb));
+  // layer group
+  struct RClass *klass = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"LayerGroup");
+  struct RData *data = mrb_data_object_alloc(mrb,klass,&c->layers,&mrb_layer_group_data_type);
+  mrb_value val = mrb_obj_value(data);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@layers"), val);
+  mrb_iv_set(mrb, val, mrb_intern_cstr(mrb,"@layers"),mrb_ary_new(mrb));
+  mrb_iv_set(mrb, val, mrb_intern_cstr(mrb,"@post_processes"),mrb_ary_new(mrb));
 
-    return self;
+  return self;
 }
 
 static mrb_value mrb_bi_now(mrb_state *mrb, mrb_value self)
 {
-    return mrb_fixnum_value( bi_get_now() );
+  return mrb_fixnum_value( bi_get_now() );
 }
 
 static mrb_value mrb_bi_start_run_loop(mrb_state *mrb, mrb_value self)
 {
-    // XXX: error check
-    BiContext* c = DATA_PTR(self);
+  // XXX: error check
+  BiContext* c = DATA_PTR(self);
 
-    // XXX: start infinit loop
-    bi_start_run_loop(c);
+  // XXX: start infinit loop
+  bi_start_run_loop(c);
 
-    return self;
+  return self;
 }
 
 // window width, height
@@ -97,15 +97,15 @@ _SET_(BiContext,debug,mrb_bool,b);
 
 static mrb_value mrb_bi_set_title(mrb_state *mrb, mrb_value self)
 {
-    mrb_value title;
-    mrb_get_args(mrb, "S", &title );
+  mrb_value title;
+  mrb_get_args(mrb, "S", &title );
 
-    // XXX: error check
-    BiContext* c = DATA_PTR(self);
+  // XXX: error check
+  BiContext* c = DATA_PTR(self);
 
-    bi_set_title( c, mrb_string_value_cstr(mrb,&title) );
+  bi_set_title( c, mrb_string_value_cstr(mrb,&title) );
 
-    return self;
+  return self;
 }
 
 //
@@ -114,22 +114,22 @@ static mrb_value mrb_bi_set_title(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-    BiContext* context = DATA_PTR(self);
-    BiTimer* timer = DATA_PTR(obj);
-    bi_add_timer(&context->timers,timer);
-    return self;
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
+  BiContext* context = DATA_PTR(self);
+  BiTimer* timer = DATA_PTR(obj);
+  bi_add_timer(&context->timers,timer);
+  return self;
 }
 
 static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-    BiContext* context = DATA_PTR(self);
-    BiTimer* timer = DATA_PTR(obj);
-    bi_remove_timer(&context->timers,timer);
-    return self;
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
+  BiContext* context = DATA_PTR(self);
+  BiTimer* timer = DATA_PTR(obj);
+  bi_remove_timer(&context->timers,timer);
+  return self;
 }
 
 //
@@ -137,19 +137,19 @@ static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
 //
 static mrb_value mrb_bi_messagebox(mrb_state *mrb, mrb_value self)
 {
-    mrb_value title,message;
-    mrb_sym dialog_type;
-    mrb_get_args(mrb, "SSn",  &title, &message, &dialog_type );
-    BiContext *context = DATA_PTR(self);
-    if(dialog_type == mrb_intern_lit(mrb,"error")){
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
-    }
-    else if(dialog_type==mrb_intern_lit(mrb,"warning")){
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
-    }else{
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
-    }
-    return self;
+  mrb_value title,message;
+  mrb_sym dialog_type;
+  mrb_get_args(mrb, "SSn",  &title, &message, &dialog_type );
+  BiContext *context = DATA_PTR(self);
+  if(dialog_type == mrb_intern_lit(mrb,"error")){
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
+  }
+  else if(dialog_type==mrb_intern_lit(mrb,"warning")){
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
+  }else{
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
+  }
+  return self;
 }
 
 //
@@ -193,7 +193,6 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_init_label(mrb,bi); DONE;
   mrb_init_action(mrb,bi); DONE;
   mrb_init_transition(mrb,bi); DONE;
-
 #undef DONE
 }
 

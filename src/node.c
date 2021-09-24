@@ -8,7 +8,7 @@
 #include <bi/node.h>
 #include <bi/util.h>
 #include <stdlib.h>
-#include "bi_core_inner_macro.h"
+#include "_inner_macro.h"
 
 // Bi::Node class
 static void node_free(mrb_state *mrb, void *p)
@@ -154,18 +154,18 @@ static bool on_textinput(BiContext* context, BiNode* node, char* text)
 
 static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
 {
-    BiNode* node;
+  BiNode* node;
 
-    node = mrb_malloc(mrb, sizeof(BiNode));
-    if (NULL == node) {
-      mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
-    }
+  node = mrb_malloc(mrb, sizeof(BiNode));
+  if (NULL == node) {
+    mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
+  }
 
-    bi_node_init(node);
-    mrb_data_init(self, node, &mrb_node_data_type);
-    node->userdata = mrb_ptr(self);
+  bi_node_init(node);
+  mrb_data_init(self, node, &mrb_node_data_type);
+  node->userdata = mrb_ptr(self);
 
-    return self;
+  return self;
 }
 
 //
@@ -194,37 +194,37 @@ static BiNode* bi_node_from_obj(mrb_state *mrb,mrb_value obj)
 
 static mrb_value mrb_node_add_child(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-    BiNode* child = bi_node_from_obj(mrb,obj);
-    if(!child) {
-      return mrb_nil_value();
-    }
-    BiNode* node = DATA_PTR(self);
-    bi_node_add_node(node,child);
-    mrb_value iv_children = _iv_children_(mrb,self);
-    mrb_ary_push(mrb,iv_children,obj);
-    mrb_iv_set(mrb,obj,MRB_IVSYM(parent),self);
-    return self;
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
+  BiNode* child = bi_node_from_obj(mrb,obj);
+  if(!child) {
+    return mrb_nil_value();
+  }
+  BiNode* node = DATA_PTR(self);
+  bi_node_add_node(node,child);
+  mrb_value iv_children = _iv_children_(mrb,self);
+  mrb_ary_push(mrb,iv_children,obj);
+  mrb_iv_set(mrb,obj,MRB_IVSYM(parent),self);
+  return self;
 }
 
 static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-    BiNode* child = bi_node_from_obj(mrb,obj);
-    if(!child) {
-      return mrb_nil_value();
-    }
-    BiNode* node = DATA_PTR(self);
-    mrb_value iv_children = _iv_children_(mrb,self);
-    mrb_iv_set(mrb,obj,MRB_IVSYM(parent),mrb_nil_value());
-    mrb_funcall(mrb,iv_children,"delete",1,obj);
-    child = bi_node_remove_node(node,child);
-    if(child!=NULL) {
-      child->parent = NULL;
-    }
-    return self;
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
+  BiNode* child = bi_node_from_obj(mrb,obj);
+  if(!child) {
+    return mrb_nil_value();
+  }
+  BiNode* node = DATA_PTR(self);
+  mrb_value iv_children = _iv_children_(mrb,self);
+  mrb_iv_set(mrb,obj,MRB_IVSYM(parent),mrb_nil_value());
+  mrb_funcall(mrb,iv_children,"delete",1,obj);
+  child = bi_node_remove_node(node,child);
+  if(child!=NULL) {
+    child->parent = NULL;
+  }
+  return self;
 }
 
 //
@@ -241,17 +241,17 @@ _SET_FUNC_(BiNode,z,mrb_int,i,bi_node_set_z);
 
 static mrb_value mrb_node_set_position(mrb_state *mrb, mrb_value self)
 {
-    mrb_int x,y;
-    mrb_get_args(mrb, "ii", &x, &y );
-    BiNode* node = DATA_PTR(self);
-    bi_node_set_position(node,x,y);
-    return self;
+  mrb_int x,y;
+  mrb_get_args(mrb, "ii", &x, &y );
+  BiNode* node = DATA_PTR(self);
+  bi_node_set_position(node,x,y);
+  return self;
 }
 
 static mrb_value mrb_node_angle(mrb_state *mrb, mrb_value self)
 {
-    BiNode* node = DATA_PTR(self);
-    return mrb_float_value(mrb,node->angle * 180.0 / 3.14159);
+  BiNode* node = DATA_PTR(self);
+  return mrb_float_value(mrb,node->angle * 180.0 / 3.14159);
 }
 
 _SET_FUNC_(BiNode,angle,mrb_float,f,bi_node_set_degree);
@@ -261,11 +261,11 @@ _GET_(BiNode,h,bi_mrb_fixnum_value);
 
 static mrb_value mrb_node_set_size(mrb_state *mrb, mrb_value self)
 {
-    mrb_int w,h;
-    mrb_get_args(mrb, "ii", &w, &h );
-    BiNode* node = DATA_PTR(self);
-    bi_node_set_size(node,w,h);
-    return self;
+  mrb_int w,h;
+  mrb_get_args(mrb, "ii", &w, &h );
+  BiNode* node = DATA_PTR(self);
+  bi_node_set_size(node,w,h);
+  return self;
 }
 
 _GET_(BiNode,scale_x,mrb_float_value);
@@ -280,26 +280,26 @@ _SET_(BiNode,anchor_y,mrb_float,f);
 
 static mrb_value mrb_node_is_include(mrb_state *mrb, mrb_value self)
 {
-    mrb_int x,y;
-    mrb_get_args(mrb, "ii", &x, &y );
-    BiNode* node = (BiNode*)DATA_PTR(self);
-    return mrb_bool_value(bi_node_inside(node,x,y));
+  mrb_int x,y;
+  mrb_get_args(mrb, "ii", &x, &y );
+  BiNode* node = (BiNode*)DATA_PTR(self);
+  return mrb_bool_value(bi_node_inside(node,x,y));
 }
 
 static mrb_value mrb_node_transform_local(mrb_state *mrb, mrb_value self)
 {
-    mrb_int x,y;
-    int lx,ly;
-    BiNode* node;
-    mrb_value v[2];
+  mrb_int x,y;
+  int lx,ly;
+  BiNode* node;
+  mrb_value v[2];
 
-    mrb_get_args(mrb, "ii", &x, &y );
-    node = (BiNode*)DATA_PTR(self);
-    bi_node_transform_local(node, x, y, &lx, &ly);
+  mrb_get_args(mrb, "ii", &x, &y );
+  node = (BiNode*)DATA_PTR(self);
+  bi_node_transform_local(node, x, y, &lx, &ly);
 
-    v[0] = mrb_fixnum_value(lx);
-    v[1] = mrb_fixnum_value(ly);
-    return mrb_ary_new_from_values(mrb,2,v);
+  v[0] = mrb_fixnum_value(lx);
+  v[1] = mrb_fixnum_value(ly);
+  return mrb_ary_new_from_values(mrb,2,v);
 }
 
 
@@ -309,50 +309,50 @@ static mrb_value mrb_node_transform_local(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_node_set_texture_mapping(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
 
-    BiNode* node = DATA_PTR(self);
-    node->texture_mapping = DATA_PTR(obj);
+  BiNode* node = DATA_PTR(self);
+  node->texture_mapping = DATA_PTR(obj);
 
-    return self;
+  return self;
 }
 
 static mrb_value mrb_node_set_color(mrb_state *mrb, mrb_value self)
 {
-    mrb_int r,g,b,a;
-    mrb_get_args(mrb, "iiii", &r, &g, &b, &a );
+  mrb_int r,g,b,a;
+  mrb_get_args(mrb, "iiii", &r, &g, &b, &a );
 
-    BiNode* node = DATA_PTR(self);
-    bi_set_color(node->color,r,g,b,a);
+  BiNode* node = DATA_PTR(self);
+  bi_set_color(node->color,r,g,b,a);
 
-    return self;
+  return self;
 }
 
 static mrb_value mrb_node_set_alpha(mrb_state *mrb, mrb_value self)
 {
-    mrb_int a;
-    mrb_get_args(mrb, "i", &a );
+  mrb_int a;
+  mrb_get_args(mrb, "i", &a );
 
-    BiNode* node = DATA_PTR(self);
-    node->color[3] = a;
+  BiNode* node = DATA_PTR(self);
+  node->color[3] = a;
 
-    return self;
+  return self;
 }
 
 static mrb_value mrb_node_set_visible(mrb_state *mrb, mrb_value self)
 {
-    mrb_bool visible;
-    mrb_get_args(mrb, "b", &visible );
-    BiNode* node = DATA_PTR(self);
-    node->visible = visible;
-    return self;
+  mrb_bool visible;
+  mrb_get_args(mrb, "b", &visible );
+  BiNode* node = DATA_PTR(self);
+  node->visible = visible;
+  return self;
 }
 
 static mrb_value mrb_node_get_visible(mrb_state *mrb, mrb_value self)
 {
-    BiNode* node = DATA_PTR(self);
-    return mrb_bool_value(node->visible);
+  BiNode* node = DATA_PTR(self);
+  return mrb_bool_value(node->visible);
 }
 
 //
@@ -401,30 +401,30 @@ static mrb_value mrb_node_on_text_input(mrb_state *mrb, mrb_value self) {
 
 static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
 
-    // TODO: error check
-    BiNode* node = DATA_PTR(self);
-    BiTimer* timer = DATA_PTR(obj);
+  // TODO: error check
+  BiNode* node = DATA_PTR(self);
+  BiTimer* timer = DATA_PTR(obj);
 
-    bi_add_timer(&node->timers,timer);
+  bi_add_timer(&node->timers,timer);
 
-    return self;
+  return self;
 }
 
 static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
 
-    // TODO: error check
-    BiNode* node = DATA_PTR(self);
-    BiTimer* timer = DATA_PTR(obj);
+  // TODO: error check
+  BiNode* node = DATA_PTR(self);
+  BiTimer* timer = DATA_PTR(obj);
 
-    bi_remove_timer(&node->timers,timer);
+  bi_remove_timer(&node->timers,timer);
 
-    return self;
+  return self;
 }
 
 // gem

@@ -27,21 +27,21 @@ static struct mrb_data_type const mrb_timer_data_type = { "Timer", mrb_free };
 
 static mrb_value mrb_timer_initialize(mrb_state *mrb, mrb_value self)
 {
-    mrb_value owner;
-    mrb_int interval;
-    mrb_int repeat;
-    mrb_value callback;
-    BiTimer* timer;
+  mrb_value owner;
+  mrb_int interval;
+  mrb_int repeat;
+  mrb_value callback;
+  BiTimer* timer;
 
-    mrb_get_args(mrb, "oii&", &owner, &interval, &repeat, &callback );
+  mrb_get_args(mrb, "oii&", &owner, &interval, &repeat, &callback );
 
-    timer = mrb_malloc(mrb,sizeof(BiTimer));
-    mrb_data_init(self, timer, &mrb_timer_data_type);
-    bi_timer_init(timer,_timer_callback_,interval,repeat, mrb_ptr(self) );
+  timer = mrb_malloc(mrb,sizeof(BiTimer));
+  mrb_data_init(self, timer, &mrb_timer_data_type);
+  bi_timer_init(timer,_timer_callback_,interval,repeat, mrb_ptr(self) );
 
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@callback"), callback);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@owner"), owner);
-    return self;
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@callback"), callback);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@owner"), owner);
+  return self;
 }
 
 void mrb_init_bi_timer(mrb_state *mrb,struct RClass *bi)

@@ -1,5 +1,5 @@
-#ifndef __MRUBY_BI_CORE_INNER_MACRO_H__
-#define __MRUBY_BI_CORE_INNER_MACRO_H__
+#ifndef __MRUBY_LIBBISMITE_INNER_MACRO_H__
+#define __MRUBY_LIBBISMITE_INNER_MACRO_H__
 
 #define bi_mrb_fixnum_value(mrb,i) mrb_fixnum_value(i)
 #define bi_mrb_bool_value(mrb,i) mrb_bool_value(i)
@@ -40,4 +40,4 @@
     return self; \
   }
 
-#endif
+#endif // __MRUBY_LIBBISMITE_INNER_MACRO_H__

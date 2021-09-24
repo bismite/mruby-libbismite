@@ -13,25 +13,25 @@ static struct mrb_data_type const mrb_texture_data_type = { "Texture", mrb_free 
 
 mrb_value create_bi_texture(mrb_state *mrb, BiTexture* texture)
 {
-    struct RClass *bi = mrb_class_get(mrb, "Bi");
-    struct RClass *klass = mrb_class_get_under(mrb,bi,"Texture");
-    struct RData *data = mrb_data_object_alloc(mrb,klass,texture,&mrb_texture_data_type);
-    mrb_value tmp = mrb_obj_value(data);
-    return tmp;
+  struct RClass *bi = mrb_class_get(mrb, "Bi");
+  struct RClass *klass = mrb_class_get_under(mrb,bi,"Texture");
+  struct RData *data = mrb_data_object_alloc(mrb,klass,texture,&mrb_texture_data_type);
+  mrb_value tmp = mrb_obj_value(data);
+  return tmp;
 }
 
 mrb_value create_bi_texture_from_memory(mrb_state *mrb, void* buffer, int size, bool antialias)
 {
-    BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-    bi_texture_init_with_file(texture,buffer,size,antialias);
-    return create_bi_texture(mrb,texture);
+  BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
+  bi_texture_init_with_file(texture,buffer,size,antialias);
+  return create_bi_texture(mrb,texture);
 }
 
 mrb_value create_bi_texture_from_pixels(mrb_state *mrb, int w, int h, void* pixels, bool antialias)
 {
-    BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-    bi_texture_init_with_pixels(texture,w,h,pixels,antialias);
-    return create_bi_texture(mrb,texture);
+  BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
+  bi_texture_init_with_pixels(texture,w,h,pixels,antialias);
+  return create_bi_texture(mrb,texture);
 }
 
 //
@@ -40,25 +40,25 @@ mrb_value create_bi_texture_from_pixels(mrb_state *mrb, int w, int h, void* pixe
 
 static mrb_value mrb_texture_initialize(mrb_state *mrb, mrb_value self)
 {
-    mrb_value image_name;
-    mrb_bool antialias;
-    mrb_get_args(mrb, "Sb", &image_name, &antialias );
-    BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-    bi_texture_init_with_filename(texture,mrb_string_value_cstr(mrb,&image_name), antialias);
-    mrb_data_init(self, texture, &mrb_texture_data_type);
-    return self;
+  mrb_value image_name;
+  mrb_bool antialias;
+  mrb_get_args(mrb, "Sb", &image_name, &antialias );
+  BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
+  bi_texture_init_with_filename(texture,mrb_string_value_cstr(mrb,&image_name), antialias);
+  mrb_data_init(self, texture, &mrb_texture_data_type);
+  return self;
 }
 
 static mrb_value mrb_texture_w(mrb_state *mrb, mrb_value self)
 {
-    BiTexture *texture = DATA_PTR(self);
-    return mrb_fixnum_value(texture->w);
+  BiTexture *texture = DATA_PTR(self);
+  return mrb_fixnum_value(texture->w);
 }
 
 static mrb_value mrb_texture_h(mrb_state *mrb, mrb_value self)
 {
-    BiTexture *texture = DATA_PTR(self);
-    return mrb_fixnum_value(texture->h);
+  BiTexture *texture = DATA_PTR(self);
+  return mrb_fixnum_value(texture->h);
 }
 
 void mrb_init_bi_texture(mrb_state *mrb,struct RClass *bi)

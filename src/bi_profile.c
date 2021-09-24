@@ -20,36 +20,36 @@ static mrb_value mrb_bi_profile_initialize(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_bi_profile_fps(mrb_state *mrb, mrb_value self)
 {
-    BiProfile* p = DATA_PTR(self);
-    return mrb_float_value(mrb, p->stats.fps);
+  BiProfile* p = DATA_PTR(self);
+  return mrb_float_value(mrb, p->stats.fps);
 }
 
 static mrb_value mrb_bi_profile_time_spent_on_rendering(mrb_state *mrb, mrb_value self)
 {
-    BiProfile* p = DATA_PTR(self);
-    return mrb_fixnum_value(p->stats.time_spent_on_rendering);
+  BiProfile* p = DATA_PTR(self);
+  return mrb_fixnum_value(p->stats.time_spent_on_rendering);
 }
 static mrb_value mrb_bi_profile_time_spent_on_callback(mrb_state *mrb, mrb_value self)
 {
-    BiProfile* p = DATA_PTR(self);
-    return mrb_fixnum_value(p->stats.time_spent_on_callback);
+  BiProfile* p = DATA_PTR(self);
+  return mrb_fixnum_value(p->stats.time_spent_on_callback);
 }
 static mrb_value mrb_bi_profile_matrix_updated(mrb_state *mrb, mrb_value self)
 {
-    BiProfile* p = DATA_PTR(self);
-    return mrb_float_value(mrb,p->stats.matrix_updated);
+  BiProfile* p = DATA_PTR(self);
+  return mrb_float_value(mrb,p->stats.matrix_updated);
 }
 
 
 static mrb_value mrb_bi_profile_rendering_nodes_queue_size(mrb_state *mrb, mrb_value self)
 {
-    BiProfile* p = DATA_PTR(self);
-    return mrb_fixnum_value(p->rendering_nodes_queue_size);
+  BiProfile* p = DATA_PTR(self);
+  return mrb_fixnum_value(p->rendering_nodes_queue_size);
 }
 static mrb_value mrb_bi_profile_callback_planned_nodes_size(mrb_state *mrb, mrb_value self)
 {
-    BiProfile* p = DATA_PTR(self);
-    return mrb_fixnum_value(p->callback_planned_nodes_size);
+  BiProfile* p = DATA_PTR(self);
+  return mrb_fixnum_value(p->callback_planned_nodes_size);
 }
 
 void mrb_init_bi_profile(mrb_state *mrb,struct RClass *bi)

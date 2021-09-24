@@ -5,7 +5,7 @@
 #include <mruby/array.h>
 #include <bi/context.h>
 #include <bi/layer.h>
-#include "bi_core_inner_macro.h"
+#include "_inner_macro.h"
 
 //
 // Bi::Layer class
@@ -15,13 +15,13 @@ static struct mrb_data_type const mrb_layer_data_type = { "Layer", mrb_free };
 
 static mrb_value mrb_layer_initialize(mrb_state *mrb, mrb_value self)
 {
-    BiLayer* layer = mrb_malloc(mrb,sizeof(BiLayer));
-    if (NULL == layer) {
-      mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
-    }
-    bi_layer_init(layer);
-    mrb_data_init(self, layer, &mrb_layer_data_type);
-    return self;
+  BiLayer* layer = mrb_malloc(mrb,sizeof(BiLayer));
+  if (NULL == layer) {
+    mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
+  }
+  bi_layer_init(layer);
+  mrb_data_init(self, layer, &mrb_layer_data_type);
+  return self;
 }
 
 //
@@ -39,72 +39,72 @@ _SET_FUNC_(BiLayer,z_order,mrb_int,i,bi_layer_set_z_order);
 
 static mrb_value mrb_BiLayer_set_root(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
-    // TODO: error check
-    BiLayer* layer = DATA_PTR(self);
-    BiNode* node = DATA_PTR(obj);
-    layer->root = node;
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@root"), obj);
-    return self;
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
+  // TODO: error check
+  BiLayer* layer = DATA_PTR(self);
+  BiNode* node = DATA_PTR(obj);
+  layer->root = node;
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@root"), obj);
+  return self;
 }
 
 static mrb_value mrb_BiLayer_get_root(mrb_state *mrb, mrb_value self)
 {
-    return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@root"));
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@root"));
 }
 
 static mrb_value mrb_BiLayer_set_shader(mrb_state *mrb, mrb_value self)
 {
-    mrb_value obj;
-    mrb_get_args(mrb, "o", &obj );
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
 
-    BiLayer* layer = DATA_PTR(self);
-    struct RClass *bi = mrb_class_get(mrb,"Bi");
-    struct RClass *shader_class = mrb_class_get_under(mrb,bi,"Shader");
-    if( mrb_obj_is_kind_of(mrb, obj, shader_class) ) {
-      BiShader* shader = DATA_PTR(obj);
-      layer->shader = shader;
-      mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), obj);
-    }else{
-      layer->shader = NULL;
-      mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), mrb_nil_value() );
-    }
+  BiLayer* layer = DATA_PTR(self);
+  struct RClass *bi = mrb_class_get(mrb,"Bi");
+  struct RClass *shader_class = mrb_class_get_under(mrb,bi,"Shader");
+  if( mrb_obj_is_kind_of(mrb, obj, shader_class) ) {
+    BiShader* shader = DATA_PTR(obj);
+    layer->shader = shader;
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), obj);
+  }else{
+    layer->shader = NULL;
+    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@shader"), mrb_nil_value() );
+  }
 
-    return self;
+  return self;
 }
 
 static mrb_value mrb_BiLayer_get_shader(mrb_state *mrb, mrb_value self)
 {
-    return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@shader"));
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@shader"));
 }
 
 static mrb_value mrb_BiLayer_set_shader_attribute(mrb_state *mrb, mrb_value self)
 {
-    mrb_int index;
-    mrb_float value;
-    mrb_get_args(mrb, "if", &index, &value );
-    BiLayer* layer = DATA_PTR(self);
-    if( 0 <= index && index < 4 ) {
-      layer->shader_attributes[index] = value;
-    }
-    return self;
+  mrb_int index;
+  mrb_float value;
+  mrb_get_args(mrb, "if", &index, &value );
+  BiLayer* layer = DATA_PTR(self);
+  if( 0 <= index && index < 4 ) {
+    layer->shader_attributes[index] = value;
+  }
+  return self;
 }
 
 static mrb_value mrb_BiLayer_set_texture(mrb_state *mrb, mrb_value self)
 {
-    mrb_int index;
-    mrb_value texture_obj;
-    mrb_get_args(mrb, "io", &index, &texture_obj );
+  mrb_int index;
+  mrb_value texture_obj;
+  mrb_get_args(mrb, "io", &index, &texture_obj );
 
-    BiLayer* layer = DATA_PTR(self);
-    BiTexture* texture = DATA_PTR(texture_obj);
+  BiLayer* layer = DATA_PTR(self);
+  BiTexture* texture = DATA_PTR(texture_obj);
 
-    if( 0 <= index && index < 8 ) {
-      layer->textures[index] = texture;
-    }
+  if( 0 <= index && index < 8 ) {
+    layer->textures[index] = texture;
+  }
 
-    return self;
+  return self;
 }
 
 static mrb_value mrb_BiLayer_set_blend_factor(mrb_state *mrb, mrb_value self)

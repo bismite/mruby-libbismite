@@ -24,19 +24,19 @@ static void transition_callback(BiContext* context, BiTransition* transition)
 
 static mrb_value mrb_transition_initialize(mrb_state *mrb, mrb_value self)
 {
-    mrb_value layer_group_obj, shader_obj, callback;
-    mrb_int duration;
-    mrb_bool invert;
-    mrb_get_args(mrb, "oiobo", &layer_group_obj, &duration, &shader_obj, &invert, &callback);
+  mrb_value layer_group_obj, shader_obj, callback;
+  mrb_int duration;
+  mrb_bool invert;
+  mrb_get_args(mrb, "oiobo", &layer_group_obj, &duration, &shader_obj, &invert, &callback);
 
-    BiTransition *transition = mrb_malloc(mrb, sizeof(BiTransition));
-    BiLayerGroup *lg = DATA_PTR(layer_group_obj);
-    BiShader *shader = DATA_PTR(shader_obj);
-    bi_transition_init(transition,lg,duration,transition_callback,shader,invert);
-    mrb_data_init(self, transition, &mrb_transition_data_type);
-    transition->userdata = mrb_ptr(self);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@callback"), callback );
-    return self;
+  BiTransition *transition = mrb_malloc(mrb, sizeof(BiTransition));
+  BiLayerGroup *lg = DATA_PTR(layer_group_obj);
+  BiShader *shader = DATA_PTR(shader_obj);
+  bi_transition_init(transition,lg,duration,transition_callback,shader,invert);
+  mrb_data_init(self, transition, &mrb_transition_data_type);
+  transition->userdata = mrb_ptr(self);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@callback"), callback );
+  return self;
 }
 
 //

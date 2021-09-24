@@ -6,7 +6,7 @@
 #include <bi/util.h>
 #include <bi/ext/action.h>
 #include <stdlib.h>
-#include "bi_ext_inner_macro.h"
+#include "_inner_macro.h"
 
 // callback on finish
 
