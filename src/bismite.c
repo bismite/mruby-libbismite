@@ -32,6 +32,11 @@ extern void mrb_init_bi_layer_group(mrb_state*, struct RClass*);
 extern void mrb_init_bi_shader(mrb_state*, struct RClass*);
 extern void mrb_init_bi_key(mrb_state*, struct RClass*);
 extern void mrb_init_bi_version(mrb_state*, struct RClass*);
+// modules ext
+extern void mrb_init_font(mrb_state *mrb, struct RClass *sg);
+extern void mrb_init_label(mrb_state *mrb, struct RClass *sg);
+extern void mrb_init_action(mrb_state *mrb, struct RClass *sg);
+extern void mrb_init_transition(mrb_state *mrb, struct RClass *sg);
 
 //
 // Bi class
@@ -150,7 +155,7 @@ static mrb_value mrb_bi_messagebox(mrb_state *mrb, mrb_value self)
 //
 // init
 //
-void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
+void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
 {
   struct RClass *bi;
   bi = mrb_define_class(mrb, "Bi", mrb->object_class);
@@ -183,9 +188,15 @@ void mrb_mruby_bi_core_gem_init(mrb_state* mrb)
   mrb_init_bi_shader(mrb,bi); DONE;
   mrb_init_bi_key(mrb,bi); DONE;
   mrb_init_bi_version(mrb,bi); DONE;
+  // ext
+  mrb_init_font(mrb,bi); DONE;
+  mrb_init_label(mrb,bi); DONE;
+  mrb_init_action(mrb,bi); DONE;
+  mrb_init_transition(mrb,bi); DONE;
+
 #undef DONE
 }
 
-void mrb_mruby_bi_core_gem_final(mrb_state* mrb)
+void mrb_mruby_libbismite_gem_final(mrb_state* mrb)
 {
 }
