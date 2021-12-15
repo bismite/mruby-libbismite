@@ -9,14 +9,14 @@
 // Timer callback
 //
 
-static bool _timer_callback_(BiContext *context,BiTimer* timer)
+static void _timer_callback_(BiContext *context,BiTimer* timer,double dt)
 {
   mrb_value self = mrb_obj_value(timer->userdata);
   mrb_state *mrb = context->userdata;
   mrb_value block = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@callback") );
-  mrb_value now_value = mrb_fixnum_value(context->frame_start_at);
-  mrb_value argv[2] = { self, now_value };
-  return mrb_bool( mrb_yield_argv(mrb, block, 2, argv) );
+  mrb_value dt_value = mrb_float_value(mrb,dt);
+  mrb_value argv[2] = { self, dt_value };
+  mrb_yield_argv(mrb, block, 2, argv);
 }
 
 //

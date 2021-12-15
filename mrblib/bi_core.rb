@@ -59,21 +59,6 @@ class Bi
     @@bi.layers.clear
   end
 
-  # Timer
-  def self.add_timer(duration,repeat,&callback)
-    @@bi.timers ||= []
-    timer = Bi::Timer.new @@bi, duration, repeat, &callback
-    @@bi.timers << timer
-    @@bi._add_timer timer
-    timer
-  end
-  def self.remove_timer(timer)
-    @@bi.timers ||= []
-    @@bi.timers.delete timer
-    @@bi._remove_timer timer
-    timer
-  end
-
   def self.messagebox(title,message,dialog_type=:information)
     @@bi.messagebox title, message,dialog_type
   end
@@ -141,9 +126,6 @@ class Bi::Node
   #
   # callbacks
   #
-  def on_update(callback=nil,&blk)
-    self._on_update_( callback || blk )
-  end
   def on_click(callback=nil,&blk)
     self._on_click_( callback || blk )
   end
@@ -190,7 +172,6 @@ class Bi::Sprite < Bi::Node
     self.texture_mapping = texture_mapping
     self.set_position 0, 0
     self.set_size texture_mapping.w, texture_mapping.h
-    self.set_color 0xff,0xff,0xff,0xff
   end
 end
 

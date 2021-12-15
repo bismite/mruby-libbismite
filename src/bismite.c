@@ -109,30 +109,6 @@ static mrb_value mrb_bi_set_title(mrb_state *mrb, mrb_value self)
 }
 
 //
-// Timer
-//
-
-static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
-{
-  mrb_value obj;
-  mrb_get_args(mrb, "o", &obj );
-  BiContext* context = DATA_PTR(self);
-  BiTimer* timer = DATA_PTR(obj);
-  bi_add_timer(&context->timers,timer);
-  return self;
-}
-
-static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
-{
-  mrb_value obj;
-  mrb_get_args(mrb, "o", &obj );
-  BiContext* context = DATA_PTR(self);
-  BiTimer* timer = DATA_PTR(obj);
-  bi_remove_timer(&context->timers,timer);
-  return self;
-}
-
-//
 // misc
 //
 static mrb_value mrb_bi_messagebox(mrb_state *mrb, mrb_value self)
@@ -171,9 +147,6 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, bi, "debug", mrb_BiContext_get_debug, MRB_ARGS_NONE());
 
   mrb_define_method(mrb, bi, "set_title", mrb_bi_set_title, MRB_ARGS_REQ(1));
-
-  mrb_define_method(mrb, bi, "_add_timer", mrb_bi_add_timer, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, bi, "_remove_timer", mrb_bi_remove_timer, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, bi, "messagebox", mrb_bi_messagebox, MRB_ARGS_REQ(3));
 

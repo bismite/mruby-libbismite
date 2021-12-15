@@ -251,10 +251,10 @@ static mrb_value mrb_node_set_position(mrb_state *mrb, mrb_value self)
 static mrb_value mrb_node_angle(mrb_state *mrb, mrb_value self)
 {
   BiNode* node = DATA_PTR(self);
-  return mrb_float_value(mrb,node->angle * 180.0 / 3.14159);
+  return mrb_float_value(mrb,node->angle);
 }
 
-_SET_FUNC_(BiNode,angle,mrb_float,f,bi_node_set_degree);
+_SET_FUNC_(BiNode,angle,mrb_float,f,bi_node_set_angle);
 
 _GET_(BiNode,w,bi_mrb_fixnum_value);
 _GET_(BiNode,h,bi_mrb_fixnum_value);
@@ -366,10 +366,6 @@ static mrb_value mrb_node_get_visible(mrb_state *mrb, mrb_value self)
   bi_node_set_ ## CALLBACK_NAME (DATA_PTR(self),  CALLBACK_NAME ); \
   return self;
 
-static mrb_value mrb_node_on_update(mrb_state *mrb, mrb_value self) {
-  SET_CALLBACK(on_update);
-}
-
 static mrb_value mrb_node_on_click(mrb_state *mrb, mrb_value self) {
   SET_CALLBACK(on_click);
 }
@@ -403,13 +399,9 @@ static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
 {
   mrb_value obj;
   mrb_get_args(mrb, "o", &obj );
-
-  // TODO: error check
   BiNode* node = DATA_PTR(self);
   BiTimer* timer = DATA_PTR(obj);
-
-  bi_add_timer(&node->timers,timer);
-
+  bi_node_add_timer(node,timer);
   return self;
 }
 
@@ -417,13 +409,9 @@ static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
 {
   mrb_value obj;
   mrb_get_args(mrb, "o", &obj );
-
-  // TODO: error check
   BiNode* node = DATA_PTR(self);
   BiTimer* timer = DATA_PTR(obj);
-
-  bi_remove_timer(&node->timers,timer);
-
+  bi_node_remove_timer(node,timer);
   return self;
 }
 
@@ -475,7 +463,6 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "visible", mrb_node_get_visible, MRB_ARGS_NONE());
 
   // callback
-  mrb_define_method(mrb, node, "_on_update_", mrb_node_on_update, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_click_", mrb_node_on_click, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_move_cursor_", mrb_node_on_move_cursor, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_key_input_", mrb_node_on_key_input, MRB_ARGS_REQ(1));

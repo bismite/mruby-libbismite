@@ -27,13 +27,6 @@ mrb_value create_bi_texture_from_memory(mrb_state *mrb, void* buffer, int size, 
   return create_bi_texture(mrb,texture);
 }
 
-mrb_value create_bi_texture_from_pixels(mrb_state *mrb, int w, int h, void* pixels, bool antialias)
-{
-  BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-  bi_texture_init_with_pixels(texture,w,h,pixels,antialias);
-  return create_bi_texture(mrb,texture);
-}
-
 //
 // instance methods
 //

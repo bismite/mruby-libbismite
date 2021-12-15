@@ -31,8 +31,6 @@ _GET_(BiLayer,camera_x,bi_mrb_fixnum_value);
 _SET_(BiLayer,camera_x,mrb_int,i);
 _GET_(BiLayer,camera_y,bi_mrb_fixnum_value);
 _SET_(BiLayer,camera_y,mrb_int,i);
-_GET_(BiLayer,projection_centering,bi_mrb_bool_value);
-_SET_(BiLayer,projection_centering,mrb_bool,b);
 
 _GET_FUNC_(BiLayer,z_order,bi_layer_get_z_order,bi_mrb_fixnum_value);
 _SET_FUNC_(BiLayer,z_order,mrb_int,i,bi_layer_set_z_order);
@@ -204,8 +202,6 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, layer, "camera_x=",mrb_BiLayer_set_camera_x, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer, "camera_y", mrb_BiLayer_get_camera_y, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "camera_y=",mrb_BiLayer_set_camera_y, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, layer, "projection_centering", mrb_BiLayer_get_projection_centering, MRB_ARGS_NONE());
-  mrb_define_method(mrb, layer, "projection_centering=", mrb_BiLayer_set_projection_centering, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, layer, "z_order", mrb_BiLayer_get_z_order, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "z_order=",mrb_BiLayer_set_z_order, MRB_ARGS_REQ(1));
