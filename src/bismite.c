@@ -27,6 +27,7 @@ extern void mrb_init_bi_node(mrb_state*, struct RClass*);
 extern void mrb_init_bi_texture(mrb_state*, struct RClass*);
 extern void mrb_init_bi_texture_mapping(mrb_state*, struct RClass*);
 extern void mrb_init_bi_timer(mrb_state*, struct RClass*);
+extern void mrb_init_bi_timer_runner(mrb_state*, struct RClass*);
 extern void mrb_init_bi_layer(mrb_state*, struct RClass*);
 extern void mrb_init_bi_layer_group(mrb_state*, struct RClass*);
 extern void mrb_init_bi_shader(mrb_state*, struct RClass*);
@@ -63,10 +64,11 @@ static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
   // layer group
   struct RClass *klass = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"LayerGroup");
   struct RData *data = mrb_data_object_alloc(mrb,klass,&c->layers,&mrb_layer_group_data_type);
-  mrb_value val = mrb_obj_value(data);
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@layers"), val);
-  mrb_iv_set(mrb, val, mrb_intern_cstr(mrb,"@layers"),mrb_ary_new(mrb));
-  mrb_iv_set(mrb, val, mrb_intern_cstr(mrb,"@post_processes"),mrb_ary_new(mrb));
+  mrb_value layergroup_obj = mrb_obj_value(data);
+  c->layers.userdata = mrb_ptr(layergroup_obj);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@layers"), layergroup_obj);
+  mrb_iv_set(mrb, layergroup_obj, mrb_intern_cstr(mrb,"@layers"),mrb_ary_new(mrb));
+  mrb_iv_set(mrb, layergroup_obj, mrb_intern_cstr(mrb,"@post_processes"),mrb_ary_new(mrb));
 
   return self;
 }
@@ -156,6 +158,7 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_init_bi_texture(mrb,bi); DONE;
   mrb_init_bi_texture_mapping(mrb,bi); DONE;
   mrb_init_bi_timer(mrb,bi); DONE;
+  mrb_init_bi_timer_runner(mrb,bi); DONE;
   mrb_init_bi_layer(mrb,bi); DONE;
   mrb_init_bi_layer_group(mrb,bi); DONE;
   mrb_init_bi_shader(mrb,bi); DONE;

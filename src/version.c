@@ -40,9 +40,9 @@ void mrb_init_bi_version(mrb_state *mrb, struct RClass *bi)
 {
   struct RClass *version = mrb_define_module_under(mrb,bi,"Version");
 
-  mrb_define_const(mrb, version, "BI_CORE_MAJOR", mrb_fixnum_value(BISMITE_MAJOR_VERSION));
-  mrb_define_const(mrb, version, "BI_CORE_MINOR", mrb_fixnum_value(BISMITE_MINOR_VERSION));
-  mrb_define_const(mrb, version, "BI_CORE_PATCH", mrb_fixnum_value(BISMITE_PATCHLEVEL));
+  mrb_define_const(mrb, version, "BISMITE_MAJOR", mrb_fixnum_value(BISMITE_MAJOR_VERSION));
+  mrb_define_const(mrb, version, "BISMITE_MINOR", mrb_fixnum_value(BISMITE_MINOR_VERSION));
+  mrb_define_const(mrb, version, "BISMITE_PATCH", mrb_fixnum_value(BISMITE_PATCHLEVEL));
 
 #ifdef EMSCRIPTEN
   mrb_define_const(mrb, version, "EMSCRIPTEN_MAJOR", mrb_fixnum_value(__EMSCRIPTEN_major__));

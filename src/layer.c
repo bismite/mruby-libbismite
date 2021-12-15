@@ -21,6 +21,7 @@ static mrb_value mrb_layer_initialize(mrb_state *mrb, mrb_value self)
   }
   bi_layer_init(layer);
   mrb_data_init(self, layer, &mrb_layer_data_type);
+  layer->userdata = mrb_ptr(self);
   return self;
 }
 

@@ -71,9 +71,14 @@ class Bi
 end
 
 class Bi::LayerGroup
+  include Bi::TimerRunner
   def layers
     @layers
   end
+end
+
+class Bi::Layer
+  include Bi::TimerRunner
 end
 
 class Bi::Texture
@@ -94,6 +99,7 @@ class Bi::TextureMapping
 end
 
 class Bi::Node
+  include Bi::TimerRunner
   attr_reader :texture_mapping
   attr_accessor :parent
 
@@ -144,26 +150,6 @@ class Bi::Node
   def on_text_input(callback=nil,&blk)
     self._on_text_input_( callback || blk )
   end
-
-  # Timer
-  def add_timer(duration,repeat,&callback)
-    @timers ||= []
-    timer = Bi::Timer.new self, duration, repeat, &callback
-    @timers << timer
-    self._add_timer timer
-    timer
-  end
-  def remove_timer(timer)
-    @timers ||= []
-    @timers.delete timer
-    self._remove_timer timer
-    timer
-  end
-end
-
-class Bi::Timer
-  attr_reader :callback
-  attr_reader :owner
 end
 
 class Bi::Sprite < Bi::Node
@@ -190,35 +176,5 @@ module Bi::ScanCode
       return c if Bi::ScanCode.const_get(c) == code
     }
     return nil
-  end
-end
-
-module Bi::Version
-  def self.bicore
-    "#{BI_CORE_MAJOR}.#{BI_CORE_MINOR}.#{BI_CORE_PATCH}"
-  end
-
-  def self.mruby_bicore
-    "0.14.2"
-  end
-
-  def self.emscripten
-    EMSCRIPTEN_MAJOR ? "#{EMSCRIPTEN_MAJOR}.#{EMSCRIPTEN_MINOR}.#{EMSCRIPTEN_PATCH}" : nil
-  end
-
-  def self.clang
-    CLANG_MAJOR ? "#{CLANG_MAJOR}.#{CLANG_MINOR}.#{CLANG_PATCH}" : nil
-  end
-
-  def self.gnuc
-    GNUC_MAJOR ? "#{GNUC_MAJOR}.#{GNUC_MINOR}.#{GNUC_PATCH}" : nil
-  end
-
-  def self.sdl_compiled
-    "#{SDL_COMPILED_MAJOR}.#{SDL_COMPILED_MINOR}.#{SDL_COMPILED_PATCH}"
-  end
-
-  def self.sdl
-    "#{SDL_LINKED_MAJOR}.#{SDL_LINKED_MINOR}.#{SDL_LINKED_PATCH}"
   end
 end

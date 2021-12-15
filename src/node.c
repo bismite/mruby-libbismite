@@ -26,20 +26,6 @@ static struct mrb_data_type const mrb_node_data_type = { "Node", node_free };
 // callback function
 //
 
-static void on_update(BiContext* context, BiNode* node)
-{
-  mrb_state *mrb = context->userdata;
-  mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_update_callback_") );
-  mrb_value argv[1] = {self};
-
-  if( mrb_symbol_p(obj) ){
-    mrb_funcall_argv(mrb,self,mrb_symbol(obj),1,argv);
-  }else if( mrb_type(obj) == MRB_TT_PROC ) {
-    mrb_yield_argv(mrb,obj,1,argv);
-  }
-}
-
 static bool on_click(BiContext* context, BiNode* node, int x, int y, int button, bool pressed)
 {
   mrb_state *mrb = context->userdata;
@@ -391,30 +377,6 @@ static mrb_value mrb_node_on_text_input(mrb_state *mrb, mrb_value self) {
   SET_CALLBACK(on_textinput);
 }
 
-//
-// Timer
-//
-
-static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
-{
-  mrb_value obj;
-  mrb_get_args(mrb, "o", &obj );
-  BiNode* node = DATA_PTR(self);
-  BiTimer* timer = DATA_PTR(obj);
-  bi_node_add_timer(node,timer);
-  return self;
-}
-
-static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
-{
-  mrb_value obj;
-  mrb_get_args(mrb, "o", &obj );
-  BiNode* node = DATA_PTR(self);
-  BiTimer* timer = DATA_PTR(obj);
-  bi_node_remove_timer(node,timer);
-  return self;
-}
-
 // gem
 
 void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
@@ -469,9 +431,4 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "_on_move_finger_", mrb_node_on_move_finger, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_touch_", mrb_node_on_touch, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_text_input_", mrb_node_on_text_input, MRB_ARGS_REQ(1));
-
-  // timer
-  mrb_define_method(mrb, node, "_add_timer", mrb_bi_add_timer, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "_remove_timer", mrb_bi_remove_timer, MRB_ARGS_REQ(1));
-
 }
