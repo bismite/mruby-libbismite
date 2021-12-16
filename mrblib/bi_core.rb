@@ -2,7 +2,7 @@
 class Bi
   @@bi = nil
   attr_accessor :title
-  attr_accessor :timers, :layers
+  attr_accessor :timers, :layers, :default_shader
 
   def self.init(w,h,opts={})
     unless @@bi
@@ -59,6 +59,12 @@ class Bi
     @@bi.layers.clear
   end
 
+  # shader
+  def self.default_shader
+    @@bi.default_shader
+  end
+
+  #
   def self.messagebox(title,message,dialog_type=:information)
     @@bi.messagebox title, message,dialog_type
   end
@@ -79,6 +85,8 @@ end
 
 class Bi::Layer
   include Bi::TimerRunner
+  attr_reader :shader
+  attr_reader :post_process_shader
 end
 
 class Bi::Texture

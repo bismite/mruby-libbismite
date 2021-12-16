@@ -30,6 +30,7 @@ extern void mrb_init_bi_timer(mrb_state*, struct RClass*);
 extern void mrb_init_bi_timer_runner(mrb_state*, struct RClass*);
 extern void mrb_init_bi_layer(mrb_state*, struct RClass*);
 extern void mrb_init_bi_layer_group(mrb_state*, struct RClass*);
+extern void mrb_init_bi_canvas(mrb_state*, struct RClass*);
 extern void mrb_init_bi_shader(mrb_state*, struct RClass*);
 extern void mrb_init_bi_key(mrb_state*, struct RClass*);
 extern void mrb_init_bi_version(mrb_state*, struct RClass*);
@@ -45,8 +46,9 @@ extern void mrb_init_transition(mrb_state *mrb, struct RClass *sg);
 
 static struct mrb_data_type const mrb_bi_data_type = { "Bi", mrb_free };
 
-// XXX: for static layer group in context structure
+// XXX: for static class in context structure
 static struct mrb_data_type const mrb_layer_group_data_type = { "LayerGroup", NULL };
+static struct mrb_data_type const mrb_shader_data_type = { "Shader", NULL };
 
 static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
 {
@@ -62,13 +64,19 @@ static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
   mrb_data_init(self, c, &mrb_bi_data_type);
 
   // layer group
-  struct RClass *klass = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"LayerGroup");
-  struct RData *data = mrb_data_object_alloc(mrb,klass,&c->layers,&mrb_layer_group_data_type);
-  mrb_value layergroup_obj = mrb_obj_value(data);
-  c->layers.userdata = mrb_ptr(layergroup_obj);
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@layers"), layergroup_obj);
-  mrb_iv_set(mrb, layergroup_obj, mrb_intern_cstr(mrb,"@layers"),mrb_ary_new(mrb));
-  mrb_iv_set(mrb, layergroup_obj, mrb_intern_cstr(mrb,"@post_processes"),mrb_ary_new(mrb));
+  struct RClass *lg_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"LayerGroup");
+  struct RData *lg_data = mrb_data_object_alloc(mrb,lg_class,&c->layers,&mrb_layer_group_data_type);
+  mrb_value lg_obj = mrb_obj_value(lg_data);
+  c->layers.userdata = mrb_ptr(lg_obj);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@layers"), lg_obj);
+  mrb_iv_set(mrb, lg_obj, mrb_intern_cstr(mrb,"@layers"),mrb_ary_new(mrb));
+  mrb_iv_set(mrb, lg_obj, mrb_intern_cstr(mrb,"@post_processes"),mrb_ary_new(mrb));
+
+  // default shader
+  struct RClass *shader_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Shader");
+  struct RData *shader_data = mrb_data_object_alloc(mrb,shader_class,&c->default_shader,&mrb_shader_data_type);
+  mrb_value shader_obj = mrb_obj_value(shader_data);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@default_shader"),shader_obj);
 
   return self;
 }
@@ -120,12 +128,21 @@ static mrb_value mrb_bi_messagebox(mrb_state *mrb, mrb_value self)
   mrb_get_args(mrb, "SSn",  &title, &message, &dialog_type );
   BiContext *context = DATA_PTR(self);
   if(dialog_type == mrb_intern_lit(mrb,"error")){
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+                             RSTRING_CSTR(mrb,title),
+                             RSTRING_CSTR(mrb,message),
+                             context->window);
   }
   else if(dialog_type==mrb_intern_lit(mrb,"warning")){
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING,
+                             RSTRING_CSTR(mrb,title),
+                             RSTRING_CSTR(mrb,message),
+                             context->window);
   }else{
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, RSTRING_CSTR(mrb,title), RSTRING_CSTR(mrb,message), context->window);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
+                             RSTRING_CSTR(mrb,title),
+                             RSTRING_CSTR(mrb,message),
+                             context->window);
   }
   return self;
 }
@@ -161,6 +178,7 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_init_bi_timer_runner(mrb,bi); DONE;
   mrb_init_bi_layer(mrb,bi); DONE;
   mrb_init_bi_layer_group(mrb,bi); DONE;
+  mrb_init_bi_canvas(mrb,bi); DONE;
   mrb_init_bi_shader(mrb,bi); DONE;
   mrb_init_bi_key(mrb,bi); DONE;
   mrb_init_bi_version(mrb,bi); DONE;
