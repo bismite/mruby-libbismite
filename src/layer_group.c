@@ -12,16 +12,16 @@ static struct mrb_data_type const mrb_layer_group_data_type = { "LayerGroup", mr
 
 static mrb_value mrb_layer_group_initialize(mrb_state *mrb, mrb_value self)
 {
-  BiLayerGroup *dat = mrb_malloc(mrb,sizeof(BiLayerGroup));
-  if (NULL == dat) {
+  BiLayerGroup *layer_group = mrb_malloc(mrb,sizeof(BiLayerGroup));
+  if (NULL == layer_group) {
     mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
   }
-  bi_layer_group_init(dat);
-  mrb_data_init(self, dat, &mrb_layer_group_data_type);
+  bi_layer_group_init(layer_group);
+  mrb_data_init(self, layer_group, &mrb_layer_group_data_type);
 
   mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@layers"),mrb_ary_new(mrb));
   mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@post_processes"),mrb_ary_new(mrb));
-
+  layer_group->userdata = mrb_ptr(self);
   return self;
 }
 

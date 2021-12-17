@@ -26,20 +26,6 @@ static struct mrb_data_type const mrb_node_data_type = { "Node", node_free };
 // callback function
 //
 
-static void on_update(BiContext* context, BiNode* node)
-{
-  mrb_state *mrb = context->userdata;
-  mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_update_callback_") );
-  mrb_value argv[1] = {self};
-
-  if( mrb_symbol_p(obj) ){
-    mrb_funcall_argv(mrb,self,mrb_symbol(obj),1,argv);
-  }else if( mrb_type(obj) == MRB_TT_PROC ) {
-    mrb_yield_argv(mrb,obj,1,argv);
-  }
-}
-
 static bool on_click(BiContext* context, BiNode* node, int x, int y, int button, bool pressed)
 {
   mrb_state *mrb = context->userdata;
@@ -251,10 +237,10 @@ static mrb_value mrb_node_set_position(mrb_state *mrb, mrb_value self)
 static mrb_value mrb_node_angle(mrb_state *mrb, mrb_value self)
 {
   BiNode* node = DATA_PTR(self);
-  return mrb_float_value(mrb,node->angle * 180.0 / 3.14159);
+  return mrb_float_value(mrb,node->angle);
 }
 
-_SET_FUNC_(BiNode,angle,mrb_float,f,bi_node_set_degree);
+_SET_FUNC_(BiNode,angle,mrb_float,f,bi_node_set_angle);
 
 _GET_(BiNode,w,bi_mrb_fixnum_value);
 _GET_(BiNode,h,bi_mrb_fixnum_value);
@@ -366,10 +352,6 @@ static mrb_value mrb_node_get_visible(mrb_state *mrb, mrb_value self)
   bi_node_set_ ## CALLBACK_NAME (DATA_PTR(self),  CALLBACK_NAME ); \
   return self;
 
-static mrb_value mrb_node_on_update(mrb_state *mrb, mrb_value self) {
-  SET_CALLBACK(on_update);
-}
-
 static mrb_value mrb_node_on_click(mrb_state *mrb, mrb_value self) {
   SET_CALLBACK(on_click);
 }
@@ -393,38 +375,6 @@ static mrb_value mrb_node_on_touch(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_node_on_text_input(mrb_state *mrb, mrb_value self) {
   SET_CALLBACK(on_textinput);
-}
-
-//
-// Timer
-//
-
-static mrb_value mrb_bi_add_timer(mrb_state *mrb, mrb_value self)
-{
-  mrb_value obj;
-  mrb_get_args(mrb, "o", &obj );
-
-  // TODO: error check
-  BiNode* node = DATA_PTR(self);
-  BiTimer* timer = DATA_PTR(obj);
-
-  bi_add_timer(&node->timers,timer);
-
-  return self;
-}
-
-static mrb_value mrb_bi_remove_timer(mrb_state *mrb, mrb_value self)
-{
-  mrb_value obj;
-  mrb_get_args(mrb, "o", &obj );
-
-  // TODO: error check
-  BiNode* node = DATA_PTR(self);
-  BiTimer* timer = DATA_PTR(obj);
-
-  bi_remove_timer(&node->timers,timer);
-
-  return self;
 }
 
 // gem
@@ -475,16 +425,10 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "visible", mrb_node_get_visible, MRB_ARGS_NONE());
 
   // callback
-  mrb_define_method(mrb, node, "_on_update_", mrb_node_on_update, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_click_", mrb_node_on_click, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_move_cursor_", mrb_node_on_move_cursor, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_key_input_", mrb_node_on_key_input, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_move_finger_", mrb_node_on_move_finger, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_touch_", mrb_node_on_touch, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "_on_text_input_", mrb_node_on_text_input, MRB_ARGS_REQ(1));
-
-  // timer
-  mrb_define_method(mrb, node, "_add_timer", mrb_bi_add_timer, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "_remove_timer", mrb_bi_remove_timer, MRB_ARGS_REQ(1));
-
 }

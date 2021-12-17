@@ -2,7 +2,7 @@
 class Bi
   @@bi = nil
   attr_accessor :title
-  attr_accessor :timers, :layers
+  attr_accessor :timers, :layers, :default_shader
 
   def self.init(w,h,opts={})
     unless @@bi
@@ -59,21 +59,12 @@ class Bi
     @@bi.layers.clear
   end
 
-  # Timer
-  def self.add_timer(duration,repeat,&callback)
-    @@bi.timers ||= []
-    timer = Bi::Timer.new @@bi, duration, repeat, &callback
-    @@bi.timers << timer
-    @@bi._add_timer timer
-    timer
-  end
-  def self.remove_timer(timer)
-    @@bi.timers ||= []
-    @@bi.timers.delete timer
-    @@bi._remove_timer timer
-    timer
+  # shader
+  def self.default_shader
+    @@bi.default_shader
   end
 
+  #
   def self.messagebox(title,message,dialog_type=:information)
     @@bi.messagebox title, message,dialog_type
   end
@@ -86,9 +77,16 @@ class Bi
 end
 
 class Bi::LayerGroup
+  include Bi::TimerRunner
   def layers
     @layers
   end
+end
+
+class Bi::Layer
+  include Bi::TimerRunner
+  attr_reader :shader
+  attr_reader :post_process_shader
 end
 
 class Bi::Texture
@@ -109,6 +107,7 @@ class Bi::TextureMapping
 end
 
 class Bi::Node
+  include Bi::TimerRunner
   attr_reader :texture_mapping
   attr_accessor :parent
 
@@ -141,9 +140,6 @@ class Bi::Node
   #
   # callbacks
   #
-  def on_update(callback=nil,&blk)
-    self._on_update_( callback || blk )
-  end
   def on_click(callback=nil,&blk)
     self._on_click_( callback || blk )
   end
@@ -162,26 +158,6 @@ class Bi::Node
   def on_text_input(callback=nil,&blk)
     self._on_text_input_( callback || blk )
   end
-
-  # Timer
-  def add_timer(duration,repeat,&callback)
-    @timers ||= []
-    timer = Bi::Timer.new self, duration, repeat, &callback
-    @timers << timer
-    self._add_timer timer
-    timer
-  end
-  def remove_timer(timer)
-    @timers ||= []
-    @timers.delete timer
-    self._remove_timer timer
-    timer
-  end
-end
-
-class Bi::Timer
-  attr_reader :callback
-  attr_reader :owner
 end
 
 class Bi::Sprite < Bi::Node
@@ -190,7 +166,6 @@ class Bi::Sprite < Bi::Node
     self.texture_mapping = texture_mapping
     self.set_position 0, 0
     self.set_size texture_mapping.w, texture_mapping.h
-    self.set_color 0xff,0xff,0xff,0xff
   end
 end
 
@@ -209,35 +184,5 @@ module Bi::ScanCode
       return c if Bi::ScanCode.const_get(c) == code
     }
     return nil
-  end
-end
-
-module Bi::Version
-  def self.bicore
-    "#{BI_CORE_MAJOR}.#{BI_CORE_MINOR}.#{BI_CORE_PATCH}"
-  end
-
-  def self.mruby_bicore
-    "0.14.2"
-  end
-
-  def self.emscripten
-    EMSCRIPTEN_MAJOR ? "#{EMSCRIPTEN_MAJOR}.#{EMSCRIPTEN_MINOR}.#{EMSCRIPTEN_PATCH}" : nil
-  end
-
-  def self.clang
-    CLANG_MAJOR ? "#{CLANG_MAJOR}.#{CLANG_MINOR}.#{CLANG_PATCH}" : nil
-  end
-
-  def self.gnuc
-    GNUC_MAJOR ? "#{GNUC_MAJOR}.#{GNUC_MINOR}.#{GNUC_PATCH}" : nil
-  end
-
-  def self.sdl_compiled
-    "#{SDL_COMPILED_MAJOR}.#{SDL_COMPILED_MINOR}.#{SDL_COMPILED_PATCH}"
-  end
-
-  def self.sdl
-    "#{SDL_LINKED_MAJOR}.#{SDL_LINKED_MINOR}.#{SDL_LINKED_PATCH}"
   end
 end

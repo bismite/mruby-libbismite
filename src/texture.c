@@ -13,24 +13,15 @@ static struct mrb_data_type const mrb_texture_data_type = { "Texture", mrb_free 
 
 mrb_value create_bi_texture(mrb_state *mrb, BiTexture* texture)
 {
-  struct RClass *bi = mrb_class_get(mrb, "Bi");
-  struct RClass *klass = mrb_class_get_under(mrb,bi,"Texture");
+  struct RClass *klass = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Texture");
   struct RData *data = mrb_data_object_alloc(mrb,klass,texture,&mrb_texture_data_type);
-  mrb_value tmp = mrb_obj_value(data);
-  return tmp;
+  return mrb_obj_value(data);
 }
 
 mrb_value create_bi_texture_from_memory(mrb_state *mrb, void* buffer, int size, bool antialias)
 {
   BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
   bi_texture_init_with_file(texture,buffer,size,antialias);
-  return create_bi_texture(mrb,texture);
-}
-
-mrb_value create_bi_texture_from_pixels(mrb_state *mrb, int w, int h, void* pixels, bool antialias)
-{
-  BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-  bi_texture_init_with_pixels(texture,w,h,pixels,antialias);
   return create_bi_texture(mrb,texture);
 }
 

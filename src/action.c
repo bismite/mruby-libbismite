@@ -47,7 +47,7 @@ static mrb_value mrb_add_action(mrb_state *mrb, mrb_value self)
     action = DATA_PTR(action_obj);
     callback_context = action->on_finish_callback_context;
     bi_add_action(node,action);
-    bi_action_start(node,action,bi_get_now());
+    bi_action_start(action);
     return self;
 }
 
@@ -68,7 +68,6 @@ static mrb_value mrb_remove_action(mrb_state *mrb, mrb_value self)
 
 void mrb_action_free(mrb_state *mrb,void* p){
   BiAction *action = p;
-  mrb_free(mrb,action->timer);
   mrb_free(mrb,action->on_finish_callback_context);
   mrb_free(mrb,action);
 }
@@ -77,9 +76,7 @@ static struct mrb_data_type const mrb_action_data_type = { "Action", mrb_action_
 
 static BiAction* action_initialize(mrb_state *mrb, mrb_value *self,mrb_value callback,size_t size)
 {
-  BiAction* action = mrb_malloc(mrb,sizeof(BiAction));
-  bi_action_init(action);
-  action->timer = mrb_malloc(mrb,sizeof(BiTimer));
+  BiAction* action = bi_action_init(mrb_malloc(mrb,sizeof(BiAction)));
   action->action_data = mrb_malloc(mrb,size);
   DATA_PTR(*self) = action;
   DATA_TYPE(*self) = &mrb_action_data_type;
@@ -120,7 +117,7 @@ static mrb_value mrb_action_move_to_initialize(mrb_state *mrb, mrb_value self)
   mrb_value callback;
   BiAction *action;
   mrb_get_args(mrb, "fiio", &duration, &x, &y, &callback);
-  action = action_initialize(mrb,&self,callback,sizeof(BiActionMoveTo));
+  action = action_initialize(mrb,&self,callback,sizeof(BiActionMove));
   bi_action_move_to_init(action,duration,x,y);
   return self;
 }
@@ -136,7 +133,7 @@ static mrb_value mrb_action_rotate_to_initialize(mrb_state *mrb, mrb_value self)
   mrb_value callback;
   BiAction *action;
   mrb_get_args(mrb, "ffo", &duration, &angle, &callback);
-  action = action_initialize(mrb,&self,callback,sizeof(BiActionRotateTo));
+  action = action_initialize(mrb,&self,callback,sizeof(BiActionRotate));
   bi_action_rotate_to_init(action,duration,angle);
   return self;
 }
@@ -152,7 +149,7 @@ static mrb_value mrb_action_rotate_by_initialize(mrb_state *mrb, mrb_value self)
   mrb_value callback;
   BiAction *action;
   mrb_get_args(mrb, "ffo", &duration, &angle, &callback);
-  action = action_initialize(mrb,&self,callback,sizeof(BiActionRotateBy));
+  action = action_initialize(mrb,&self,callback,sizeof(BiActionRotate));
   bi_action_rotate_by_init(action,duration,angle);
   return self;
 }
@@ -163,7 +160,6 @@ static mrb_value mrb_action_rotate_by_initialize(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_action_repeat_initialize(mrb_state *mrb, mrb_value self)
 {
-  mrb_float duration;
   mrb_value target_action_obj;
   mrb_value callback;
   BiAction *action;
