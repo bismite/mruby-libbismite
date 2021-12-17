@@ -4,7 +4,7 @@ for [libbismite 1.1.8](https://github.com/bismite/libbismite/releases/tag/1.1.8)
 
 # Changelog
 
-## 1.0.0 - 2021/12/18
+## 1.0.1 - 2021/12/18
 - for libbismite 1.1.8
   - remove on_update from Node
   - add Canvas class
