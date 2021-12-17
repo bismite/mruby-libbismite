@@ -1,12 +1,14 @@
-# mruby-bi-core
+# mruby-libbismite
 
-[bismite-library-core ver 0.13.0](https://github.com/bismite/bismite-library-core/releases/tag/0.13.0) required.
+for [libbismite 1.1.8](https://github.com/bismite/libbismite/releases/tag/1.1.8)
 
 # Changelog
 
-## 0.15.0 - 2021/12/15
-- for libbismite 1.1.1
+## 1.0.0 - 2021/12/18
+- for libbismite 1.1.8
   - remove on_update from Node
+  - add Canvas class
+  - on_update callback removed
 - node angle getter/setter use radian
 ## 0.14.2
 - modifications to the rand function have been moved to [mrubi-bi-misc](https://github.com/bismite/mruby-bi-misc).
