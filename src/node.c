@@ -288,6 +288,45 @@ static mrb_value mrb_node_transform_local(mrb_state *mrb, mrb_value self)
   return mrb_ary_new_from_values(mrb,2,v);
 }
 
+//
+// color
+//
+
+static mrb_value mrb_node_get_color(mrb_state *mrb, mrb_value self)
+{
+  BiNode* node = DATA_PTR(self);
+  mrb_value vals[4] = {
+    mrb_fixnum_value(node->color[0]),
+    mrb_fixnum_value(node->color[1]),
+    mrb_fixnum_value(node->color[2]),
+    mrb_fixnum_value(node->color[3])
+  };
+  return mrb_ary_new_from_values(mrb,4,vals);
+}
+
+static mrb_value mrb_node_set_color(mrb_state *mrb, mrb_value self)
+{
+  mrb_int r,g,b,a;
+  mrb_get_args(mrb, "iiii", &r, &g, &b, &a );
+  BiNode* node = DATA_PTR(self);
+  bi_set_color(node->color,r,g,b,a);
+  return self;
+}
+
+static mrb_value mrb_node_get_opacity(mrb_state *mrb, mrb_value self)
+{
+  BiNode* node = DATA_PTR(self);
+  return mrb_float_value(mrb,node->opacity);
+}
+
+static mrb_value mrb_node_set_opacity(mrb_state *mrb, mrb_value self)
+{
+  mrb_float opacity;
+  mrb_get_args(mrb, "f", &opacity );
+  BiNode* node = DATA_PTR(self);
+  node->opacity = opacity;
+  return mrb_float_value(mrb,opacity);
+}
 
 //
 // visual
@@ -300,28 +339,6 @@ static mrb_value mrb_node_set_texture_mapping(mrb_state *mrb, mrb_value self)
 
   BiNode* node = DATA_PTR(self);
   node->texture_mapping = DATA_PTR(obj);
-
-  return self;
-}
-
-static mrb_value mrb_node_set_color(mrb_state *mrb, mrb_value self)
-{
-  mrb_int r,g,b,a;
-  mrb_get_args(mrb, "iiii", &r, &g, &b, &a );
-
-  BiNode* node = DATA_PTR(self);
-  bi_set_color(node->color,r,g,b,a);
-
-  return self;
-}
-
-static mrb_value mrb_node_set_alpha(mrb_state *mrb, mrb_value self)
-{
-  mrb_int a;
-  mrb_get_args(mrb, "i", &a );
-
-  BiNode* node = DATA_PTR(self);
-  node->color[3] = a;
 
   return self;
 }
@@ -417,10 +434,14 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "include?", mrb_node_is_include, MRB_ARGS_REQ(2));
   mrb_define_method(mrb, node, "transform_local", mrb_node_transform_local, MRB_ARGS_REQ(2));
 
+  // color
+  mrb_define_method(mrb, node, "get_color", mrb_node_get_color, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "set_color", mrb_node_set_color, MRB_ARGS_REQ(4));
+  mrb_define_method(mrb, node, "opacity", mrb_node_get_opacity, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "opacity=", mrb_node_set_opacity, MRB_ARGS_REQ(1));
+
   // visual
   mrb_define_method(mrb, node, "set_texture_mapping", mrb_node_set_texture_mapping, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "set_color", mrb_node_set_color, MRB_ARGS_REQ(4));
-  mrb_define_method(mrb, node, "set_alpha", mrb_node_set_alpha, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "visible=", mrb_node_set_visible, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "visible", mrb_node_get_visible, MRB_ARGS_NONE());
 
