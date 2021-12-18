@@ -39,13 +39,11 @@ static mrb_value mrb_add_action(mrb_state *mrb, mrb_value self)
 {
     BiNode *node;
     BiAction *action;
-    mrb_action_finish_callback_context *callback_context;
     mrb_value action_obj;
     mrb_get_args(mrb, "o", &action_obj);
     // TODO: check error
     node = DATA_PTR(self);
     action = DATA_PTR(action_obj);
-    callback_context = action->on_finish_callback_context;
     bi_add_action(node,action);
     bi_action_start(action);
     return self;
