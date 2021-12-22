@@ -4,6 +4,11 @@ for [libbismite 1.1.8](https://github.com/bismite/libbismite/releases/tag/1.1.8)
 
 # Changelog
 
+## 1.1.0 - 2021/12/22
+- for libbismite 1.2
+- BiCanvas: add blend factor setter/getter.
+- Blend factor constants moved to under the kernel module.
+- BiTexture receives straight-alpha flag.
 ## 1.0.2 - 2021/12/18
 - for libbismite 1.1.8
   - remove on_update from Node
