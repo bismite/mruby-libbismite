@@ -4,6 +4,7 @@
 #include <mruby/variable.h>
 #include <mruby/array.h>
 #include <bi/layer.h>
+#include "_blend_factor_macro.h"
 
 //
 // Bi::LayerGroup class
@@ -27,22 +28,12 @@ static mrb_value mrb_layer_group_initialize(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_layer_group_set_blend_factor(mrb_state *mrb, mrb_value self)
 {
-  mrb_int src,dst,alpha_src,alpha_dst;
-  mrb_get_args(mrb, "iiii", &src, &dst, &alpha_src, &alpha_dst );
-  BiLayerGroup* l = DATA_PTR(self);
-  bi_set_blend_factor(&l->blend_factor,src,dst,alpha_src,alpha_dst);
-  return self;
+  SET_BLEND_FACTOR(BiLayerGroup,blend_factor);
 }
 
 static mrb_value mrb_layer_group_get_blend_factor(mrb_state *mrb, mrb_value self)
 {
-  BiLayerGroup* l = DATA_PTR(self);
-  mrb_value v[4];
-  v[0] = mrb_fixnum_value(l->blend_factor.src);
-  v[1] = mrb_fixnum_value(l->blend_factor.dst);
-  v[2] = mrb_fixnum_value(l->blend_factor.alpha_src);
-  v[3] = mrb_fixnum_value(l->blend_factor.alpha_dst);
-  return mrb_ary_new_from_values(mrb,4,v);
+  GET_BLEND_FACTOR(BiLayerGroup,blend_factor);
 }
 
 // add macro

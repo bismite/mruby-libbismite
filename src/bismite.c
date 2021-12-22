@@ -188,6 +188,24 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_init_action(mrb,bi); DONE;
   mrb_init_transition(mrb,bi); DONE;
 #undef DONE
+
+  // blend functions
+  // source: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendFunc.xhtml
+  mrb_define_const(mrb, mrb->kernel_module, "GL_ZERO", mrb_fixnum_value(GL_ZERO));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_ONE", mrb_fixnum_value(GL_ONE));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_SRC_COLOR", mrb_fixnum_value(GL_SRC_COLOR));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_ONE_MINUS_SRC_COLOR", mrb_fixnum_value(GL_ONE_MINUS_SRC_COLOR));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_DST_COLOR", mrb_fixnum_value(GL_DST_COLOR));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_ONE_MINUS_DST_COLOR", mrb_fixnum_value(GL_ONE_MINUS_DST_COLOR));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_SRC_ALPHA", mrb_fixnum_value(GL_SRC_ALPHA));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_ONE_MINUS_SRC_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_SRC_ALPHA));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_DST_ALPHA", mrb_fixnum_value(GL_DST_ALPHA));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_ONE_MINUS_DST_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_DST_ALPHA));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_CONSTANT_COLOR", mrb_fixnum_value(GL_CONSTANT_COLOR));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_ONE_MINUS_CONSTANT_COLOR", mrb_fixnum_value(GL_ONE_MINUS_CONSTANT_COLOR));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_CONSTANT_ALPHA", mrb_fixnum_value(GL_CONSTANT_ALPHA));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_ONE_MINUS_CONSTANT_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_CONSTANT_ALPHA));
+  mrb_define_const(mrb, mrb->kernel_module, "GL_SRC_ALPHA_SATURATE", mrb_fixnum_value(GL_SRC_ALPHA_SATURATE));
 }
 
 void mrb_mruby_libbismite_gem_final(mrb_state* mrb)

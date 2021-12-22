@@ -32,10 +32,10 @@ mrb_value create_bi_texture_from_memory(mrb_state *mrb, void* buffer, int size, 
 static mrb_value mrb_texture_initialize(mrb_state *mrb, mrb_value self)
 {
   mrb_value image_name;
-  mrb_bool antialias;
-  mrb_get_args(mrb, "Sb", &image_name, &antialias );
+  mrb_bool straight_alpha = false;
+  mrb_get_args(mrb, "S|b", &image_name, &straight_alpha );
   BiTexture *texture = mrb_malloc(mrb,sizeof(BiTexture));
-  bi_texture_init_with_filename(texture,mrb_string_value_cstr(mrb,&image_name), antialias);
+  bi_texture_init_with_filename(texture,mrb_string_value_cstr(mrb,&image_name), straight_alpha);
   mrb_data_init(self, texture, &mrb_texture_data_type);
   return self;
 }
@@ -58,7 +58,7 @@ void mrb_init_bi_texture(mrb_state *mrb,struct RClass *bi)
   texture = mrb_define_class_under(mrb, bi, "Texture", mrb->object_class);
   MRB_SET_INSTANCE_TT(texture, MRB_TT_DATA);
 
-  mrb_define_method(mrb, texture, "initialize", mrb_texture_initialize, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, texture, "initialize", mrb_texture_initialize, MRB_ARGS_REQ(1)|MRB_ARGS_OPT(1)); // filename,straight-alpha
   mrb_define_method(mrb, texture, "w", mrb_texture_w, MRB_ARGS_NONE());
   mrb_define_method(mrb, texture, "h", mrb_texture_h, MRB_ARGS_NONE());
 }

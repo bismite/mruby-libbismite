@@ -6,7 +6,8 @@
 #include <bi/context.h>
 #include <bi/layer.h>
 #include "_inner_macro.h"
-#include "_shader_inner_macro.h"
+#include "_shader_macro.h"
+#include "_blend_factor_macro.h"
 
 //
 // Bi::Layer class
@@ -67,22 +68,12 @@ static mrb_value mrb_BiLayer_set_texture(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_BiLayer_set_blend_factor(mrb_state *mrb, mrb_value self)
 {
-  mrb_int src,dst,alpha_src,alpha_dst;
-  mrb_get_args(mrb, "iiii", &src, &dst, &alpha_src, &alpha_dst );
-  BiLayer* l = DATA_PTR(self);
-  bi_set_blend_factor(&l->blend_factor,src,dst,alpha_src,alpha_dst);
-  return self;
+  SET_BLEND_FACTOR(BiLayer,blend_factor);
 }
 
 static mrb_value mrb_BiLayer_get_blend_factor(mrb_state *mrb, mrb_value self)
 {
-  BiLayer* l = DATA_PTR(self);
-  mrb_value v[4];
-  v[0] = mrb_fixnum_value(l->blend_factor.src);
-  v[1] = mrb_fixnum_value(l->blend_factor.dst);
-  v[2] = mrb_fixnum_value(l->blend_factor.alpha_src);
-  v[3] = mrb_fixnum_value(l->blend_factor.alpha_dst);
-  return mrb_ary_new_from_values(mrb,4,v);
+  GET_BLEND_FACTOR(BiLayer,blend_factor);
 }
 
 //
@@ -134,22 +125,12 @@ static mrb_value mrb_BiLayer_set_post_process_framebuffer_enabled(mrb_state *mrb
 
 static mrb_value mrb_BiLayer_set_post_process_blend_factor(mrb_state *mrb, mrb_value self)
 {
-  mrb_int src,dst,alpha_src,alpha_dst;
-  mrb_get_args(mrb, "iiii", &src, &dst, &alpha_src, &alpha_dst );
-  BiLayer* l = DATA_PTR(self);
-  bi_set_blend_factor(&l->post_process.blend_factor,src,dst,alpha_src,alpha_dst);
-  return self;
+  SET_BLEND_FACTOR(BiLayer,post_process.blend_factor);
 }
 
 static mrb_value mrb_BiLayer_get_post_process_blend_factor(mrb_state *mrb, mrb_value self)
 {
-  BiLayer* l = DATA_PTR(self);
-  mrb_value v[4];
-  v[0] = mrb_fixnum_value(l->post_process.blend_factor.src);
-  v[1] = mrb_fixnum_value(l->post_process.blend_factor.dst);
-  v[2] = mrb_fixnum_value(l->post_process.blend_factor.alpha_src);
-  v[3] = mrb_fixnum_value(l->post_process.blend_factor.alpha_dst);
-  return mrb_ary_new_from_values(mrb,4,v);
+  GET_BLEND_FACTOR(BiLayer,post_process.blend_factor);
 }
 
 //
@@ -185,27 +166,4 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, layer, "set_post_process_framebuffer_enabled",mrb_BiLayer_set_post_process_framebuffer_enabled, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer, "set_post_process_blend_factor",mrb_BiLayer_set_post_process_blend_factor, MRB_ARGS_REQ(4));
   mrb_define_method(mrb, layer, "get_post_process_blend_factor",mrb_BiLayer_get_post_process_blend_factor, MRB_ARGS_NONE());
-
-  // blend functions
-  // source: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendFunc.xhtml
-  mrb_define_const(mrb, layer, "GL_ZERO", mrb_fixnum_value(GL_ZERO));
-  mrb_define_const(mrb, layer, "GL_ONE", mrb_fixnum_value(GL_ONE));
-  mrb_define_const(mrb, layer, "GL_SRC_COLOR", mrb_fixnum_value(GL_SRC_COLOR));
-  mrb_define_const(mrb, layer, "GL_ONE_MINUS_SRC_COLOR", mrb_fixnum_value(GL_ONE_MINUS_SRC_COLOR));
-  mrb_define_const(mrb, layer, "GL_DST_COLOR", mrb_fixnum_value(GL_DST_COLOR));
-  mrb_define_const(mrb, layer, "GL_ONE_MINUS_DST_COLOR", mrb_fixnum_value(GL_ONE_MINUS_DST_COLOR));
-  mrb_define_const(mrb, layer, "GL_SRC_ALPHA", mrb_fixnum_value(GL_SRC_ALPHA));
-  mrb_define_const(mrb, layer, "GL_ONE_MINUS_SRC_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_SRC_ALPHA));
-  mrb_define_const(mrb, layer, "GL_DST_ALPHA", mrb_fixnum_value(GL_DST_ALPHA));
-  mrb_define_const(mrb, layer, "GL_ONE_MINUS_DST_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_DST_ALPHA));
-  mrb_define_const(mrb, layer, "GL_CONSTANT_COLOR", mrb_fixnum_value(GL_CONSTANT_COLOR));
-  mrb_define_const(mrb, layer, "GL_ONE_MINUS_CONSTANT_COLOR", mrb_fixnum_value(GL_ONE_MINUS_CONSTANT_COLOR));
-  mrb_define_const(mrb, layer, "GL_CONSTANT_ALPHA", mrb_fixnum_value(GL_CONSTANT_ALPHA));
-  mrb_define_const(mrb, layer, "GL_ONE_MINUS_CONSTANT_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_CONSTANT_ALPHA));
-  mrb_define_const(mrb, layer, "GL_SRC_ALPHA_SATURATE", mrb_fixnum_value(GL_SRC_ALPHA_SATURATE));
-  // not supported in OpenGL ES
-  // mrb_define_const(mrb, layer, "GL_SRC1_COLOR", mrb_fixnum_value(GL_SRC1_COLOR));
-  // mrb_define_const(mrb, layer, "GL_ONE_MINUS_SRC1_COLOR", mrb_fixnum_value(GL_ONE_MINUS_SRC1_COLOR));
-  // mrb_define_const(mrb, layer, "GL_SRC1_ALPHA", mrb_fixnum_value(GL_SRC1_ALPHA));
-  // mrb_define_const(mrb, layer, "GL_ONE_MINUS_SRC1_ALPHA", mrb_fixnum_value(GL_ONE_MINUS_SRC1_ALPHA));
 }

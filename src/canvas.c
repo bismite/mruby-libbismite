@@ -2,10 +2,12 @@
 #include <mruby/data.h>
 #include <mruby/class.h>
 #include <mruby/variable.h>
+#include <mruby/array.h>
 #include <bi/canvas.h>
 #include <bi/texture.h>
 #include <bi_core.h>
-#include "_shader_inner_macro.h"
+#include "_shader_macro.h"
+#include "_blend_factor_macro.h"
 
 //
 // Bi::Canvas class
@@ -56,6 +58,16 @@ static mrb_value mrb_bi_canvas_set_shader_attribute(mrb_state *mrb, mrb_value se
   return self;
 }
 
+static mrb_value mrb_bi_canvas_set_blend_factor(mrb_state *mrb, mrb_value self)
+{
+  SET_BLEND_FACTOR(BiCanvas,blend_factor);
+}
+
+static mrb_value mrb_bi_canvas_get_blend_factor(mrb_state *mrb, mrb_value self)
+{
+  GET_BLEND_FACTOR(BiCanvas,blend_factor);
+}
+
 static mrb_value mrb_bi_canvas_draw(mrb_state *mrb, mrb_value self)
 {
   mrb_value node_obj;
@@ -93,6 +105,8 @@ void mrb_init_bi_canvas(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb,canvas,"set_texture",mrb_bi_canvas_set_texture,MRB_ARGS_REQ(2)); // index,texture
   mrb_define_method(mrb,canvas,"shader=",    mrb_bi_canvas_set_shader, MRB_ARGS_REQ(1)); // shader
   mrb_define_method(mrb,canvas,"set_shader_attribute",mrb_bi_canvas_set_shader_attribute,MRB_ARGS_REQ(2)); // index,value
+  mrb_define_method(mrb,canvas,"set_blend_factor",    mrb_bi_canvas_set_blend_factor, MRB_ARGS_REQ(4));
+  mrb_define_method(mrb,canvas,"get_blend_factor",    mrb_bi_canvas_get_blend_factor, MRB_ARGS_NONE());
   mrb_define_method(mrb,canvas,"draw",       mrb_bi_canvas_draw,       MRB_ARGS_REQ(1)); // Node
   mrb_define_method(mrb,canvas,"to_texture", mrb_bi_canvas_to_texture, MRB_ARGS_NONE());
   mrb_define_method(mrb,canvas,"save_png",   mrb_bi_canvas_save_png,   MRB_ARGS_REQ(1)); // filename
