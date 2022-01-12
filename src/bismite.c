@@ -9,18 +9,6 @@
 #include <time.h>
 #include "_inner_macro.h"
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-int timespec_get(struct timespec *ts, int base)
-{
-  double msec = EM_ASM_DOUBLE({ return Date.now(); });
-  ts->tv_sec = msec / 1000;
-  int ms = (uint64_t)msec % 1000;
-  ts->tv_nsec = ms * 1000 * 1000;
-  return 1;
-}
-#endif
-
 // modules
 extern void mrb_init_bi_profile(mrb_state*, struct RClass*);
 extern void mrb_init_bi_node(mrb_state*, struct RClass*);

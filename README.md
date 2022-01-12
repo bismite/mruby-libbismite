@@ -1,9 +1,11 @@
 # mruby-libbismite
 
-for [libbismite 1.1.8](https://github.com/bismite/libbismite/releases/tag/1.1.8)
+for [libbismite 2.0.2](https://github.com/bismite/libbismite/releases/tag/2.0.2)
 
 # Changelog
 
+## 1.1.1 - 2022/01/13
+- remove unused emscripten code
 ## 1.1.0 - 2021/12/22
 - for libbismite 1.2
 - BiCanvas: add blend factor setter/getter.
@@ -27,6 +29,6 @@ for [libbismite 1.1.8](https://github.com/bismite/libbismite/releases/tag/1.1.8)
 
 # License
 
-Copyright 2018-2021 kbys <work4kbys@gmail.com>
+Copyright 2018-2022 kbys <work4kbys@gmail.com>
 
 Apache License Version 2.0
