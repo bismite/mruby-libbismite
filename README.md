@@ -4,6 +4,8 @@ for [libbismite 2.0.2](https://github.com/bismite/libbismite/releases/tag/2.0.2)
 
 # Changelog
 
+## 1.2.1 - 2022/02/11
+- add x,y accsessors Bi::TextureMapping
 ## 1.1.1 - 2022/01/13
 - remove unused emscripten code
 ## 1.1.0 - 2021/12/22

@@ -44,6 +44,10 @@ _GET_(BiTextureMapping,w,bi_mrb_fixnum_value);
 _SET_(BiTextureMapping,w,mrb_int,i);
 _GET_(BiTextureMapping,h,bi_mrb_fixnum_value);
 _SET_(BiTextureMapping,h,mrb_int,i);
+_GET_(BiTextureMapping,x,bi_mrb_fixnum_value);
+_SET_(BiTextureMapping,x,mrb_int,i);
+_GET_(BiTextureMapping,y,bi_mrb_fixnum_value);
+_SET_(BiTextureMapping,y,mrb_int,i);
 
 void mrb_init_bi_texture_mapping(mrb_state *mrb,struct RClass *bi)
 {
@@ -58,4 +62,8 @@ void mrb_init_bi_texture_mapping(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, mapping, "w=",mrb_BiTextureMapping_set_w, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, mapping, "h", mrb_BiTextureMapping_get_h, MRB_ARGS_NONE());
   mrb_define_method(mrb, mapping, "h=",mrb_BiTextureMapping_set_h, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mapping, "x", mrb_BiTextureMapping_get_x, MRB_ARGS_NONE());
+  mrb_define_method(mrb, mapping, "x=",mrb_BiTextureMapping_set_x, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mapping, "y", mrb_BiTextureMapping_get_y, MRB_ARGS_NONE());
+  mrb_define_method(mrb, mapping, "y=",mrb_BiTextureMapping_set_y, MRB_ARGS_REQ(1));
 }
