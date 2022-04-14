@@ -3,7 +3,10 @@
 for [libbismite 2.0.2](https://github.com/bismite/libbismite/releases/tag/2.0.2)
 
 # Changelog
-
+## 1.3.0 - 2022/04/15
+- add line_x_to_index to Bi::Font
+- add set_text_color_with_range to Bi::Label
+- Changed alpha value of set_color function to optional. (canvas,label,node)
 ## 1.2.1 - 2022/02/11
 - add x,y accsessors Bi::TextureMapping
 ## 1.1.1 - 2022/01/13
