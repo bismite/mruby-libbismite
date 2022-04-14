@@ -19,7 +19,7 @@ static mrb_value mrb_bi_font_read(mrb_state *mrb, mrb_value self)
   BiFontAtlas *font = mrb_malloc(mrb,sizeof(BiFontAtlas));
   BiTexture* texture = DATA_PTR(texture_obj);
 
-  bi_load_font_layout_from_file( mrb_string_value_cstr(mrb,&layout_file), font );
+  bi_font_init_with_file(font, mrb_string_value_cstr(mrb,&layout_file) );
   font->texture = texture;
 
   struct RClass *bi = mrb_class_get(mrb, "Bi");
@@ -49,7 +49,7 @@ static mrb_value mrb_font_initialize(mrb_state *mrb, mrb_value self)
   // TODO: error check
   BiTexture* texture = DATA_PTR(texture_obj);
 
-  bi_load_font_layout( RSTRING_PTR(layout_data), RSTRING_LEN(layout_data), font );
+  bi_font_init( font, RSTRING_PTR(layout_data), RSTRING_LEN(layout_data) );
   font->texture = texture;
 
   DATA_PTR(self) = font;
@@ -62,6 +62,14 @@ static mrb_value mrb_font_initialize(mrb_state *mrb, mrb_value self)
 
 _GET_(BiFontAtlas,font_size,bi_mrb_fixnum_value);
 
+static mrb_value mrb_font_line_x_to_index(mrb_state *mrb, mrb_value self)
+{
+  mrb_int x;
+  char *text;
+  mrb_get_args(mrb, "zi", &text, &x );
+  BiFontAtlas* font = DATA_PTR(self);
+  return mrb_fixnum_value( bi_font_line_x_to_index(font, text, x) );
+}
 
 void mrb_init_font(mrb_state *mrb, struct RClass *bi)
 {
@@ -73,4 +81,6 @@ void mrb_init_font(mrb_state *mrb, struct RClass *bi)
 
   mrb_define_method(mrb, font, "initialize", mrb_font_initialize, MRB_ARGS_REQ(2)); // texture, layout_data
   mrb_define_method(mrb, font, "size", mrb_BiFontAtlas_get_font_size, MRB_ARGS_NONE());
+
+  mrb_define_method(mrb, font, "line_x_to_index", mrb_font_line_x_to_index, MRB_ARGS_REQ(2)); // text,x
 }

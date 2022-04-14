@@ -25,8 +25,8 @@ static mrb_value mrb_bi_canvas_initialize(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_bi_canvas_clear(mrb_state *mrb, mrb_value self)
 {
-  mrb_int r,g,b,a;
-  mrb_get_args(mrb, "iiii", &r,&g,&b,&a );
+  mrb_int r,g,b,a=0xFF;
+  mrb_get_args(mrb, "iii|i", &r,&g,&b,&a );
   BiCanvas* canvas = DATA_PTR(self);
   bi_canvas_clear(canvas,r,g,b,a);
   return self;
@@ -101,7 +101,7 @@ void mrb_init_bi_canvas(mrb_state *mrb,struct RClass *bi)
   struct RClass *canvas = mrb_define_class_under(mrb, bi, "Canvas", mrb->object_class);
   MRB_SET_INSTANCE_TT(canvas, MRB_TT_DATA);
   mrb_define_method(mrb,canvas,"initialize", mrb_bi_canvas_initialize, MRB_ARGS_REQ(2)); // w,h
-  mrb_define_method(mrb,canvas,"clear",      mrb_bi_canvas_clear,      MRB_ARGS_REQ(4)); // r,g,b,a
+  mrb_define_method(mrb,canvas,"clear",      mrb_bi_canvas_clear,      MRB_ARGS_REQ(3)|MRB_ARGS_OPT(1)); // r,g,b|a
   mrb_define_method(mrb,canvas,"set_texture",mrb_bi_canvas_set_texture,MRB_ARGS_REQ(2)); // index,texture
   mrb_define_method(mrb,canvas,"shader=",    mrb_bi_canvas_set_shader, MRB_ARGS_REQ(1)); // shader
   mrb_define_method(mrb,canvas,"set_shader_attribute",mrb_bi_canvas_set_shader_attribute,MRB_ARGS_REQ(2)); // index,value

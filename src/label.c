@@ -23,12 +23,10 @@ static void label_free(mrb_state *mrb, void *p)
 }
 static struct mrb_data_type const mrb_label_data_type = { "Label", label_free };
 
-
 static mrb_value mrb_label_initialize(mrb_state *mrb, mrb_value self)
 {
   mrb_value font_obj;
   mrb_get_args(mrb, "o", &font_obj);
-
   BiNode* node = DATA_PTR(self);
   if (node == NULL) {
     node = mrb_malloc(mrb, sizeof(BiNode));
@@ -36,19 +34,11 @@ static mrb_value mrb_label_initialize(mrb_state *mrb, mrb_value self)
       mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
     }
   }
-
   bi_node_init(node);
   DATA_PTR(self) = node;
   DATA_TYPE(self) = &mrb_label_data_type;
   node->userdata = mrb_ptr(self);
-
   mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@font"), font_obj);
-
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@r"), mrb_fixnum_value(0xff));
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@g"), mrb_fixnum_value(0xff));
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@b"), mrb_fixnum_value(0xff));
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@a"), mrb_fixnum_value(0xff));
-
   return self;
 }
 
@@ -57,28 +47,30 @@ static mrb_value mrb_label_set_text(mrb_state *mrb, mrb_value self)
   mrb_value text;
   mrb_get_args(mrb, "S", &text );
   mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@text"), text);
-  uint8_t r = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@r")));
-  uint8_t g = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@g")));
-  uint8_t b = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@b")));
-  uint8_t a = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@a")));
   mrb_value font_obj = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@font"));
   BiFontAtlas* f = DATA_PTR(font_obj);
   BiNode* n = DATA_PTR(self);
-  bi_update_label(n, mrb_string_value_cstr(mrb,&text), f, r,g,b,a );
-
+  bi_label_set_text(n,f,mrb_string_value_cstr(mrb,&text));
   return self;
 }
 
 static mrb_value mrb_label_set_text_color(mrb_state *mrb, mrb_value self)
 {
-  mrb_int r,g,b,a;
-  mrb_get_args(mrb, "iiii", &r, &g, &b, &a );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@r"), mrb_fixnum_value(r));
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@g"), mrb_fixnum_value(g));
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@b"), mrb_fixnum_value(b));
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@a"), mrb_fixnum_value(a));
+  mrb_int r,g,b,a=0xFF;
+  mrb_float opacity=1.0;
+  mrb_get_args(mrb, "iii|if", &r, &g, &b, &a, &opacity );
   BiNode* n = DATA_PTR(self);
-  bi_update_color(n,r,g,b,a);
+  bi_label_set_color(n,r,g,b,a,opacity);
+  return self;
+}
+
+static mrb_value mrb_label_set_text_color_with_range(mrb_state *mrb, mrb_value self)
+{
+  mrb_int start,end,r,g,b,a=0xFF;
+  mrb_float opacity=1.0;
+  mrb_get_args(mrb, "iiiii|if", &start, &end, &r, &g, &b, &a, &opacity );
+  BiNode* n = DATA_PTR(self);
+  bi_label_set_color_with_range(n,start,end,r,g,b,a,opacity);
   return self;
 }
 
@@ -93,5 +85,6 @@ void mrb_init_label(mrb_state *mrb, struct RClass *bi)
 
   mrb_define_method(mrb, label, "initialize", mrb_label_initialize, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, label, "set_text", mrb_label_set_text, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, label, "set_text_color", mrb_label_set_text_color, MRB_ARGS_REQ(4)); // r,g,b,a
+  mrb_define_method(mrb, label, "set_text_color", mrb_label_set_text_color, MRB_ARGS_REQ(3)|MRB_ARGS_OPT(2)); // r,g,b|a,opacity
+  mrb_define_method(mrb, label, "set_text_color_with_range", mrb_label_set_text_color_with_range, MRB_ARGS_REQ(5)|MRB_ARGS_OPT(2) ); // start,end,r,g,b|a,opacity
 }

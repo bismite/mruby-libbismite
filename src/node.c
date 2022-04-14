@@ -306,8 +306,8 @@ static mrb_value mrb_node_get_color(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_node_set_color(mrb_state *mrb, mrb_value self)
 {
-  mrb_int r,g,b,a;
-  mrb_get_args(mrb, "iiii", &r, &g, &b, &a );
+  mrb_int r,g,b,a=0xFF;
+  mrb_get_args(mrb, "iii|i", &r, &g, &b, &a );
   BiNode* node = DATA_PTR(self);
   bi_set_color(node->color,r,g,b,a);
   return self;
@@ -436,7 +436,7 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
 
   // color
   mrb_define_method(mrb, node, "get_color", mrb_node_get_color, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "set_color", mrb_node_set_color, MRB_ARGS_REQ(4));
+  mrb_define_method(mrb, node, "set_color", mrb_node_set_color, MRB_ARGS_REQ(3)|MRB_ARGS_OPT(1)); // r,g,b|a
   mrb_define_method(mrb, node, "opacity", mrb_node_get_opacity, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "opacity=", mrb_node_set_opacity, MRB_ARGS_REQ(1));
 
