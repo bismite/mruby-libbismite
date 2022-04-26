@@ -1,8 +1,10 @@
 # mruby-libbismite
 
-for [libbismite 2.0.2](https://github.com/bismite/libbismite/releases/tag/2.0.2)
+for [libbismite 3.0.0](https://github.com/bismite/libbismite/releases/tag/3.0.0)
 
 # Changelog
+## 1.4.0 - 2022/04/26
+- add flip_vertical and flip_horizontal to TextureMapping
 ## 1.3.0 - 2022/04/15
 - add line_x_to_index to Bi::Font
 - add set_text_color_with_range to Bi::Label
