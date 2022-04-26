@@ -49,6 +49,11 @@ _SET_(BiTextureMapping,x,mrb_int,i);
 _GET_(BiTextureMapping,y,bi_mrb_fixnum_value);
 _SET_(BiTextureMapping,y,mrb_int,i);
 
+_GET_(BiTextureMapping,flip_vertical,bi_mrb_bool_value);
+_SET_(BiTextureMapping,flip_vertical,mrb_bool,b);
+_GET_(BiTextureMapping,flip_horizontal,bi_mrb_bool_value);
+_SET_(BiTextureMapping,flip_horizontal,mrb_bool,b);
+
 void mrb_init_bi_texture_mapping(mrb_state *mrb,struct RClass *bi)
 {
   struct RClass *mapping;
@@ -66,4 +71,9 @@ void mrb_init_bi_texture_mapping(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, mapping, "x=",mrb_BiTextureMapping_set_x, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, mapping, "y", mrb_BiTextureMapping_get_y, MRB_ARGS_NONE());
   mrb_define_method(mrb, mapping, "y=",mrb_BiTextureMapping_set_y, MRB_ARGS_REQ(1));
+
+  mrb_define_method(mrb, mapping, "flip_vertical", mrb_BiTextureMapping_get_flip_vertical, MRB_ARGS_NONE());
+  mrb_define_method(mrb, mapping, "flip_vertical=", mrb_BiTextureMapping_set_flip_vertical, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mapping, "flip_horizontal", mrb_BiTextureMapping_get_flip_horizontal, MRB_ARGS_NONE());
+  mrb_define_method(mrb, mapping, "flip_horizontal=", mrb_BiTextureMapping_set_flip_horizontal, MRB_ARGS_REQ(1));
 }
