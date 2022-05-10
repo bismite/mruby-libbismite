@@ -242,9 +242,9 @@ static mrb_value mrb_node_angle(mrb_state *mrb, mrb_value self)
 
 _SET_FUNC_(BiNode,angle,mrb_float,f,bi_node_set_angle);
 
+// Size
 _GET_(BiNode,w,bi_mrb_fixnum_value);
 _GET_(BiNode,h,bi_mrb_fixnum_value);
-
 static mrb_value mrb_node_set_size(mrb_state *mrb, mrb_value self)
 {
   mrb_int w,h;
@@ -254,15 +254,34 @@ static mrb_value mrb_node_set_size(mrb_state *mrb, mrb_value self)
   return self;
 }
 
+// Scale
 _GET_(BiNode,scale_x,mrb_float_value);
 _GET_(BiNode,scale_y,mrb_float_value);
 _SET_FUNC_(BiNode,scale_x,mrb_float,f,bi_node_set_scale_x);
 _SET_FUNC_(BiNode,scale_y,mrb_float,f,bi_node_set_scale_y);
+static mrb_value mrb_node_set_scale(mrb_state *mrb, mrb_value self)
+{
+  mrb_float x,y;
+  mrb_get_args(mrb, "ff", &x, &y );
+  BiNode* node = DATA_PTR(self);
+  bi_node_set_scale(node,x,y);
+  return self;
+}
 
+// Anchor
+static mrb_value mrb_node_set_anchor(mrb_state *mrb, mrb_value self)
+{
+  mrb_float x,y;
+  mrb_get_args(mrb, "ff", &x, &y );
+  BiNode* node = DATA_PTR(self);
+  bi_node_set_anchor(node,x,y);
+  return self;
+}
 _GET_(BiNode,anchor_x,mrb_float_value);
 _GET_(BiNode,anchor_y,mrb_float_value);
-_SET_(BiNode,anchor_x,mrb_float,f);
-_SET_(BiNode,anchor_y,mrb_float,f);
+_SET_FUNC_(BiNode,anchor_x,mrb_float,f,bi_node_set_anchor_x);
+_SET_FUNC_(BiNode,anchor_y,mrb_float,f,bi_node_set_anchor_y);
+
 
 static mrb_value mrb_node_is_include(mrb_state *mrb, mrb_value self)
 {
@@ -328,21 +347,7 @@ static mrb_value mrb_node_set_opacity(mrb_state *mrb, mrb_value self)
   return mrb_float_value(mrb,opacity);
 }
 
-//
-// visual
-//
-
-static mrb_value mrb_node_set_texture_mapping(mrb_state *mrb, mrb_value self)
-{
-  mrb_value obj;
-  mrb_get_args(mrb, "o", &obj );
-
-  BiNode* node = DATA_PTR(self);
-  node->texture_mapping = DATA_PTR(obj);
-
-  return self;
-}
-
+// Visibility
 static mrb_value mrb_node_set_visible(mrb_state *mrb, mrb_value self)
 {
   mrb_bool visible;
@@ -351,12 +356,39 @@ static mrb_value mrb_node_set_visible(mrb_state *mrb, mrb_value self)
   node->visible = visible;
   return self;
 }
-
 static mrb_value mrb_node_get_visible(mrb_state *mrb, mrb_value self)
 {
   BiNode* node = DATA_PTR(self);
   return mrb_bool_value(node->visible);
 }
+
+// Texture
+static mrb_value mrb_node_set_texture(mrb_state *mrb, mrb_value self)
+{
+  mrb_int x,y,w,h;
+  mrb_int cx,cy,ow,oh;
+  mrb_value tex_obj;
+  mrb_int num = mrb_get_args(mrb, "oiiii|iiii", &tex_obj,&x,&y,&w,&h, &cx,&cy,&ow,&oh );
+  BiNode* node = DATA_PTR(self);
+  BiTexture* tex = DATA_PTR(tex_obj);
+  if(num==5){
+    bi_node_set_texture(node,tex,x,y,w,h);
+  }else{
+    bi_node_set_cropped_texture(node,tex, x,y,w,h, cx,cy,ow,oh);
+  }
+  mrb_iv_set(mrb,self,MRB_IVSYM(texture),tex_obj);
+  return self;
+}
+static mrb_value mrb_node_unset_texture(mrb_state *mrb, mrb_value self)
+{
+  BiNode* node = DATA_PTR(self);
+  bi_node_unset_texture(node);
+  return self;
+}
+_GET_(BiNode,texture_flip_vertical,bi_mrb_bool_value);
+_GET_(BiNode,texture_flip_horizontal,bi_mrb_bool_value);
+_SET_(BiNode,texture_flip_vertical,mrb_bool,b);
+_SET_(BiNode,texture_flip_horizontal,mrb_bool,b);
 
 //
 // callback
@@ -416,23 +448,27 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "y=", mrb_BiNode_set_y, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "z=", mrb_BiNode_set_z, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "set_position", mrb_node_set_position, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, node, "include?", mrb_node_is_include, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, node, "transform_local", mrb_node_transform_local, MRB_ARGS_REQ(2));
+  // size
   mrb_define_method(mrb, node, "w", mrb_BiNode_get_w, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "h", mrb_BiNode_get_h, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "set_size", mrb_node_set_size, MRB_ARGS_REQ(2));
+  // scale
   mrb_define_method(mrb, node, "scale_x", mrb_BiNode_get_scale_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "scale_y", mrb_BiNode_get_scale_y, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "scale_x=", mrb_BiNode_set_scale_x, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "scale_y=", mrb_BiNode_set_scale_y, MRB_ARGS_REQ(1));
-
-  mrb_define_method(mrb, node, "anchor_x=",mrb_BiNode_set_anchor_x, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "set_scale", mrb_node_set_scale, MRB_ARGS_REQ(2));
+  // anchor
   mrb_define_method(mrb, node, "anchor_x", mrb_BiNode_get_anchor_x, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "anchor_y=",mrb_BiNode_set_anchor_y, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "anchor_y", mrb_BiNode_get_anchor_y, MRB_ARGS_NONE());
-
+  mrb_define_method(mrb, node, "anchor_x=",mrb_BiNode_set_anchor_x, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "anchor_y=",mrb_BiNode_set_anchor_y, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "set_anchor",mrb_node_set_anchor, MRB_ARGS_REQ(2));
+  // angle
   mrb_define_method(mrb, node, "angle", mrb_node_angle, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "angle=", mrb_BiNode_set_angle, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "include?", mrb_node_is_include, MRB_ARGS_REQ(2));
-  mrb_define_method(mrb, node, "transform_local", mrb_node_transform_local, MRB_ARGS_REQ(2));
 
   // color
   mrb_define_method(mrb, node, "get_color", mrb_node_get_color, MRB_ARGS_NONE());
@@ -440,10 +476,17 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "opacity", mrb_node_get_opacity, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "opacity=", mrb_node_set_opacity, MRB_ARGS_REQ(1));
 
-  // visual
-  mrb_define_method(mrb, node, "set_texture_mapping", mrb_node_set_texture_mapping, MRB_ARGS_REQ(1));
+  // Visibility
   mrb_define_method(mrb, node, "visible=", mrb_node_set_visible, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "visible", mrb_node_get_visible, MRB_ARGS_NONE());
+
+  // Texture
+  mrb_define_method(mrb, node, "set_texture", mrb_node_set_texture, MRB_ARGS_REQ(5)|MRB_ARGS_OPT(4)); // tex,x,y,w,h, xywh
+  mrb_define_method(mrb, node, "unset_texture", mrb_node_unset_texture, MRB_ARGS_NONE()); // tex,x,y,w,h, xywh
+  mrb_define_method(mrb, node, "flip_vertical", mrb_BiNode_get_texture_flip_vertical, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "flip_vertical=", mrb_BiNode_set_texture_flip_vertical, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "flip_horizontal", mrb_BiNode_get_texture_flip_horizontal, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "flip_horizontal=", mrb_BiNode_set_texture_flip_horizontal, MRB_ARGS_REQ(1));
 
   // callback
   mrb_define_method(mrb, node, "_on_click_", mrb_node_on_click, MRB_ARGS_REQ(1));

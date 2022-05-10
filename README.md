@@ -1,8 +1,12 @@
 # mruby-libbismite
 
-for [libbismite 3.0.0](https://github.com/bismite/libbismite/releases/tag/3.0.0)
+for [libbismite 4.0.0](https://github.com/bismite/libbismite/releases/tag/4.0.0)
 
 # Changelog
+## 2.0.0 - 2022/05/10
+- update libbismite 4.0.0
+- TextureMapping removed.
+- Cropped Texture supported.
 ## 1.4.0 - 2022/04/26
 - add flip_vertical and flip_horizontal to TextureMapping
 ## 1.3.0 - 2022/04/15

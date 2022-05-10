@@ -11,16 +11,24 @@
 static void label_free(mrb_state *mrb, void *p)
 {
   BiNode* node = (BiNode*)p;
-  if (NULL != node) {
-    for(int i=0;i<node->children.size;i++){
-      BiNode* n = node->children.objects[i];
-      free(n->texture_mapping);
-      free(n);
+  if(node != NULL){
+    BiNode* label = NULL;
+    if(node->children.size>0){
+      label = bi_node_child_at(node,0);
+    }
+    if (NULL != label) {
+      for(int i=0;i<label->children.size;i++){
+        BiNode* n = label->children.objects[i];
+        free(n);
+      }
+      free(label->children.objects);
+      free(label);
     }
     free(node->children.objects);
     mrb_free(mrb, node);
   }
 }
+
 static struct mrb_data_type const mrb_label_data_type = { "Label", label_free };
 
 static mrb_value mrb_label_initialize(mrb_state *mrb, mrb_value self)
@@ -74,17 +82,21 @@ static mrb_value mrb_label_set_text_color_with_range(mrb_state *mrb, mrb_value s
   return self;
 }
 
+static mrb_value mrb_label_anchor_reposition(mrb_state *mrb, mrb_value self)
+{
+  BiNode* n = DATA_PTR(self);
+  bi_label_anchor_reposition(n);
+  return self;
+}
+
 void mrb_init_label(mrb_state *mrb, struct RClass *bi)
 {
-  struct RClass *node;
-  struct RClass *label;
-
-  node = mrb_class_get_under(mrb, bi, "Node");
-  label = mrb_define_class_under(mrb, bi, "Label", node);
+  struct RClass *node = mrb_class_get_under(mrb, bi, "Node");
+  struct RClass *label = mrb_define_class_under(mrb, bi, "Label", node);
   MRB_SET_INSTANCE_TT(label, MRB_TT_DATA);
-
   mrb_define_method(mrb, label, "initialize", mrb_label_initialize, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, label, "set_text", mrb_label_set_text, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, label, "set_text_color", mrb_label_set_text_color, MRB_ARGS_REQ(3)|MRB_ARGS_OPT(2)); // r,g,b|a,opacity
   mrb_define_method(mrb, label, "set_text_color_with_range", mrb_label_set_text_color_with_range, MRB_ARGS_REQ(5)|MRB_ARGS_OPT(2) ); // start,end,r,g,b|a,opacity
+  mrb_define_method(mrb, label, "anchor_reposition", mrb_label_anchor_reposition, MRB_ARGS_NONE());
 }

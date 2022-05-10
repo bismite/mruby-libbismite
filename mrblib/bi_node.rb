@@ -1,9 +1,8 @@
 
-
 class Bi::Node
   include Bi::TimerRunner
-  attr_reader :texture_mapping
-  attr_accessor :parent
+  attr_reader :texture
+  attr_reader :parent
 
   # NW   N  NE
   #  W   C   E
@@ -22,10 +21,6 @@ class Bi::Node
 
   def anchor=(anchor)
     self.anchor_x, self.anchor_y = ANCHOR_ALIAS[anchor]
-  end
-  def texture_mapping=(texture_mapping)
-    @texture_mapping = texture_mapping
-    self.set_texture_mapping @texture_mapping
   end
   def remove_from_parent
     self.parent&.remove self
@@ -51,14 +46,5 @@ class Bi::Node
   end
   def on_text_input(callback=nil,&blk)
     self._on_text_input_( callback || blk )
-  end
-end
-
-class Bi::Sprite < Bi::Node
-  def initialize(texture_mapping)
-    super
-    self.texture_mapping = texture_mapping
-    self.set_position 0, 0
-    self.set_size texture_mapping.w, texture_mapping.h
   end
 end
