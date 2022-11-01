@@ -1,6 +1,9 @@
 #include <mruby.h>
 #include <mruby/class.h>
 #include <bi/bismite.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten/version.h>
+#endif
 
 static mrb_value mrb_bi_version_gl_version(mrb_state *mrb, mrb_value self)
 {
@@ -44,7 +47,7 @@ void mrb_init_bi_version(mrb_state *mrb, struct RClass *bi)
   mrb_define_const(mrb, version, "BISMITE_MINOR", mrb_fixnum_value(BISMITE_MINOR_VERSION));
   mrb_define_const(mrb, version, "BISMITE_PATCH", mrb_fixnum_value(BISMITE_PATCHLEVEL));
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
   mrb_define_const(mrb, version, "EMSCRIPTEN_MAJOR", mrb_fixnum_value(__EMSCRIPTEN_major__));
   mrb_define_const(mrb, version, "EMSCRIPTEN_MINOR", mrb_fixnum_value(__EMSCRIPTEN_minor__));
   mrb_define_const(mrb, version, "EMSCRIPTEN_PATCH", mrb_fixnum_value(__EMSCRIPTEN_tiny__));
