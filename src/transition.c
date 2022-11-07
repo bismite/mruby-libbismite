@@ -9,9 +9,9 @@
 // Bi::Transition class
 static struct mrb_data_type const mrb_transition_data_type = { "Transition", mrb_free };
 
-static void transition_callback(BiContext* context, BiTransition* transition)
+static void transition_callback(BiTransition* transition)
 {
-  mrb_state *mrb = context->userdata;
+  mrb_state *mrb = transition->context->userdata;
   mrb_value self = mrb_obj_value(transition->userdata);
   mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@callback") );
   mrb_value argv[1] = {self};

@@ -3,6 +3,8 @@
 for [libbismite 5.0.0](https://github.com/bismite/libbismite/releases/tag/4.0.0)
 
 # Changelog
+## 4.0.1 - 2022/11/7
+- fix transition callback
 ## 4.0.0 - 2022/11/7
 - add w/h getter to canvas
 - update BiTimer callback
