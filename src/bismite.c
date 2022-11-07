@@ -14,7 +14,6 @@ extern void mrb_init_bi_profile(mrb_state*, struct RClass*);
 extern void mrb_init_bi_node(mrb_state*, struct RClass*);
 extern void mrb_init_bi_texture(mrb_state*, struct RClass*);
 extern void mrb_init_bi_timer(mrb_state*, struct RClass*);
-extern void mrb_init_bi_timer_runner(mrb_state*, struct RClass*);
 extern void mrb_init_bi_layer(mrb_state*, struct RClass*);
 extern void mrb_init_bi_layer_group(mrb_state*, struct RClass*);
 extern void mrb_init_bi_canvas(mrb_state*, struct RClass*);
@@ -161,7 +160,6 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_init_bi_node(mrb,bi); DONE;
   mrb_init_bi_texture(mrb,bi); DONE;
   mrb_init_bi_timer(mrb,bi); DONE;
-  mrb_init_bi_timer_runner(mrb,bi); DONE;
   mrb_init_bi_layer(mrb,bi); DONE;
   mrb_init_bi_layer_group(mrb,bi); DONE;
   mrb_init_bi_canvas(mrb,bi); DONE;

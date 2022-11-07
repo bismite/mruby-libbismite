@@ -35,14 +35,7 @@ static mrb_value mrb_label_initialize(mrb_state *mrb, mrb_value self)
 {
   mrb_value font_obj;
   mrb_get_args(mrb, "o", &font_obj);
-  BiNode* node = DATA_PTR(self);
-  if (node == NULL) {
-    node = mrb_malloc(mrb, sizeof(BiNode));
-    if (NULL == node) {
-      mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
-    }
-  }
-  bi_node_init(node);
+  BiNode* node = bi_node_init(mrb_malloc(mrb, sizeof(BiNode)));
   DATA_PTR(self) = node;
   DATA_TYPE(self) = &mrb_label_data_type;
   node->userdata = mrb_ptr(self);

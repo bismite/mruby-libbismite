@@ -5,7 +5,7 @@ module Bi::Version
   end
 
   def self.mruby_bicore
-    "3.1.0"
+    "4.0.0"
   end
 
   def self.emscripten
