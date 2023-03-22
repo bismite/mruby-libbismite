@@ -1,8 +1,10 @@
 # mruby-libbismite
 
-for [libbismite 5.0.0](https://github.com/bismite/libbismite/releases/tag/4.0.0)
+[libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 5.0.0 - 2023/03/23
+- license changed : MIT License
 ## 4.1.0 - 2022/11/12
 - add autoremove flag to actions
 ## 4.0.1 - 2022/11/7
@@ -48,7 +50,6 @@ for [libbismite 5.0.0](https://github.com/bismite/libbismite/releases/tag/4.0.0)
 - layer class can act as a post-process.
 
 # License
+Copyright 2018-2023 kbys <work4kbys@gmail.com>
 
-Copyright 2018-2022 kbys <work4kbys@gmail.com>
-
-Apache License Version 2.0
+MIT License

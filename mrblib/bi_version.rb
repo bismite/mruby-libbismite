@@ -4,8 +4,8 @@ module Bi::Version
     "#{BISMITE_MAJOR}.#{BISMITE_MINOR}.#{BISMITE_PATCH}"
   end
 
-  def self.mruby_bicore
-    "4.1.0"
+  def self.mruby_libbismite
+    "5.0.0"
   end
 
   def self.emscripten
