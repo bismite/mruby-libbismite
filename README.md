@@ -3,6 +3,10 @@
 [libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 6.0.0 - 2023/04/10
+- update libbismite 8.0.2
+- remove Repeat action.
+- add actions (FadeOut,FadeIn,ScaleTo,ScaleBy,MoveBy)
 ## 5.0.0 - 2023/03/23
 - license changed : MIT License
 ## 4.1.0 - 2022/11/12

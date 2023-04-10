@@ -5,7 +5,7 @@ module Bi::Version
   end
 
   def self.mruby_libbismite
-    "5.0.0"
+    "6.0.0"
   end
 
   def self.emscripten
