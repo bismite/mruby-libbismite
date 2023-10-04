@@ -5,7 +5,7 @@
   mrb_int src,dst,alpha_src,alpha_dst; \
   mrb_get_args(mrb, "iiii", &src, &dst, &alpha_src, &alpha_dst ); \
   CLASS* target = DATA_PTR(self); \
-  bi_set_blend_factor(&target->ATTR,src,dst,alpha_src,alpha_dst); \
+  target->blend_factor = bi_blend_factor(src,dst,alpha_src,alpha_dst); \
   return self;
 
 #define GET_BLEND_FACTOR(CLASS,ATTR) \

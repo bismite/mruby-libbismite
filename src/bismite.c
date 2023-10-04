@@ -20,11 +20,12 @@ extern void mrb_init_bi_canvas(mrb_state*, struct RClass*);
 extern void mrb_init_bi_shader(mrb_state*, struct RClass*);
 extern void mrb_init_bi_key(mrb_state*, struct RClass*);
 extern void mrb_init_bi_version(mrb_state*, struct RClass*);
+extern void mrb_init_bi_color(mrb_state*, struct RClass*);
 // modules ext
 extern void mrb_init_font(mrb_state *mrb, struct RClass *sg);
 extern void mrb_init_label(mrb_state *mrb, struct RClass *sg);
 extern void mrb_init_action(mrb_state *mrb, struct RClass *sg);
-extern void mrb_init_transition(mrb_state *mrb, struct RClass *sg);
+extern void mrb_init_transition_layer(mrb_state *mrb, struct RClass *sg);
 
 //
 // Bi class
@@ -155,23 +156,23 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
 
   mrb_define_method(mrb, bi, "messagebox", mrb_bi_messagebox, MRB_ARGS_REQ(3));
 
-#define DONE mrb_gc_arena_restore(mrb, 0)
-  mrb_init_bi_profile(mrb,bi); DONE;
-  mrb_init_bi_node(mrb,bi); DONE;
-  mrb_init_bi_texture(mrb,bi); DONE;
-  mrb_init_bi_timer(mrb,bi); DONE;
-  mrb_init_bi_layer(mrb,bi); DONE;
-  mrb_init_bi_layer_group(mrb,bi); DONE;
-  mrb_init_bi_canvas(mrb,bi); DONE;
-  mrb_init_bi_shader(mrb,bi); DONE;
-  mrb_init_bi_key(mrb,bi); DONE;
-  mrb_init_bi_version(mrb,bi); DONE;
+  //
+  mrb_init_bi_profile(mrb,bi);;
+  mrb_init_bi_node(mrb,bi);;
+  mrb_init_bi_texture(mrb,bi);;
+  mrb_init_bi_timer(mrb,bi);
+  mrb_init_bi_layer(mrb,bi);
+  mrb_init_bi_layer_group(mrb,bi);
+  mrb_init_bi_canvas(mrb,bi);
+  mrb_init_bi_shader(mrb,bi);
+  mrb_init_bi_key(mrb,bi);
+  mrb_init_bi_version(mrb,bi);
+  mrb_init_bi_color(mrb,bi);
   // ext
-  mrb_init_font(mrb,bi); DONE;
-  mrb_init_label(mrb,bi); DONE;
-  mrb_init_action(mrb,bi); DONE;
-  mrb_init_transition(mrb,bi); DONE;
-#undef DONE
+  mrb_init_font(mrb,bi);
+  mrb_init_label(mrb,bi);
+  mrb_init_action(mrb,bi);
+  mrb_init_transition_layer(mrb,bi);
 
   // blend functions
   // source: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendFunc.xhtml

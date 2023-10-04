@@ -1,12 +1,12 @@
 #ifndef __MRUBY_LIBBISMITE_SHADER_MACRO_H__
 #define __MRUBY_LIBBISMITE_SHADER_MACRO_H__
 
-#define SET_SHADER_ATTRIBUTE(CLASS,NAME) \
+#define SET_SHADER_EXTRA_DATA(CLASS) \
   mrb_int index; \
   mrb_float value; \
   mrb_get_args(mrb, "if", &index, &value ); \
   CLASS *ptr = DATA_PTR(self); \
-  if(0<=index&&index<4) ptr->NAME[index]=value;
+  if(0<=index&&index<16) ptr->shader_extra_data[index]=value;
 
 static inline void set_shader(mrb_state* mrb, mrb_value self,const char* ivname,BiShader** shader_p,mrb_value shader_obj)
 {

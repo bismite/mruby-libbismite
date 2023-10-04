@@ -67,7 +67,7 @@ static mrb_value mrb_bi_canvas_set_shader(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_bi_canvas_set_shader_attribute(mrb_state *mrb, mrb_value self)
 {
-  SET_SHADER_ATTRIBUTE(BiCanvas,shader_attributes);
+  SET_SHADER_EXTRA_DATA(BiCanvas);
   return self;
 }
 

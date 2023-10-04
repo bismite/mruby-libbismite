@@ -1,7 +1,7 @@
 #include <mruby.h>
 #include <mruby/data.h>
 #include <mruby/class.h>
-#include <mruby/presym.h>
+
 #include <mruby/variable.h>
 #include <mruby/array.h>
 #include <bi/context.h>
@@ -9,18 +9,20 @@
 #include <bi/util.h>
 #include <stdlib.h>
 #include "_inner_macro.h"
+#include "_node_base.h"
+
+// Color class (static)
+static struct mrb_data_type const mrb_bi_color_data_type = { "Color", NULL };
 
 // Bi::Node class
-static void node_free(mrb_state *mrb, void *p)
+static void bi_node_free(mrb_state *mrb, void *p)
 {
-  BiNode* node = p;
-  if (NULL != node) {
-    free(node->children.objects);
-    free(node->timers.timers);
-    mrb_free(mrb, node);
+  if (NULL != p) {
+    bi_node_base_deinit(p);
+    mrb_free(mrb, p);
   }
 }
-static struct mrb_data_type const mrb_node_data_type = { "Node", node_free };
+static struct mrb_data_type const mrb_node_data_type = { "Node", bi_node_free };
 
 //
 // callback function
@@ -135,39 +137,31 @@ static bool on_textinput(BiContext* context, BiNode* node, char* text)
 }
 
 //
-// node functions
+// BiNode
 //
+
+static mrb_value color_obj(mrb_state *mrb,BiColor* color)
+{
+  struct RClass *color_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Color");
+  struct RData *color_data = mrb_data_object_alloc(mrb,color_class,color,&mrb_bi_color_data_type);
+  return mrb_obj_value(color_data);
+}
 
 static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
 {
-  BiNode* node;
-
-  node = mrb_malloc(mrb, sizeof(BiNode));
-  if (NULL == node) {
-    mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
-  }
-
+  BiNode* node = mrb_malloc(mrb, sizeof(BiNode));
   bi_node_init(node);
   mrb_data_init(self, node, &mrb_node_data_type);
   node->userdata = mrb_ptr(self);
-
+  // Color
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@color_tint"), color_obj(mrb,&node->color_tint) );
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@color_modulate"), color_obj(mrb,&node->color_modulate) );
   return self;
 }
 
 //
 // scene graph
 //
-
-static mrb_value _iv_children_(mrb_state *mrb, mrb_value self)
-{
-  mrb_sym iv_name = MRB_IVSYM(_children_);
-  mrb_value v = mrb_iv_get(mrb,self,iv_name);
-  if( mrb_nil_p(v) ) {
-    v = mrb_ary_new(mrb);
-    mrb_iv_set(mrb,self,iv_name,v);
-  }
-  return v;
-}
 
 static BiNode* bi_node_from_obj(mrb_state *mrb,mrb_value obj)
 {
@@ -206,10 +200,7 @@ static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
   mrb_value iv_children = _iv_children_(mrb,self);
   mrb_iv_set(mrb,obj,MRB_IVSYM(parent),mrb_nil_value());
   mrb_funcall(mrb,iv_children,"delete",1,obj);
-  child = bi_node_remove_node(node,child);
-  if(child!=NULL) {
-    child->parent = NULL;
-  }
+  bi_node_remove_node(node,child);
   return self;
 }
 
@@ -308,43 +299,26 @@ static mrb_value mrb_node_transform_local(mrb_state *mrb, mrb_value self)
 }
 
 //
-// color
+// Color
 //
-
-static mrb_value mrb_node_get_color(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_node_set_color_modulate(mrb_state *mrb, mrb_value self)
 {
+  mrb_value color_obj;
+  mrb_get_args(mrb, "o", &color_obj );
+  BiColor* color = DATA_PTR(color_obj);
   BiNode* node = DATA_PTR(self);
-  mrb_value vals[4] = {
-    mrb_fixnum_value(node->color[0]),
-    mrb_fixnum_value(node->color[1]),
-    mrb_fixnum_value(node->color[2]),
-    mrb_fixnum_value(node->color[3])
-  };
-  return mrb_ary_new_from_values(mrb,4,vals);
+  node->color_modulate = *color;
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color_modulate") );
 }
 
-static mrb_value mrb_node_set_color(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_node_set_color_tint(mrb_state *mrb, mrb_value self)
 {
-  mrb_int r,g,b,a=0xFF;
-  mrb_get_args(mrb, "iii|i", &r, &g, &b, &a );
+  mrb_value color_obj;
+  mrb_get_args(mrb, "o", &color_obj );
+  BiColor* color = DATA_PTR(color_obj);
   BiNode* node = DATA_PTR(self);
-  bi_set_color(node->color,r,g,b,a);
-  return self;
-}
-
-static mrb_value mrb_node_get_opacity(mrb_state *mrb, mrb_value self)
-{
-  BiNode* node = DATA_PTR(self);
-  return mrb_float_value(mrb,node->opacity);
-}
-
-static mrb_value mrb_node_set_opacity(mrb_state *mrb, mrb_value self)
-{
-  mrb_float opacity;
-  mrb_get_args(mrb, "f", &opacity );
-  BiNode* node = DATA_PTR(self);
-  node->opacity = opacity;
-  return mrb_float_value(mrb,opacity);
+  node->color_tint = *color;
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color_tint") );
 }
 
 // Visibility
@@ -471,10 +445,8 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "angle=", mrb_BiNode_set_angle, MRB_ARGS_REQ(1));
 
   // color
-  mrb_define_method(mrb, node, "get_color", mrb_node_get_color, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "set_color", mrb_node_set_color, MRB_ARGS_REQ(3)|MRB_ARGS_OPT(1)); // r,g,b|a
-  mrb_define_method(mrb, node, "opacity", mrb_node_get_opacity, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "opacity=", mrb_node_set_opacity, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "color_tint=", mrb_node_set_color_tint, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "color_modulate=", mrb_node_set_color_modulate, MRB_ARGS_REQ(1));
 
   // Visibility
   mrb_define_method(mrb, node, "visible=", mrb_node_set_visible, MRB_ARGS_REQ(1));

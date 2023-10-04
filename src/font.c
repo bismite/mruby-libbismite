@@ -16,7 +16,7 @@ static mrb_value mrb_bi_font_read(mrb_state *mrb, mrb_value self)
   mrb_value texture_obj, layout_file;
   mrb_get_args(mrb, "oS", &texture_obj, &layout_file);
 
-  BiFontAtlas *font = mrb_malloc(mrb,sizeof(BiFontAtlas));
+  BiFont *font = mrb_malloc(mrb,sizeof(BiFont));
   BiTexture* texture = DATA_PTR(texture_obj);
 
   bi_font_init_with_file(font, mrb_string_value_cstr(mrb,&layout_file) );
@@ -38,9 +38,9 @@ static mrb_value mrb_font_initialize(mrb_state *mrb, mrb_value self)
   mrb_value texture_obj, layout_data;
   mrb_get_args(mrb, "oS", &texture_obj, &layout_data);
 
-  BiFontAtlas *font = DATA_PTR(self);
+  BiFont *font = DATA_PTR(self);
   if (font == NULL) {
-    font = mrb_malloc(mrb, sizeof(BiFontAtlas));
+    font = mrb_malloc(mrb, sizeof(BiFont));
     if (NULL == font) {
       mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
     }
@@ -60,14 +60,14 @@ static mrb_value mrb_font_initialize(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-_GET_(BiFontAtlas,font_size,bi_mrb_fixnum_value);
+_GET_(BiFont,font_size,bi_mrb_fixnum_value);
 
 static mrb_value mrb_font_line_x_to_index(mrb_state *mrb, mrb_value self)
 {
   mrb_int x;
   char *text;
   mrb_get_args(mrb, "zi", &text, &x );
-  BiFontAtlas* font = DATA_PTR(self);
+  BiFont* font = DATA_PTR(self);
   return mrb_fixnum_value( bi_font_line_x_to_index(font, text, x) );
 }
 
@@ -80,7 +80,7 @@ void mrb_init_font(mrb_state *mrb, struct RClass *bi)
   mrb_define_class_method(mrb, font, "read", mrb_bi_font_read, MRB_ARGS_REQ(2) ); // texture, layout_filename
 
   mrb_define_method(mrb, font, "initialize", mrb_font_initialize, MRB_ARGS_REQ(2)); // texture, layout_data
-  mrb_define_method(mrb, font, "size", mrb_BiFontAtlas_get_font_size, MRB_ARGS_NONE());
+  mrb_define_method(mrb, font, "size", mrb_BiFont_get_font_size, MRB_ARGS_NONE());
 
   mrb_define_method(mrb, font, "line_x_to_index", mrb_font_line_x_to_index, MRB_ARGS_REQ(2)); // text,x
 }

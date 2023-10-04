@@ -8,12 +8,19 @@
 #include "_inner_macro.h"
 #include "_shader_macro.h"
 #include "_blend_factor_macro.h"
+#include "_node_base.h"
 
 //
 // Bi::Layer class
 //
-
-static struct mrb_data_type const mrb_layer_data_type = { "Layer", mrb_free };
+static void mrb_bi_layer_free(mrb_state *mrb, void *p)
+{
+  if (NULL != p) {
+    bi_node_base_deinit(p);
+    mrb_free(mrb,p);
+  }
+}
+static struct mrb_data_type const mrb_layer_data_type = { "Layer", mrb_bi_layer_free };
 
 static mrb_value mrb_layer_initialize(mrb_state *mrb, mrb_value self)
 {
@@ -28,8 +35,39 @@ static mrb_value mrb_layer_initialize(mrb_state *mrb, mrb_value self)
 }
 
 //
+// Scene graph
+//
+
+static mrb_value mrb_BiLayer_add_node(mrb_state *mrb, mrb_value self)
+{
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
+  BiLayer* layer = DATA_PTR(self);
+  BiNode* node = DATA_PTR(obj);
+  bi_layer_add_node(layer,node);
+  mrb_value iv_children = _iv_children_(mrb,self);
+  mrb_ary_push(mrb,iv_children,obj);
+  mrb_iv_set(mrb,obj,MRB_IVSYM(parent),self);
+  return self;
+}
+
+static mrb_value mrb_BiLayer_remove_node(mrb_state *mrb, mrb_value self)
+{
+  mrb_value obj;
+  mrb_get_args(mrb, "o", &obj );
+  BiLayer* layer = DATA_PTR(self);
+  BiNode* node = DATA_PTR(obj);
+  bi_layer_remove_node(layer,node);
+  mrb_value iv_children = _iv_children_(mrb,self);
+  mrb_funcall(mrb,iv_children,"delete",1,obj);
+  mrb_iv_set(mrb,obj,MRB_IVSYM(parent),mrb_nil_value());
+  return self;
+}
+
+//
 // define accessors
 //
+
 _GET_(BiLayer,camera_x,bi_mrb_fixnum_value);
 _SET_(BiLayer,camera_x,mrb_int,i);
 _GET_(BiLayer,camera_y,bi_mrb_fixnum_value);
@@ -37,23 +75,6 @@ _SET_(BiLayer,camera_y,mrb_int,i);
 
 _GET_FUNC_(BiLayer,z_order,bi_layer_get_z_order,bi_mrb_fixnum_value);
 _SET_FUNC_(BiLayer,z_order,mrb_int,i,bi_layer_set_z_order);
-
-static mrb_value mrb_BiLayer_set_root(mrb_state *mrb, mrb_value self)
-{
-  mrb_value obj;
-  mrb_get_args(mrb, "o", &obj );
-  // TODO: error check
-  BiLayer* layer = DATA_PTR(self);
-  BiNode* node = DATA_PTR(obj);
-  layer->root = node;
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@root"), obj);
-  return self;
-}
-
-static mrb_value mrb_BiLayer_get_root(mrb_state *mrb, mrb_value self)
-{
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@root"));
-}
 
 static mrb_value mrb_BiLayer_set_texture(mrb_state *mrb, mrb_value self)
 {
@@ -88,49 +109,10 @@ static mrb_value mrb_BiLayer_set_shader(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-static mrb_value mrb_BiLayer_set_post_process_shader(mrb_state *mrb, mrb_value self)
-{
-  mrb_value shader_obj;
-  mrb_get_args(mrb, "o", &shader_obj );
-  BiLayer* layer = DATA_PTR(self);
-  set_shader(mrb,self,"@post_process_shader",&layer->post_process.shader,shader_obj);
-  return self;
-}
-
 static mrb_value mrb_BiLayer_set_shader_attribute(mrb_state *mrb, mrb_value self)
 {
-  SET_SHADER_ATTRIBUTE(BiLayer,shader_attributes);
+  SET_SHADER_EXTRA_DATA(BiLayer);
   return self;
-}
-
-static mrb_value mrb_BiLayer_set_post_process_shader_attribute(mrb_state *mrb, mrb_value self)
-{
-  SET_SHADER_ATTRIBUTE(BiLayer,post_process.shader_attributes);
-  return self;
-}
-
-//
-// post process
-//
-
-static mrb_value mrb_BiLayer_set_post_process_framebuffer_enabled(mrb_state *mrb, mrb_value self)
-{
-  mrb_bool framebuffer_enabled;
-  mrb_get_args(mrb, "b", &framebuffer_enabled );
-  BiLayer* layer = DATA_PTR(self);
-  layer->post_process.framebuffer_enabled = framebuffer_enabled;
-  return self;
-}
-
-
-static mrb_value mrb_BiLayer_set_post_process_blend_factor(mrb_state *mrb, mrb_value self)
-{
-  SET_BLEND_FACTOR(BiLayer,post_process.blend_factor);
-}
-
-static mrb_value mrb_BiLayer_get_post_process_blend_factor(mrb_state *mrb, mrb_value self)
-{
-  GET_BLEND_FACTOR(BiLayer,post_process.blend_factor);
 }
 
 //
@@ -141,6 +123,8 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   MRB_SET_INSTANCE_TT(layer, MRB_TT_DATA);
 
   mrb_define_method(mrb, layer, "initialize", mrb_layer_initialize, MRB_ARGS_NONE());
+  mrb_define_method(mrb, layer, "add", mrb_BiLayer_add_node, MRB_ARGS_REQ(1)); // node
+  mrb_define_method(mrb, layer, "remove", mrb_BiLayer_remove_node, MRB_ARGS_REQ(1)); // node
 
   mrb_define_method(mrb, layer, "camera_x", mrb_BiLayer_get_camera_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "camera_x=",mrb_BiLayer_set_camera_x, MRB_ARGS_REQ(1));
@@ -150,9 +134,6 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, layer, "z_order", mrb_BiLayer_get_z_order, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "z_order=",mrb_BiLayer_set_z_order, MRB_ARGS_REQ(1));
 
-  mrb_define_method(mrb, layer, "root", mrb_BiLayer_get_root, MRB_ARGS_NONE());
-  mrb_define_method(mrb, layer, "root=",mrb_BiLayer_set_root, MRB_ARGS_REQ(1));
-
   mrb_define_method(mrb, layer, "shader=",mrb_BiLayer_set_shader, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer, "set_shader_attribute",mrb_BiLayer_set_shader_attribute, MRB_ARGS_REQ(2)); // index,value
 
@@ -160,10 +141,4 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
 
   mrb_define_method(mrb, layer, "set_blend_factor", mrb_BiLayer_set_blend_factor, MRB_ARGS_REQ(4));
   mrb_define_method(mrb, layer, "get_blend_factor", mrb_BiLayer_get_blend_factor, MRB_ARGS_NONE());
-
-  mrb_define_method(mrb, layer, "set_post_process_shader",mrb_BiLayer_set_post_process_shader, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, layer, "set_post_process_shader_attribute",mrb_BiLayer_set_post_process_shader_attribute, MRB_ARGS_REQ(2)); // index,value
-  mrb_define_method(mrb, layer, "set_post_process_framebuffer_enabled",mrb_BiLayer_set_post_process_framebuffer_enabled, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, layer, "set_post_process_blend_factor",mrb_BiLayer_set_post_process_blend_factor, MRB_ARGS_REQ(4));
-  mrb_define_method(mrb, layer, "get_post_process_blend_factor",mrb_BiLayer_get_post_process_blend_factor, MRB_ARGS_NONE());
 }
