@@ -11,7 +11,7 @@
 #include "_node_base.h"
 
 //
-// Bi::Layer class
+// Bi::Layer, Bi::PostProcessLayer
 //
 static void mrb_bi_layer_free(mrb_state *mrb, void *p)
 {
@@ -21,7 +21,11 @@ static void mrb_bi_layer_free(mrb_state *mrb, void *p)
   }
 }
 static struct mrb_data_type const mrb_layer_data_type = { "Layer", mrb_bi_layer_free };
+static struct mrb_data_type const mrb_pp_layer_data_type = { "PostProcessLayer", mrb_bi_layer_free };
 
+//
+// Bi::Layer
+//
 static mrb_value mrb_layer_initialize(mrb_state *mrb, mrb_value self)
 {
   BiLayer* layer = mrb_malloc(mrb,sizeof(BiLayer));
@@ -115,11 +119,23 @@ static mrb_value mrb_BiLayer_set_shader_attribute(mrb_state *mrb, mrb_value self
   return self;
 }
 
+// PostProcessLayer
+static mrb_value mrb_pp_layer_initialize(mrb_state *mrb, mrb_value self)
+{
+  BiLayer* layer = mrb_malloc(mrb,sizeof(BiLayer));
+  if (NULL == layer) {
+    mrb_raise(mrb, E_RUNTIME_ERROR, "insufficient memory.");
+  }
+  bi_layer_init_as_postprocess(layer);
+  mrb_data_init(self, layer, &mrb_pp_layer_data_type);
+  layer->userdata = mrb_ptr(self);
+  return self;
+}
+
 //
 void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
 {
-  struct RClass *layer;
-  layer = mrb_define_class_under(mrb, bi, "Layer", mrb->object_class);
+  struct RClass *layer = mrb_define_class_under(mrb, bi, "Layer", mrb->object_class);
   MRB_SET_INSTANCE_TT(layer, MRB_TT_DATA);
 
   mrb_define_method(mrb, layer, "initialize", mrb_layer_initialize, MRB_ARGS_NONE());
@@ -141,4 +157,8 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
 
   mrb_define_method(mrb, layer, "set_blend_factor", mrb_BiLayer_set_blend_factor, MRB_ARGS_REQ(4));
   mrb_define_method(mrb, layer, "get_blend_factor", mrb_BiLayer_get_blend_factor, MRB_ARGS_NONE());
+
+  struct RClass *pp_layer = mrb_define_class_under(mrb, bi, "PostProcessLayer", layer);
+  MRB_SET_INSTANCE_TT(pp_layer, MRB_TT_DATA);
+  mrb_define_method(mrb, pp_layer, "initialize", mrb_pp_layer_initialize, MRB_ARGS_NONE());
 }

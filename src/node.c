@@ -10,9 +10,7 @@
 #include <stdlib.h>
 #include "_inner_macro.h"
 #include "_node_base.h"
-
-// Color class (static)
-static struct mrb_data_type const mrb_bi_color_data_type = { "Color", NULL };
+#include "_color.h"
 
 // Bi::Node class
 static void bi_node_free(mrb_state *mrb, void *p)
@@ -140,13 +138,6 @@ static bool on_textinput(BiContext* context, BiNode* node, char* text)
 // BiNode
 //
 
-static mrb_value color_obj(mrb_state *mrb,BiColor* color)
-{
-  struct RClass *color_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Color");
-  struct RData *color_data = mrb_data_object_alloc(mrb,color_class,color,&mrb_bi_color_data_type);
-  return mrb_obj_value(color_data);
-}
-
 static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
 {
   BiNode* node = mrb_malloc(mrb, sizeof(BiNode));
@@ -154,8 +145,8 @@ static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
   mrb_data_init(self, node, &mrb_node_data_type);
   node->userdata = mrb_ptr(self);
   // Color
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@color_tint"), color_obj(mrb,&node->color_tint) );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@color_modulate"), color_obj(mrb,&node->color_modulate) );
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@tint"), color_obj(mrb,&node->tint) );
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@color"), color_obj(mrb,&node->color) );
   return self;
 }
 
@@ -301,24 +292,33 @@ static mrb_value mrb_node_transform_local(mrb_state *mrb, mrb_value self)
 //
 // Color
 //
-static mrb_value mrb_node_set_color_modulate(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_node_get_color(mrb_state *mrb, mrb_value self)
 {
-  mrb_value color_obj;
-  mrb_get_args(mrb, "o", &color_obj );
-  BiColor* color = DATA_PTR(color_obj);
-  BiNode* node = DATA_PTR(self);
-  node->color_modulate = *color;
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color_modulate") );
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color") );
+}
+static mrb_value mrb_node_get_tint(mrb_state *mrb, mrb_value self)
+{
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@tint") );
 }
 
-static mrb_value mrb_node_set_color_tint(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_node_set_color(mrb_state *mrb, mrb_value self)
 {
   mrb_value color_obj;
   mrb_get_args(mrb, "o", &color_obj );
   BiColor* color = DATA_PTR(color_obj);
   BiNode* node = DATA_PTR(self);
-  node->color_tint = *color;
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color_tint") );
+  node->color = *color;
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color") );
+}
+
+static mrb_value mrb_node_set_tint(mrb_state *mrb, mrb_value self)
+{
+  mrb_value color_obj;
+  mrb_get_args(mrb, "o", &color_obj );
+  BiColor* color = DATA_PTR(color_obj);
+  BiNode* node = DATA_PTR(self);
+  node->tint = *color;
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@tint") );
 }
 
 // Visibility
@@ -445,8 +445,10 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "angle=", mrb_BiNode_set_angle, MRB_ARGS_REQ(1));
 
   // color
-  mrb_define_method(mrb, node, "color_tint=", mrb_node_set_color_tint, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "color_modulate=", mrb_node_set_color_modulate, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "tint", mrb_node_get_tint, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "color", mrb_node_get_color, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "tint=", mrb_node_set_tint, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "color=", mrb_node_set_color, MRB_ARGS_REQ(1));
 
   // Visibility
   mrb_define_method(mrb, node, "visible=", mrb_node_set_visible, MRB_ARGS_REQ(1));

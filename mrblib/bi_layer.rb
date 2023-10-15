@@ -1,13 +1,10 @@
 
 class Bi::LayerGroup
   include Bi::TimerRunner
-  def layers
-    @layers
-  end
+  attr_reader :framebuffer
 end
 
 class Bi::Layer
   include Bi::TimerRunner
   attr_reader :shader
-  attr_reader :post_process_shader
 end
