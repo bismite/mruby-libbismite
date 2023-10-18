@@ -37,12 +37,6 @@ class Bi
 
   # Layer
   def self.layers = @@bi.layers
-  def self.add_layer(layer) = @@bi.layers.add_layer layer
-  def self.remove_layer(layer) = @@bi.layers.remove_layer layer
-  def self.remove_all_layers
-    @@bi.layers.layers.each{|l| @@bi.remove_layer l }
-    @@bi.layers.clear
-  end
 
   # shader
   def self.default_shader = @@bi.default_shader

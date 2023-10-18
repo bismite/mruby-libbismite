@@ -28,7 +28,6 @@ extern void mrb_init_bi_framebuffer(mrb_state*, struct RClass*);
 extern void mrb_init_font(mrb_state *mrb, struct RClass *sg);
 extern void mrb_init_label(mrb_state *mrb, struct RClass *sg);
 extern void mrb_init_action(mrb_state *mrb, struct RClass *sg);
-extern void mrb_init_transition_layer(mrb_state *mrb, struct RClass *sg);
 
 //
 // Bi class
@@ -191,7 +190,6 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_init_font(mrb,bi);
   mrb_init_label(mrb,bi);
   mrb_init_action(mrb,bi);
-  mrb_init_transition_layer(mrb,bi);
   // blend functions
   // source: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendFunc.xhtml
   mrb_define_const(mrb, mrb->kernel_module, "GL_ZERO", mrb_fixnum_value(GL_ZERO));

@@ -3,6 +3,7 @@
 #include <mruby/class.h>
 #include <mruby/variable.h>
 #include <mruby/array.h>
+#include <mruby/presym.h>
 #include <bi/context.h>
 #include <bi/layer.h>
 #include "_inner_macro.h"
@@ -113,7 +114,7 @@ static mrb_value mrb_BiLayer_set_shader(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-static mrb_value mrb_BiLayer_set_shader_attribute(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_BiLayer_set_shader_extra_data(mrb_state *mrb, mrb_value self)
 {
   SET_SHADER_EXTRA_DATA(BiLayer);
   return self;
@@ -151,7 +152,7 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, layer, "z_order=",mrb_BiLayer_set_z_order, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, layer, "shader=",mrb_BiLayer_set_shader, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, layer, "set_shader_attribute",mrb_BiLayer_set_shader_attribute, MRB_ARGS_REQ(2)); // index,value
+  mrb_define_method(mrb, layer, "set_shader_extra_data",mrb_BiLayer_set_shader_extra_data, MRB_ARGS_REQ(2)); // index,value
 
   mrb_define_method(mrb, layer, "set_texture",mrb_BiLayer_set_texture, MRB_ARGS_REQ(2));
 
