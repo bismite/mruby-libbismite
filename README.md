@@ -3,6 +3,25 @@
 [libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 7.0.0
+- update libbismite 10.0.0
+- Color update
+  - add Bi::Color class.
+  - Bi::Node: add `color` and `tint` accessor.
+  - add `color` accessor to Bi class.
+- Postprocess and Framebuffer update
+  - add FrameBuffer class and PostProcessLayer class.
+  - postprocess related attributes removed from Layer class.
+  - TransitionLayer removed.
+- Scene graph related update
+  - remove root node from layer, and add `add` and `remove` function.
+  - Bi::LayerGroup : add `add` and `remove` function. `add_layer`,`remove_layer`,`add_layer_group` and `remove_layer_group` removed.
+  - `add_layer`, `remove_layer` and `remove_all_layers` removed from Bi class.
+  - add `parent` accessor to LayerGroup and Layer.
+- other
+  - timer.c : callback receives context.
+  - Bi::Node : rename anchor aliases. (top_left,bottom_left,...)
+  - overhaul Bi::Label class.
 ## 6.0.0 - 2023/04/10
 - update libbismite 8.0.2
 - remove Repeat action.
