@@ -3,6 +3,9 @@
 [libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 7.1.0
+- update libbismite 10.1.0
+- src/bismite.c: stop run loop when mrb exception occured in main loop.
 ## 7.0.0
 - update libbismite 10.0.0
 - Color update
