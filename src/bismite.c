@@ -4,6 +4,8 @@
 #include <mruby/string.h>
 #include <mruby/variable.h>
 #include <mruby/array.h>
+#include <mruby/error.h>
+#include <mruby/presym.h>
 #include <bi/context.h>
 #include <bi/main_loop.h>
 #include <time.h>
@@ -65,9 +67,22 @@ static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
   return self;
 }
 
+static void on_mainloop_end(BiContext* context)
+{
+  mrb_state *mrb = context->userdata;
+  // catch exception in mainloop
+  if (mrb->exc) {
+    MRB_EXC_CHECK_EXIT(mrb, mrb->exc);
+    // mrb_p(mrb, mrb_obj_value(mrb->exc));
+    mrb_print_error(mrb);
+    bi_stop_run_loop();
+  }
+}
+
 static mrb_value mrb_bi_start_run_loop(mrb_state *mrb, mrb_value self)
 {
   BiContext* c = DATA_PTR(self);
+  c->on_mainloop_end = on_mainloop_end;
   bi_start_run_loop(c);
   return self;
 }
