@@ -25,6 +25,7 @@ static mrb_value mrb_bi_color_get_b(mrb_state *mrb, mrb_value self) { GETCOLOR(b
 static mrb_value mrb_bi_color_get_a(mrb_state *mrb, mrb_value self) { GETCOLOR(a); }
 
 #define SETCOLOR(x) mrb_int c; \
+  mrb_check_frozen_value(mrb,self); \
   mrb_get_args(mrb, "i", &c ); \
   ((BiColor*)DATA_PTR(self))->x = c; \
   return mrb_fixnum_value(c);
