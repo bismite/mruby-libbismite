@@ -119,6 +119,13 @@ static mrb_value mrb_BiLayer_set_shader_extra_data(mrb_state *mrb, mrb_value sel
   SET_SHADER_EXTRA_DATA(BiLayer);
   return self;
 }
+static mrb_value mrb_BiLayer_get_shader_extra_data(mrb_state *mrb, mrb_value self)
+{
+  mrb_int i;
+  mrb_get_args(mrb, "i", &i );
+  BiLayer* layer = DATA_PTR(self);
+  return mrb_float_value(mrb,layer->shader_extra_data[i]);
+}
 
 // PostProcessLayer
 static mrb_value mrb_pp_layer_initialize(mrb_state *mrb, mrb_value self)
@@ -153,6 +160,7 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
 
   mrb_define_method(mrb, layer, "shader=",mrb_BiLayer_set_shader, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer, "set_shader_extra_data",mrb_BiLayer_set_shader_extra_data, MRB_ARGS_REQ(2)); // index,value
+  mrb_define_method(mrb, layer, "get_shader_extra_data",mrb_BiLayer_get_shader_extra_data, MRB_ARGS_REQ(1)); // index
 
   mrb_define_method(mrb, layer, "set_texture",mrb_BiLayer_set_texture, MRB_ARGS_REQ(2));
 

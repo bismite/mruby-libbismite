@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include "_inner_macro.h"
 #include "_node_base.h"
+#include "_shader_macro.h"
 #include "_color.h"
 
 // Bi::Node class
@@ -364,6 +365,17 @@ _GET_(BiNode,texture_flip_horizontal,bi_mrb_bool_value);
 _SET_(BiNode,texture_flip_vertical,mrb_bool,b);
 _SET_(BiNode,texture_flip_horizontal,mrb_bool,b);
 
+// Extra Data
+static mrb_value mrb_BiNode_set_shader_extra_data(mrb_state *mrb, mrb_value self) {
+  SET_SHADER_EXTRA_DATA(BiNode);
+}
+static mrb_value mrb_BiNode_get_shader_extra_data(mrb_state *mrb, mrb_value self) {
+  mrb_int i;
+  mrb_get_args(mrb, "i", &i );
+  BiNode* node = DATA_PTR(self);
+  return mrb_float_value(mrb,node->shader_extra_data[i]);
+}
+
 //
 // callback
 //
@@ -461,6 +473,10 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "flip_vertical=", mrb_BiNode_set_texture_flip_vertical, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "flip_horizontal", mrb_BiNode_get_texture_flip_horizontal, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "flip_horizontal=", mrb_BiNode_set_texture_flip_horizontal, MRB_ARGS_REQ(1));
+
+  // extra
+  mrb_define_method(mrb, node, "set_shader_extra_data", mrb_BiNode_set_shader_extra_data, MRB_ARGS_REQ(2)); // index,value
+  mrb_define_method(mrb, node, "get_shader_extra_data", mrb_BiNode_get_shader_extra_data, MRB_ARGS_REQ(1)); // index
 
   // callback
   mrb_define_method(mrb, node, "_on_click_", mrb_node_on_click, MRB_ARGS_REQ(1));

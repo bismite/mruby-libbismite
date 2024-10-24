@@ -6,7 +6,12 @@
   mrb_float value; \
   mrb_get_args(mrb, "if", &index, &value ); \
   CLASS *ptr = DATA_PTR(self); \
-  if(0<=index&&index<16) ptr->shader_extra_data[index]=value;
+  if(0<=index&&index<16) { \
+      ptr->shader_extra_data[index]=value; \
+      return mrb_float_value(mrb,value); \
+  } \
+  return mrb_nil_value();
+
 
 static inline void set_shader(mrb_state* mrb, mrb_value self,const char* ivname,BiShader** shader_p,mrb_value shader_obj)
 {
