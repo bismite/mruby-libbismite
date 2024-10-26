@@ -164,7 +164,7 @@ static BiNode* bi_node_from_obj(mrb_state *mrb,mrb_value obj)
   return DATA_PTR(obj);
 }
 
-static mrb_value mrb_node_add_child(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_node_add_node(mrb_state *mrb, mrb_value self)
 {
   mrb_value obj;
   mrb_get_args(mrb, "o", &obj );
@@ -177,10 +177,10 @@ static mrb_value mrb_node_add_child(mrb_state *mrb, mrb_value self)
   mrb_value iv_children = _iv_children_(mrb,self);
   mrb_ary_push(mrb,iv_children,obj);
   mrb_iv_set(mrb,obj,MRB_IVSYM(parent),self);
-  return self;
+  return obj;
 }
 
-static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_node_remove_node(mrb_state *mrb, mrb_value self)
 {
   mrb_value obj;
   mrb_get_args(mrb, "o", &obj );
@@ -193,7 +193,7 @@ static mrb_value mrb_node_remove_child(mrb_state *mrb, mrb_value self)
   mrb_iv_set(mrb,obj,MRB_IVSYM(parent),mrb_nil_value());
   mrb_funcall(mrb,iv_children,"delete",1,obj);
   bi_node_remove_node(node,child);
-  return self;
+  return obj;
 }
 
 //
@@ -423,8 +423,8 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "initialize", mrb_node_initialize, MRB_ARGS_NONE());
 
   // scene graph
-  mrb_define_method(mrb, node, "add", mrb_node_add_child, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "remove", mrb_node_remove_child, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_add_node_", mrb_node_add_node, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_remove_node_", mrb_node_remove_node, MRB_ARGS_REQ(1));
 
   // geometry
   mrb_define_method(mrb, node, "x", mrb_BiNode_get_x, MRB_ARGS_NONE());

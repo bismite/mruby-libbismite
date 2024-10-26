@@ -1,7 +1,6 @@
 
-class Bi::Node
+module Bi::NodeBase
   include Bi::TimerRunner
-  attr_reader :texture
   attr_reader :parent
 
   #  TopLeft     Top     TopRight
@@ -19,25 +18,75 @@ class Bi::Node
     top_right:   [1.0, 1.0]
   }
 
-  def anchor=(anchor)
-    raise "unknown anchor alias #{anchor}" unless ANCHOR_ALIAS[anchor]
-    self.anchor_x, self.anchor_y = ANCHOR_ALIAS[anchor]
+  #
+  # Scene Graph
+  #
+  def add(node,x=nil,y=nil,z=nil)
+    if x==:center
+      node.x = (self.w - node.w*node.scale_x)/2 + node.w*node.scale_x*node.anchor_x
+    elsif x
+      node.x = x.to_i
+    end
+    if y==:center
+      node.y = (self.h - node.h*node.scale_y)/2 + node.h*node.scale_y*node.anchor_y
+    elsif y
+      node.y = y.to_i
+    end
+    if z
+      node.z = z.to_i
+    end
+    self._add_node_ node
   end
-
   def remove_from_parent
     self.parent&.remove self
   end
+  def remove_all_children
+    @_children_.dup&.each{|c| c.remove_from_parent }
+  end
+end
 
-  def scale=(s)
-    self.set_scale s,s
+
+class Bi::Node
+  include Bi::NodeBase
+  attr_reader :texture
+
+  def self.xywh(x,y,w,h)
+    n = Bi::Node.new
+    n.set_size w,h
+    n.set_position x,y
+    n
   end
 
+  def self.rect(w,h)
+    n = Bi::Node.new
+    n.set_size w,h
+    n
+  end
+
+  #
+  # Color
+  #
   def set_color(r,g,b,a=nil)
     self.color.r = r
     self.color.g = g
     self.color.b = b
     self.color.a = a if a
     self.color
+  end
+  def opacity=(o)
+    self.color.a = (o*0xff).to_i
+  end
+
+  #
+  # Scene Graph
+  #
+  alias :remove :_remove_node_
+  def anchor=(anchor)
+    raise "unknown anchor alias #{anchor}" unless ANCHOR_ALIAS[anchor]
+    self.anchor_x, self.anchor_y = ANCHOR_ALIAS[anchor]
+  end
+  def scale=(s)
+    self.set_scale s,s
   end
 
   #
@@ -60,5 +109,23 @@ class Bi::Node
   end
   def on_text_input(callback=nil,&blk)
     self._on_text_input_( callback || blk )
+  end
+end
+
+class Bi::LayerGroup
+  include Bi::TimerRunner
+  attr_reader :framebuffer
+  attr_reader :parent
+end
+
+class Bi::Layer
+  include Bi::NodeBase
+  attr_reader :shader
+  alias :remove :_remove_node_
+  def w
+    Bi.w
+  end
+  def h
+    Bi.h
   end
 end

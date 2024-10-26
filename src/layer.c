@@ -53,7 +53,7 @@ static mrb_value mrb_BiLayer_add_node(mrb_state *mrb, mrb_value self)
   mrb_value iv_children = _iv_children_(mrb,self);
   mrb_ary_push(mrb,iv_children,obj);
   mrb_iv_set(mrb,obj,MRB_IVSYM(parent),self);
-  return self;
+  return obj;
 }
 
 static mrb_value mrb_BiLayer_remove_node(mrb_state *mrb, mrb_value self)
@@ -66,7 +66,7 @@ static mrb_value mrb_BiLayer_remove_node(mrb_state *mrb, mrb_value self)
   mrb_value iv_children = _iv_children_(mrb,self);
   mrb_funcall(mrb,iv_children,"delete",1,obj);
   mrb_iv_set(mrb,obj,MRB_IVSYM(parent),mrb_nil_value());
-  return self;
+  return obj;
 }
 
 //
@@ -147,8 +147,8 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   MRB_SET_INSTANCE_TT(layer, MRB_TT_DATA);
 
   mrb_define_method(mrb, layer, "initialize", mrb_layer_initialize, MRB_ARGS_NONE());
-  mrb_define_method(mrb, layer, "add", mrb_BiLayer_add_node, MRB_ARGS_REQ(1)); // node
-  mrb_define_method(mrb, layer, "remove", mrb_BiLayer_remove_node, MRB_ARGS_REQ(1)); // node
+  mrb_define_method(mrb, layer, "_add_node_", mrb_BiLayer_add_node, MRB_ARGS_REQ(1)); // node
+  mrb_define_method(mrb, layer, "_remove_node_", mrb_BiLayer_remove_node, MRB_ARGS_REQ(1)); // node
 
   mrb_define_method(mrb, layer, "camera_x", mrb_BiLayer_get_camera_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "camera_x=",mrb_BiLayer_set_camera_x, MRB_ARGS_REQ(1));
