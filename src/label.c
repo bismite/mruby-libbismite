@@ -49,15 +49,6 @@ static mrb_value mrb_label_set_text(mrb_state *mrb, mrb_value self)
 //
 // text color
 //
-static mrb_value mrb_node_get_color(mrb_state *mrb, mrb_value self)
-{
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_color_") );
-}
-static mrb_value mrb_node_get_tint(mrb_state *mrb, mrb_value self)
-{
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_tint_") );
-}
-
 static mrb_value mrb_label_set_color(mrb_state *mrb, mrb_value self)
 {
   mrb_value color_obj;
