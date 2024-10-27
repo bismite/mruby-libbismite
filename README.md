@@ -3,6 +3,19 @@
 [libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 7.2.0 - 2024/10/28
+- Bi::Node#add, Bi::Layer#add : add node with xyz, return received node object.
+- Bi::Layer.w,h : return window width and height.
+- Bi::Node.rect and Bi::Node.xywh added.
+- add Bi::Color.rgba, Bi::Color.rgb.
+- add Bi::Color#dup, Bi::Color#to_s.
+- add named colors(white,black,red...) to Bi::Color.
+- Bi::Node#set_color and set_tint accepts Integer and String.
+- alias `color=` to `set_color`, `tint=` to `set_tint`.
+- add String#to_color.
+- remove Bi::Color.rgba32.
+- 'to_color' method add to Bi::Color, String, Integer.
+- tidy up Bi::Label color funciton.
 ## 7.1.0
 - update libbismite 10.1.0
 - src/bismite.c: stop run loop when mrb exception occured in main loop.
