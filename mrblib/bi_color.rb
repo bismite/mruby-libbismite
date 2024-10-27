@@ -1,19 +1,21 @@
 
 class Bi::Color
-  def self.rgba32(rgba)
+  def self.rgba(rgba)
     r = rgba >> 24 & 0xff
     g = rgba >> 16 & 0xff
     b = rgba >>  8 & 0xff
     a = rgba & 0xff
     Bi::Color.new r,g,b,a
   end
-  def self.rgba(x) = Bi::Color::rgba32(x)
-  def self.rgb(x) = Bi::Color::rgba32(x << 8 | 0xff)
+  def self.rgb(x) = Bi::Color::rgba(x << 8 | 0xff)
   def dup()
     Bi::Color.new r,g,b,a
   end
   def to_s
     "#%02X" % r + "%02X" % g + "%02X" % b + "%02X" % a
+  end
+  def to_color
+    self
   end
   # named colors
   def self.transparent = rgba(0)

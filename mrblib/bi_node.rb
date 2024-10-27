@@ -73,16 +73,10 @@ class Bi::Node
     @_tint_
   end
   def set_color(c)
-    c = Bi::Color.rgba(c) if c.is_a? Integer
-    c = c.to_color if c.is_a? String
-    return nil unless c.is_a? Bi::Color
-    self._set_color_ c
+    self._set_color_ c.to_color
   end
   def set_tint(c)
-    c = Bi::Color.rgba(c) if c.is_a? Integer
-    c = c.to_color if c.is_a? String
-    return nil unless c.is_a? Bi::Color
-    self._set_tint_ c
+    self._set_tint_ c.to_color
   end
   alias :color= :set_color
   alias :tint= :set_tint

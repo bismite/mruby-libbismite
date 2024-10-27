@@ -12,6 +12,6 @@ class String
     elsif tmp.length == 8 # RRGGBBAA
       return Bi::Color.rgba(tmp.to_i(16))
     end
-    return nil
+    return Bi::Color.transparent()
   end
 end
