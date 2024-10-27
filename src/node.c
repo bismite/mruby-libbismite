@@ -146,8 +146,8 @@ static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
   mrb_data_init(self, node, &mrb_node_data_type);
   node->userdata = mrb_ptr(self);
   // Color
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@tint"), color_obj(mrb,&node->tint) );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@color"), color_obj(mrb,&node->color) );
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_tint_"), color_obj(mrb,&node->tint) );
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_color_"), color_obj(mrb,&node->color) );
   return self;
 }
 
@@ -293,15 +293,6 @@ static mrb_value mrb_node_transform_local(mrb_state *mrb, mrb_value self)
 //
 // Color
 //
-static mrb_value mrb_node_get_color(mrb_state *mrb, mrb_value self)
-{
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color") );
-}
-static mrb_value mrb_node_get_tint(mrb_state *mrb, mrb_value self)
-{
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@tint") );
-}
-
 static mrb_value mrb_node_set_color(mrb_state *mrb, mrb_value self)
 {
   mrb_value color_obj;
@@ -309,7 +300,7 @@ static mrb_value mrb_node_set_color(mrb_state *mrb, mrb_value self)
   BiColor* color = DATA_PTR(color_obj);
   BiNode* node = DATA_PTR(self);
   node->color = *color;
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color") );
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_color_") );
 }
 
 static mrb_value mrb_node_set_tint(mrb_state *mrb, mrb_value self)
@@ -319,7 +310,7 @@ static mrb_value mrb_node_set_tint(mrb_state *mrb, mrb_value self)
   BiColor* color = DATA_PTR(color_obj);
   BiNode* node = DATA_PTR(self);
   node->tint = *color;
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@tint") );
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_tint_") );
 }
 
 // Visibility
@@ -457,10 +448,8 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "angle=", mrb_BiNode_set_angle, MRB_ARGS_REQ(1));
 
   // color
-  mrb_define_method(mrb, node, "tint", mrb_node_get_tint, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "color", mrb_node_get_color, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "tint=", mrb_node_set_tint, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "color=", mrb_node_set_color, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_set_tint_", mrb_node_set_tint, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "_set_color_", mrb_node_set_color, MRB_ARGS_REQ(1));
 
   // Visibility
   mrb_define_method(mrb, node, "visible=", mrb_node_set_visible, MRB_ARGS_REQ(1));
