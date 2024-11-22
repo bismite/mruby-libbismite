@@ -90,8 +90,8 @@ static mrb_value mrb_bi_start_run_loop(mrb_state *mrb, mrb_value self)
 //
 // Window Size
 //
-_GET_(BiContext,w,bi_mrb_fixnum_value);
-_GET_(BiContext,h,bi_mrb_fixnum_value);
+_GET_INT_(BiContext,w);
+_GET_INT_(BiContext,h);
 
 //
 // Color
@@ -131,8 +131,8 @@ static mrb_value mrb_bi_get_title(mrb_state *mrb, mrb_value self)
 // misc
 //
 
-_GET_(BiContext,debug,bi_mrb_bool_value);
-_SET_(BiContext,debug,mrb_bool,b);
+_GET_BOOL_(BiContext,debug);
+_SET_BOOL_(BiContext,debug);
 static mrb_value mrb_bi_now(mrb_state *mrb, mrb_value self)
 {
   return mrb_fixnum_value( bi_get_now() );

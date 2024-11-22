@@ -12,5 +12,6 @@ class Bi::Texture
       n.set_texture self, 0,0,self.w,self.h
       n.set_size self.w,self.h
     end
+    n
   end
 end

@@ -60,7 +60,7 @@ static mrb_value mrb_font_initialize(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-_GET_(BiFont,font_size,bi_mrb_fixnum_value);
+_GET_INT_(BiFont,font_size);
 
 static mrb_value mrb_font_line_x_to_index(mrb_state *mrb, mrb_value self)
 {

@@ -73,13 +73,13 @@ static mrb_value mrb_BiLayer_remove_node(mrb_state *mrb, mrb_value self)
 // define accessors
 //
 
-_GET_(BiLayer,camera_x,bi_mrb_fixnum_value);
-_SET_(BiLayer,camera_x,mrb_int,i);
-_GET_(BiLayer,camera_y,bi_mrb_fixnum_value);
-_SET_(BiLayer,camera_y,mrb_int,i);
+_GET_INT_(BiLayer,camera_x);
+_GET_INT_(BiLayer,camera_y);
+_SET_INT_(BiLayer,camera_x);
+_SET_INT_(BiLayer,camera_y);
 
-_GET_FUNC_(BiLayer,z_order,bi_layer_get_z_order,bi_mrb_fixnum_value);
-_SET_FUNC_(BiLayer,z_order,mrb_int,i,bi_layer_set_z_order);
+_GET_INT_F_(bi_layer_get_z_order);
+_SET_INT_F_(bi_layer_set_z_order);
 
 static mrb_value mrb_BiLayer_set_texture(mrb_state *mrb, mrb_value self)
 {
@@ -155,8 +155,8 @@ void mrb_init_bi_layer(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, layer, "camera_y", mrb_BiLayer_get_camera_y, MRB_ARGS_NONE());
   mrb_define_method(mrb, layer, "camera_y=",mrb_BiLayer_set_camera_y, MRB_ARGS_REQ(1));
 
-  mrb_define_method(mrb, layer, "z_order", mrb_BiLayer_get_z_order, MRB_ARGS_NONE());
-  mrb_define_method(mrb, layer, "z_order=",mrb_BiLayer_set_z_order, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, layer, "z_order", mrb_bi_layer_get_z_order, MRB_ARGS_NONE());
+  mrb_define_method(mrb, layer, "z_order=",mrb_bi_layer_set_z_order, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, layer, "shader=",mrb_BiLayer_set_shader, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, layer, "set_shader_extra_data",mrb_BiLayer_set_shader_extra_data, MRB_ARGS_REQ(2)); // index,value

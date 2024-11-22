@@ -200,22 +200,13 @@ static mrb_value mrb_node_remove_node(mrb_state *mrb, mrb_value self)
 // geometry
 //
 
-_GET_(BiNode,x,bi_mrb_fixnum_value);
-_GET_(BiNode,y,bi_mrb_fixnum_value);
-_GET_(BiNode,z,bi_mrb_fixnum_value);
-
-_SET_FUNC_(BiNode,x,mrb_int,i,bi_node_set_x);
-_SET_FUNC_(BiNode,y,mrb_int,i,bi_node_set_y);
-_SET_FUNC_(BiNode,z,mrb_int,i,bi_node_set_z);
-
-static mrb_value mrb_node_set_position(mrb_state *mrb, mrb_value self)
-{
-  mrb_int x,y;
-  mrb_get_args(mrb, "ii", &x, &y );
-  BiNode* node = DATA_PTR(self);
-  bi_node_set_position(node,x,y);
-  return self;
-}
+_GET_INT_(BiNode,x);
+_GET_INT_(BiNode,y);
+_GET_INT_(BiNode,z);
+_SET_INT_F_(bi_node_set_x);
+_SET_INT_F_(bi_node_set_y);
+_SET_INT_F_(bi_node_set_z);
+_SET_INT2_F_(bi_node_set_position);
 
 static mrb_value mrb_node_angle(mrb_state *mrb, mrb_value self)
 {
@@ -223,68 +214,41 @@ static mrb_value mrb_node_angle(mrb_state *mrb, mrb_value self)
   return mrb_float_value(mrb,node->angle);
 }
 
-_SET_FUNC_(BiNode,angle,mrb_float,f,bi_node_set_angle);
+_SET_FLOAT_F_(bi_node_set_angle);
 
 // Size
-_GET_(BiNode,w,bi_mrb_fixnum_value);
-_GET_(BiNode,h,bi_mrb_fixnum_value);
-static mrb_value mrb_node_set_size(mrb_state *mrb, mrb_value self)
-{
-  mrb_int w,h;
-  mrb_get_args(mrb, "ii", &w, &h );
-  BiNode* node = DATA_PTR(self);
-  bi_node_set_size(node,w,h);
-  return self;
-}
+_GET_INT_(BiNode,w);
+_GET_INT_(BiNode,h);
+_SET_INT2_F_(bi_node_set_size);
 
 // Scale
-_GET_(BiNode,scale_x,mrb_float_value);
-_GET_(BiNode,scale_y,mrb_float_value);
-_SET_FUNC_(BiNode,scale_x,mrb_float,f,bi_node_set_scale_x);
-_SET_FUNC_(BiNode,scale_y,mrb_float,f,bi_node_set_scale_y);
-static mrb_value mrb_node_set_scale(mrb_state *mrb, mrb_value self)
-{
-  mrb_float x,y;
-  mrb_get_args(mrb, "ff", &x, &y );
-  BiNode* node = DATA_PTR(self);
-  bi_node_set_scale(node,x,y);
-  return self;
-}
+_GET_FLOAT_(BiNode,scale_x);
+_GET_FLOAT_(BiNode,scale_y);
+_SET_FLOAT_F_(bi_node_set_scale_x);
+_SET_FLOAT_F_(bi_node_set_scale_y);
+_SET_FLOAT2_F_(bi_node_set_scale);
 
 // Anchor
-static mrb_value mrb_node_set_anchor(mrb_state *mrb, mrb_value self)
-{
-  mrb_float x,y;
-  mrb_get_args(mrb, "ff", &x, &y );
-  BiNode* node = DATA_PTR(self);
-  bi_node_set_anchor(node,x,y);
-  return self;
-}
-_GET_(BiNode,anchor_x,mrb_float_value);
-_GET_(BiNode,anchor_y,mrb_float_value);
-_SET_FUNC_(BiNode,anchor_x,mrb_float,f,bi_node_set_anchor_x);
-_SET_FUNC_(BiNode,anchor_y,mrb_float,f,bi_node_set_anchor_y);
-
+_GET_FLOAT_(BiNode,anchor_x);
+_GET_FLOAT_(BiNode,anchor_y);
+_SET_FLOAT_F_(bi_node_set_anchor_x);
+_SET_FLOAT_F_(bi_node_set_anchor_y);
+_SET_FLOAT2_F_(bi_node_set_anchor);
 
 static mrb_value mrb_node_is_include(mrb_state *mrb, mrb_value self)
 {
   mrb_int x,y;
   mrb_get_args(mrb, "ii", &x, &y );
-  BiNode* node = (BiNode*)DATA_PTR(self);
-  return mrb_bool_value(bi_node_inside(node,x,y));
+  return mrb_bool_value(bi_node_inside(DATA_PTR(self),x,y));
 }
 
 static mrb_value mrb_node_transform_local(mrb_state *mrb, mrb_value self)
 {
   mrb_int x,y;
   int lx,ly;
-  BiNode* node;
   mrb_value v[2];
-
   mrb_get_args(mrb, "ii", &x, &y );
-  node = (BiNode*)DATA_PTR(self);
-  bi_node_transform_local(node, x, y, &lx, &ly);
-
+  bi_node_transform_local(DATA_PTR(self), x, y, &lx, &ly);
   v[0] = mrb_fixnum_value(lx);
   v[1] = mrb_fixnum_value(ly);
   return mrb_ary_new_from_values(mrb,2,v);
@@ -351,10 +315,10 @@ static mrb_value mrb_node_unset_texture(mrb_state *mrb, mrb_value self)
   bi_node_unset_texture(node);
   return self;
 }
-_GET_(BiNode,texture_flip_vertical,bi_mrb_bool_value);
-_GET_(BiNode,texture_flip_horizontal,bi_mrb_bool_value);
-_SET_(BiNode,texture_flip_vertical,mrb_bool,b);
-_SET_(BiNode,texture_flip_horizontal,mrb_bool,b);
+_GET_BOOL_(BiNode,texture_flip_vertical);
+_GET_BOOL_(BiNode,texture_flip_horizontal);
+_SET_BOOL_(BiNode,texture_flip_vertical);
+_SET_BOOL_(BiNode,texture_flip_horizontal);
 
 // Extra Data
 static mrb_value mrb_BiNode_set_shader_extra_data(mrb_state *mrb, mrb_value self) {
@@ -421,31 +385,31 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "x", mrb_BiNode_get_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "y", mrb_BiNode_get_y, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "z", mrb_BiNode_get_z, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "x=", mrb_BiNode_set_x, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "y=", mrb_BiNode_set_y, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "z=", mrb_BiNode_set_z, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "set_position", mrb_node_set_position, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, node, "x=", mrb_bi_node_set_x, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "y=", mrb_bi_node_set_y, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "z=", mrb_bi_node_set_z, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "set_position", mrb_bi_node_set_position, MRB_ARGS_REQ(2));
   mrb_define_method(mrb, node, "include?", mrb_node_is_include, MRB_ARGS_REQ(2));
   mrb_define_method(mrb, node, "transform_local", mrb_node_transform_local, MRB_ARGS_REQ(2));
   // size
   mrb_define_method(mrb, node, "w", mrb_BiNode_get_w, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "h", mrb_BiNode_get_h, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "set_size", mrb_node_set_size, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, node, "set_size", mrb_bi_node_set_size, MRB_ARGS_REQ(2));
   // scale
   mrb_define_method(mrb, node, "scale_x", mrb_BiNode_get_scale_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "scale_y", mrb_BiNode_get_scale_y, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "scale_x=", mrb_BiNode_set_scale_x, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "scale_y=", mrb_BiNode_set_scale_y, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "set_scale", mrb_node_set_scale, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, node, "scale_x=", mrb_bi_node_set_scale_x, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "scale_y=", mrb_bi_node_set_scale_y, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "set_scale", mrb_bi_node_set_scale, MRB_ARGS_REQ(2));
   // anchor
   mrb_define_method(mrb, node, "anchor_x", mrb_BiNode_get_anchor_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "anchor_y", mrb_BiNode_get_anchor_y, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "anchor_x=",mrb_BiNode_set_anchor_x, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "anchor_y=",mrb_BiNode_set_anchor_y, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, node, "set_anchor",mrb_node_set_anchor, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, node, "anchor_x=",mrb_bi_node_set_anchor_x, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "anchor_y=",mrb_bi_node_set_anchor_y, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "set_anchor",mrb_bi_node_set_anchor, MRB_ARGS_REQ(2));
   // angle
   mrb_define_method(mrb, node, "angle", mrb_node_angle, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "angle=", mrb_BiNode_set_angle, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "angle=", mrb_bi_node_set_angle, MRB_ARGS_REQ(1));
 
   // color
   mrb_define_method(mrb, node, "_set_tint_", mrb_node_set_tint, MRB_ARGS_REQ(1));
