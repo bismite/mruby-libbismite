@@ -22,6 +22,7 @@ module Bi::NodeBase
   # Scene Graph
   #
   def add(node,x=nil,y=nil,z=nil)
+    return nil unless node.is_a?(Bi::Node) || node.is_a?(Bi::ShaderNode)
     if x==:center
       node.x = (self.w - node.w*node.scale_x)/2 + node.w*node.scale_x*node.anchor_x
     elsif x
@@ -119,20 +120,14 @@ class Bi::Node
   end
 end
 
-class Bi::LayerGroup
-  include Bi::TimerRunner
-  attr_reader :framebuffer
-  attr_reader :parent
-end
-
-class Bi::Layer
+class Bi::ShaderNode
   include Bi::NodeBase
   attr_reader :shader
   alias :remove :_remove_node_
   def w
-    Bi.w
+    @parent.w
   end
   def h
-    Bi.h
+    @parent.h
   end
 end

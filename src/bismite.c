@@ -10,7 +10,6 @@
 #include <bi/main_loop.h>
 #include <time.h>
 #include "_inner_macro.h"
-#include "_init_layer_group.h"
 #include "_color.h"
 
 // modules
@@ -18,10 +17,9 @@ extern void mrb_init_bi_profile(mrb_state*, struct RClass*);
 extern void mrb_init_bi_node(mrb_state*, struct RClass*);
 extern void mrb_init_bi_texture(mrb_state*, struct RClass*);
 extern void mrb_init_bi_timer(mrb_state*, struct RClass*);
-extern void mrb_init_bi_layer(mrb_state*, struct RClass*);
-extern void mrb_init_bi_layer_group(mrb_state*, struct RClass*);
 extern void mrb_init_bi_canvas(mrb_state*, struct RClass*);
 extern void mrb_init_bi_shader(mrb_state*, struct RClass*);
+extern void mrb_init_bi_shader_node(mrb_state*, struct RClass*);
 extern void mrb_init_bi_key(mrb_state*, struct RClass*);
 extern void mrb_init_bi_version(mrb_state*, struct RClass*);
 extern void mrb_init_bi_color(mrb_state*, struct RClass*);
@@ -37,33 +35,43 @@ extern void mrb_init_action(mrb_state *mrb, struct RClass *sg);
 static struct mrb_data_type const mrb_bi_data_type = { "Bi", mrb_free };
 
 // XXX: for static class in context structure
-static struct mrb_data_type const mrb_layer_group_data_type = { "LayerGroup", NULL };
+static struct mrb_data_type const mrb_node_data_type = { "Node", NULL };
+static struct mrb_data_type const mrb_framebuffer_data_type = { "Framebuffer", NULL };
 static struct mrb_data_type const mrb_shader_data_type = { "Shader", NULL };
 
 static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
 {
-  mrb_int width, height, fps;
-  mrb_bool highdpi;
+  mrb_int width, height, fps, flags;
   mrb_value title_obj;
-  mrb_get_args(mrb, "iiibS", &width, &height, &fps, &highdpi, &title_obj );
+  mrb_get_args(mrb, "iiiiS", &width, &height, &fps, &flags, &title_obj );
   const char* title_str = mrb_string_value_cstr(mrb,&title_obj);
   //
   BiContext* c = mrb_malloc(mrb,sizeof(BiContext));
-  bi_init_context(c, width, height, fps, highdpi, title_str);
+  bi_init_context(c, width, height, fps, flags, title_str);
   c->userdata = mrb; // XXX: hold mrb_state
   mrb_data_init(self, c, &mrb_bi_data_type);
-  // layer group
-  struct RClass *lg_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"LayerGroup");
-  struct RData *lg_data = mrb_data_object_alloc(mrb,lg_class,&c->layers,&mrb_layer_group_data_type);
-  mrb_value lg_obj = _init_layer_group_(mrb,mrb_obj_value(lg_data),&c->layers);
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@layers"),lg_obj);
-  // default shader
+
+  // Default Framebuffer
+  struct RClass *framebuffer_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Framebuffer");
+  struct RData *framebuffer_data = mrb_data_object_alloc(mrb,framebuffer_class,&c->default_framebuffer,&mrb_framebuffer_data_type);
+  mrb_value framebuffer_obj = mrb_obj_value(framebuffer_data);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@default_framebuffer"),framebuffer_obj);
+  // Default Framebuffer Node
+  struct RClass *node_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Node");
+  struct RData *node_data = mrb_data_object_alloc(mrb,node_class,&c->default_framebuffer_node,&mrb_node_data_type);
+  mrb_value node_obj = mrb_obj_value(node_data);
+  mrb_iv_set(mrb, node_obj, mrb_intern_cstr(mrb,"@framebuffer"),framebuffer_obj);
+  c->default_framebuffer_node.userdata = mrb_ptr(node_obj);
+  mrb_iv_set(mrb, node_obj, mrb_intern_cstr(mrb,"@_tint_"), color_obj(mrb,&c->default_framebuffer_node.tint) );
+  mrb_iv_set(mrb, node_obj, mrb_intern_cstr(mrb,"@_color_"), color_obj(mrb,&c->default_framebuffer_node.color) );
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@default_framebuffer_node"),node_obj);
+
+  // Default shader
   struct RClass *shader_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Shader");
   struct RData *shader_data = mrb_data_object_alloc(mrb,shader_class,&c->default_shader,&mrb_shader_data_type);
   mrb_value shader_obj = mrb_obj_value(shader_data);
   mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@default_shader"),shader_obj);
-  // color
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@color"), color_obj(mrb,&c->color) );
+
   return self;
 }
 
@@ -94,23 +102,6 @@ _GET_INT_(BiContext,w);
 _GET_INT_(BiContext,h);
 
 //
-// Color
-//
-static mrb_value mrb_bi_set_color(mrb_state *mrb, mrb_value self)
-{
-  mrb_value color_obj;
-  mrb_get_args(mrb, "o", &color_obj );
-  BiContext* c = DATA_PTR(self);
-  BiColor* color = DATA_PTR(color_obj);
-  c->color = *color;
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color"));;
-}
-static mrb_value mrb_bi_get_color(mrb_state *mrb, mrb_value self)
-{
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@color"));
-}
-
-//
 // Title
 //
 static mrb_value mrb_bi_set_title(mrb_state *mrb, mrb_value self)
@@ -121,10 +112,6 @@ static mrb_value mrb_bi_set_title(mrb_state *mrb, mrb_value self)
   bi_set_title( c, mrb_string_value_cstr(mrb,&title_obj) );
   mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@title"), title_obj );
   return self;
-}
-static mrb_value mrb_bi_get_title(mrb_state *mrb, mrb_value self)
-{
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@title"));
 }
 
 //
@@ -148,18 +135,18 @@ static mrb_value mrb_bi_messagebox(mrb_state *mrb, mrb_value self)
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
                              RSTRING_CSTR(mrb,title),
                              RSTRING_CSTR(mrb,message),
-                             context->window);
+                             context->_window);
   }
   else if(dialog_type==mrb_intern_lit(mrb,"warning")){
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING,
                              RSTRING_CSTR(mrb,title),
                              RSTRING_CSTR(mrb,message),
-                             context->window);
+                             context->_window);
   }else{
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
                              RSTRING_CSTR(mrb,title),
                              RSTRING_CSTR(mrb,message),
-                             context->window);
+                             context->_window);
   }
   return self;
 }
@@ -172,17 +159,13 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   struct RClass *bi;
   bi = mrb_define_class(mrb, "Bi", mrb->object_class);
   MRB_SET_INSTANCE_TT(bi, MRB_TT_DATA);
-  mrb_define_method(mrb, bi, "initialize", mrb_bi_initialize, MRB_ARGS_REQ(5));
+  mrb_define_method(mrb, bi, "initialize", mrb_bi_initialize, MRB_ARGS_REQ(5)); // w, h, fps, flags, title
   mrb_define_method(mrb, bi, "start_run_loop", mrb_bi_start_run_loop, MRB_ARGS_NONE());
   // window size
   mrb_define_method(mrb, bi, "w", mrb_BiContext_get_w, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "h", mrb_BiContext_get_h, MRB_ARGS_NONE());
-  // color
-  mrb_define_method(mrb, bi, "color=", mrb_bi_set_color, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, bi, "color", mrb_bi_get_color, MRB_ARGS_NONE());
   // title
   mrb_define_method(mrb, bi, "title=", mrb_bi_set_title, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, bi, "title", mrb_bi_get_title, MRB_ARGS_NONE());
   //
   mrb_define_method(mrb, bi, "now", mrb_bi_now, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "debug=", mrb_BiContext_set_debug, MRB_ARGS_REQ(1));
@@ -193,9 +176,7 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_init_bi_node(mrb,bi);;
   mrb_init_bi_texture(mrb,bi);;
   mrb_init_bi_timer(mrb,bi);
-  mrb_init_bi_layer(mrb,bi);
-  mrb_init_bi_layer_group(mrb,bi);
-  mrb_init_bi_canvas(mrb,bi);
+  mrb_init_bi_shader_node(mrb,bi);
   mrb_init_bi_shader(mrb,bi);
   mrb_init_bi_key(mrb,bi);
   mrb_init_bi_version(mrb,bi);
@@ -205,6 +186,11 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_init_font(mrb,bi);
   mrb_init_label(mrb,bi);
   mrb_init_action(mrb,bi);
+
+  // Flag
+  mrb_define_const(mrb, mrb->kernel_module, "BI_WINDOW_ALLOW_HIGHDPI", mrb_fixnum_value(BI_WINDOW_ALLOW_HIGHDPI));
+  mrb_define_const(mrb, mrb->kernel_module, "BI_WINDOW_RESIZABLE", mrb_fixnum_value(BI_WINDOW_RESIZABLE));
+
   // blend functions
   // source: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendFunc.xhtml
   mrb_define_const(mrb, mrb->kernel_module, "GL_ZERO", mrb_fixnum_value(GL_ZERO));

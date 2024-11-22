@@ -168,10 +168,7 @@ static mrb_value mrb_node_add_node(mrb_state *mrb, mrb_value self)
 {
   mrb_value obj;
   mrb_get_args(mrb, "o", &obj );
-  BiNode* child = bi_node_from_obj(mrb,obj);
-  if(!child) {
-    return mrb_nil_value();
-  }
+  BiNode* child = DATA_PTR(obj);
   BiNode* node = DATA_PTR(self);
   bi_node_add_node(node,child);
   mrb_value iv_children = _iv_children_(mrb,self);
@@ -184,15 +181,12 @@ static mrb_value mrb_node_remove_node(mrb_state *mrb, mrb_value self)
 {
   mrb_value obj;
   mrb_get_args(mrb, "o", &obj );
-  BiNode* child = bi_node_from_obj(mrb,obj);
-  if(!child) {
-    return mrb_nil_value();
-  }
+  BiNode* child = DATA_PTR(obj);
   BiNode* node = DATA_PTR(self);
+  bi_node_remove_node(node,child);
   mrb_value iv_children = _iv_children_(mrb,self);
   mrb_iv_set(mrb,obj,MRB_IVSYM(parent),mrb_nil_value());
   mrb_funcall(mrb,iv_children,"delete",1,obj);
-  bi_node_remove_node(node,child);
   return obj;
 }
 
@@ -202,7 +196,8 @@ static mrb_value mrb_node_remove_node(mrb_state *mrb, mrb_value self)
 
 _GET_INT_(BiNode,x);
 _GET_INT_(BiNode,y);
-_GET_INT_(BiNode,z);
+_GET_INT_F_(bi_node_get_z);
+
 _SET_INT_F_(bi_node_set_x);
 _SET_INT_F_(bi_node_set_y);
 _SET_INT_F_(bi_node_set_z);
@@ -292,7 +287,9 @@ static mrb_value mrb_node_get_visible(mrb_state *mrb, mrb_value self)
   return mrb_bool_value(node->visible);
 }
 
+//
 // Texture
+//
 static mrb_value mrb_node_set_texture(mrb_state *mrb, mrb_value self)
 {
   mrb_int x,y,w,h;
@@ -320,7 +317,26 @@ _GET_BOOL_(BiNode,texture_flip_horizontal);
 _SET_BOOL_(BiNode,texture_flip_vertical);
 _SET_BOOL_(BiNode,texture_flip_horizontal);
 
+//
+// Framebuffer
+//
+static mrb_value mrb_bi_node_set_framebuffer(mrb_state *mrb, mrb_value self)
+{
+  mrb_value fb_obj;
+  mrb_get_args(mrb, "o", &fb_obj );
+  BiNode* node = DATA_PTR(self);
+  node->framebuffer = DATA_PTR(fb_obj);
+  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@framebuffer"), fb_obj );
+  return self;
+}
+static mrb_value mrb_bi_node_get_framebuffer(mrb_state *mrb, mrb_value self)
+{
+  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@framebuffer") );
+}
+
+//
 // Extra Data
+//
 static mrb_value mrb_BiNode_set_shader_extra_data(mrb_state *mrb, mrb_value self) {
   SET_SHADER_EXTRA_DATA(BiNode);
 }
@@ -367,8 +383,10 @@ static mrb_value mrb_node_on_text_input(mrb_state *mrb, mrb_value self) {
   SET_CALLBACK(on_textinput);
 }
 
-// gem
 
+//
+// gem
+//
 void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
 {
   struct RClass *node;
@@ -384,7 +402,7 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   // geometry
   mrb_define_method(mrb, node, "x", mrb_BiNode_get_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "y", mrb_BiNode_get_y, MRB_ARGS_NONE());
-  mrb_define_method(mrb, node, "z", mrb_BiNode_get_z, MRB_ARGS_NONE());
+  mrb_define_method(mrb, node, "z", mrb_bi_node_get_z, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "x=", mrb_bi_node_set_x, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "y=", mrb_bi_node_set_y, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "z=", mrb_bi_node_set_z, MRB_ARGS_REQ(1));
@@ -426,6 +444,10 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "flip_vertical=", mrb_BiNode_set_texture_flip_vertical, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "flip_horizontal", mrb_BiNode_get_texture_flip_horizontal, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "flip_horizontal=", mrb_BiNode_set_texture_flip_horizontal, MRB_ARGS_REQ(1));
+
+  // Framebuffer
+  mrb_define_method(mrb, node, "set_framebuffer=", mrb_bi_node_set_framebuffer, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "framebuffer", mrb_bi_node_get_framebuffer, MRB_ARGS_NONE());
 
   // extra
   mrb_define_method(mrb, node, "set_shader_extra_data", mrb_BiNode_set_shader_extra_data, MRB_ARGS_REQ(2)); // index,value
