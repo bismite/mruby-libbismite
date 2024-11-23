@@ -3,6 +3,18 @@
 [libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 8.0.0
+- libbismite 12.1.0
+  - remove Bi::LayerGroup and Bi::Canvas.
+  - rename Bi::Layer -> Bi::ShaderNode.
+  - Bi::Node has framebuffer.
+    - add Bi::Node#framebuffer=()
+  - Bi has default_framebuffer and default_framebuffer_node.
+  - flag BI_WINDOW_ALLOW_HIGHDPI and BI_WINDOW_RESIZABLE for initialize.
+  - Bi::Node#add receive Node or ShaderNode.
+  - ShaderNode w and h inherit from parent node.
+  - add Bi#draw_framebuffer_node()
+  - add Bi::Framebuffer#clear, Bi::Framebuffer#save_png
 ## 7.2.0 - 2024/10/28
 - Bi::Node#add, Bi::Layer#add : add node with xyz, return received node object.
 - Bi::Layer.w,h : return window width and height.
@@ -89,6 +101,6 @@
 - layer class can act as a post-process.
 
 # License
-Copyright 2018-2023 kbys <work4kbys@gmail.com>
+Copyright 2018-2024 kbys <work4kbys@gmail.com>
 
 MIT License
