@@ -30,6 +30,18 @@ class Bi
     @@bi.title = title
   end
 
+  def self.draw_framebuffer_node(node)
+    @@bi.draw_framebuffer_node node
+  end
+
+  #
+  def self.add(node)
+    @@bi.default_framebuffer_node.add node
+  end
+  def self.remove(node)
+    @@bi.default_framebuffer_node.remove node
+  end
+
   # Default Framebuffer
   def self.default_framebuffer_node = @@bi.default_framebuffer_node
   def self.default_framebuffer = @@bi.default_framebuffer

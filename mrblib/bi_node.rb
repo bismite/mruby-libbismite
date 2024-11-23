@@ -67,18 +67,10 @@ class Bi::Node
   #
   # Color
   #
-  def color
-    @_color_
-  end
-  def tint
-    @_tint_
-  end
-  def set_color(c)
-    self._set_color_ c.to_color
-  end
-  def set_tint(c)
-    self._set_tint_ c.to_color
-  end
+  def color = @_color_
+  def tint =  @_tint_
+  def set_color(c) = self._set_color_(c.to_color)
+  def set_tint(c) = self._set_tint_(c.to_color)
   alias :color= :set_color
   alias :tint= :set_tint
   def opacity=(o)
@@ -96,6 +88,11 @@ class Bi::Node
   def scale=(s)
     self.set_scale s,s
   end
+
+  #
+  # action
+  #
+  def actions = @_actions
 
   #
   # callbacks

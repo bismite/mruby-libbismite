@@ -149,7 +149,7 @@ void mrb_init_bi_shader_node(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, shader_node, "set_shader_extra_data",mrb_BiShaderNode_set_shader_extra_data, MRB_ARGS_REQ(2)); // index,value
   mrb_define_method(mrb, shader_node, "get_shader_extra_data",mrb_BiShaderNode_get_shader_extra_data, MRB_ARGS_REQ(1)); // index
 
-  mrb_define_method(mrb, shader_node, "set_texture",mrb_BiShaderNode_set_texture, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, shader_node, "set_texture",mrb_BiShaderNode_set_texture, MRB_ARGS_REQ(2)); // num,tex
 
   mrb_define_method(mrb, shader_node, "set_blend_factor", mrb_BiShaderNode_set_blend_factor, MRB_ARGS_REQ(4));
   mrb_define_method(mrb, shader_node, "get_blend_factor", mrb_BiShaderNode_get_blend_factor, MRB_ARGS_NONE());

@@ -114,10 +114,20 @@ static mrb_value mrb_bi_set_title(mrb_state *mrb, mrb_value self)
   return self;
 }
 
+// Draw Framebuffer
+static mrb_value mrb_bi_draw_framebuffer_node(mrb_state *mrb, mrb_value self)
+{
+  mrb_value node_obj;
+  mrb_get_args(mrb, "o", &node_obj );
+  BiNode* node = DATA_PTR(node_obj);
+  BiContext* context = DATA_PTR(self);
+  bi_draw_framebuffer_node(context,node);
+  return self;
+}
+
 //
 // misc
 //
-
 _GET_BOOL_(BiContext,debug);
 _SET_BOOL_(BiContext,debug);
 static mrb_value mrb_bi_now(mrb_state *mrb, mrb_value self)
@@ -166,6 +176,8 @@ void mrb_mruby_libbismite_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, bi, "h", mrb_BiContext_get_h, MRB_ARGS_NONE());
   // title
   mrb_define_method(mrb, bi, "title=", mrb_bi_set_title, MRB_ARGS_REQ(1));
+  //
+  mrb_define_method(mrb, bi, "draw_framebuffer_node", mrb_bi_draw_framebuffer_node, MRB_ARGS_REQ(1)); // node
   //
   mrb_define_method(mrb, bi, "now", mrb_bi_now, MRB_ARGS_NONE());
   mrb_define_method(mrb, bi, "debug=", mrb_BiContext_set_debug, MRB_ARGS_REQ(1));

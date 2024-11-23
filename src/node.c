@@ -446,7 +446,7 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "flip_horizontal=", mrb_BiNode_set_texture_flip_horizontal, MRB_ARGS_REQ(1));
 
   // Framebuffer
-  mrb_define_method(mrb, node, "set_framebuffer=", mrb_bi_node_set_framebuffer, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, node, "framebuffer=", mrb_bi_node_set_framebuffer, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "framebuffer", mrb_bi_node_get_framebuffer, MRB_ARGS_NONE());
 
   // extra

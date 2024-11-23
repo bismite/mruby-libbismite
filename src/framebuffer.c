@@ -10,10 +10,10 @@ static struct mrb_data_type const mrb_bi_framebuffer_data_type = { "Framebuffer"
 
 static mrb_value mrb_bi_framebuffer_init(mrb_state *mrb, mrb_value self)
 {
-  mrb_int w,h;
-  mrb_get_args(mrb, "ii", &w,&h );
+  mrb_int w,h,num=1;
+  mrb_get_args(mrb, "ii|i", &w,&h,&num );
   BiFramebuffer *fb = mrb_malloc(mrb, sizeof(BiFramebuffer));
-  bi_framebuffer_init(fb,w,h);
+  bi_framebuffer_init_with_texture_num(fb,w,h,num);
   mrb_data_init(self, fb, &mrb_bi_framebuffer_data_type);
   return self;
 }
@@ -36,12 +36,32 @@ static mrb_value mrb_bi_framebuffer_set_h(mrb_state *mrb, mrb_value self) {
   return mrb_fixnum_value(h);
 }
 
+static mrb_value mrb_bi_framebuffer_clear(mrb_state *mrb, mrb_value self)
+{
+  mrb_int r,g,b,a;
+  mrb_get_args(mrb, "iiii", &r,&g,&b,&a );
+  BiFramebuffer* fb = DATA_PTR(self);
+  bi_framebuffer_clear(fb,r,g,b,a);
+  return self;
+}
+
 static mrb_value mrb_bi_framebuffer_to_texture(mrb_state *mrb, mrb_value self)
 {
+  mrb_int num=0;
+  mrb_get_args(mrb, "|i", &num );
   BiFramebuffer* fb = DATA_PTR(self);
   BiTexture* tex = mrb_malloc(mrb,sizeof(BiTexture));
-  bi_texture_init_with_framebuffer(tex,fb);
+  bi_texture_init_with_texture_id(tex,fb->w,fb->h,fb->texture_ids[num] );
   return create_bi_texture(mrb, tex);
+}
+
+static mrb_value mrb_bi_framebuffer_save_png(mrb_state *mrb, mrb_value self)
+{
+  char *name;
+  mrb_get_args(mrb, "z", &name );
+  BiFramebuffer* fb = DATA_PTR(self);
+  bi_framebuffer_save_png_image(fb,name);
+  return self;
 }
 
 //
@@ -56,5 +76,7 @@ void mrb_init_bi_framebuffer(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, framebuffer, "h", mrb_bi_framebuffer_get_h, MRB_ARGS_NONE());
   mrb_define_method(mrb, framebuffer, "w=", mrb_bi_framebuffer_set_w, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, framebuffer, "h=", mrb_bi_framebuffer_set_h, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, framebuffer, "_clear_", mrb_bi_framebuffer_clear, MRB_ARGS_REQ(4)); // r,g,b,a
   mrb_define_method(mrb, framebuffer, "to_texture", mrb_bi_framebuffer_to_texture, MRB_ARGS_OPT(1)); // num
+  mrb_define_method(mrb, framebuffer, "save_png", mrb_bi_framebuffer_save_png, MRB_ARGS_OPT(1)); // name
 }
