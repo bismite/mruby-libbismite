@@ -438,8 +438,8 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "visible", mrb_node_get_visible, MRB_ARGS_NONE());
 
   // Texture
-  mrb_define_method(mrb, node, "set_texture", mrb_node_set_texture, MRB_ARGS_REQ(5)|MRB_ARGS_OPT(4)); // tex,x,y,w,h, xywh
-  mrb_define_method(mrb, node, "unset_texture", mrb_node_unset_texture, MRB_ARGS_NONE()); // tex,x,y,w,h, xywh
+  mrb_define_method(mrb, node, "_set_texture_", mrb_node_set_texture, MRB_ARGS_REQ(5)|MRB_ARGS_OPT(4)); // tex,x,y,w,h, xywh
+  mrb_define_method(mrb, node, "_unset_texture_", mrb_node_unset_texture, MRB_ARGS_NONE()); // tex,x,y,w,h, xywh
   mrb_define_method(mrb, node, "flip_vertical", mrb_BiNode_get_texture_flip_vertical, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "flip_vertical=", mrb_BiNode_set_texture_flip_vertical, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "flip_horizontal", mrb_BiNode_get_texture_flip_horizontal, MRB_ARGS_NONE());

@@ -8,7 +8,6 @@
 #include <bi/shader_node.h>
 #include "_inner_macro.h"
 #include "_shader_macro.h"
-#include "_blend_factor_macro.h"
 #include "_node_base.h"
 
 //
@@ -86,19 +85,33 @@ static mrb_value mrb_BiShaderNode_set_texture(mrb_state *mrb, mrb_value self)
   mrb_value texture_obj;
   mrb_get_args(mrb, "io", &index, &texture_obj );
   BiShaderNode* shader_node = DATA_PTR(self);
-  BiTexture* texture = DATA_PTR(texture_obj);
-  shader_node->textures[index] = texture;
+  if(mrb_nil_p(texture_obj)){
+    shader_node->textures[index] = NULL;
+  }else{
+    BiTexture* texture = DATA_PTR(texture_obj);
+    shader_node->textures[index] = texture;
+  }
   return self;
 }
 
 static mrb_value mrb_BiShaderNode_set_blend_factor(mrb_state *mrb, mrb_value self)
 {
-  SET_BLEND_FACTOR(BiShaderNode,blend_factor);
+  mrb_int src,dst,alpha_src,alpha_dst;
+  mrb_get_args(mrb, "iiii", &src, &dst, &alpha_src, &alpha_dst );
+  BiShaderNode* target = DATA_PTR(self);
+  target->blend_factor = bi_blend_factor(src,dst,alpha_src,alpha_dst);
+  return self;
 }
 
 static mrb_value mrb_BiShaderNode_get_blend_factor(mrb_state *mrb, mrb_value self)
 {
-  GET_BLEND_FACTOR(BiShaderNode,blend_factor);
+  BiShaderNode* target = DATA_PTR(self);
+  mrb_value v[4];
+  v[0] = mrb_fixnum_value(target->blend_factor.src);
+  v[1] = mrb_fixnum_value(target->blend_factor.dst);
+  v[2] = mrb_fixnum_value(target->blend_factor.alpha_src);
+  v[3] = mrb_fixnum_value(target->blend_factor.alpha_dst);
+  return mrb_ary_new_from_values(mrb,4,v);
 }
 
 //
@@ -149,7 +162,7 @@ void mrb_init_bi_shader_node(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, shader_node, "set_shader_extra_data",mrb_BiShaderNode_set_shader_extra_data, MRB_ARGS_REQ(2)); // index,value
   mrb_define_method(mrb, shader_node, "get_shader_extra_data",mrb_BiShaderNode_get_shader_extra_data, MRB_ARGS_REQ(1)); // index
 
-  mrb_define_method(mrb, shader_node, "set_texture",mrb_BiShaderNode_set_texture, MRB_ARGS_REQ(2)); // num,tex
+  mrb_define_method(mrb, shader_node, "_set_texture_",mrb_BiShaderNode_set_texture, MRB_ARGS_REQ(2)); // num,tex
 
   mrb_define_method(mrb, shader_node, "set_blend_factor", mrb_BiShaderNode_set_blend_factor, MRB_ARGS_REQ(4));
   mrb_define_method(mrb, shader_node, "get_blend_factor", mrb_BiShaderNode_get_blend_factor, MRB_ARGS_NONE());
