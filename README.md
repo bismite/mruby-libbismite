@@ -3,6 +3,10 @@
 [libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 9.0.0 - 2024/11/27
+- Bi::ShaderNode#set_texture : can receive nil texture.
+- Bi::Framebuffer: remove save_png() and to_texture(). add textures attribute.
+- Bi::Texture: save_png() receive flip-vertical flag.
 ## 8.1.0 - 2024/11/24
 - libbismite 12.1.1
   - remove Bi::LayerGroup and Bi::Canvas.
