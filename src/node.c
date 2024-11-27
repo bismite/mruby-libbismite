@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include "_inner_macro.h"
 #include "_node_base.h"
-#include "_shader_macro.h"
 #include "_color.h"
 
 // Bi::Node class
@@ -154,15 +153,6 @@ static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
 //
 // scene graph
 //
-
-static BiNode* bi_node_from_obj(mrb_state *mrb,mrb_value obj)
-{
-  struct RClass* node_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Node");
-  if( ! mrb_obj_is_kind_of(mrb,obj,node_class) ) {
-    return NULL;
-  }
-  return DATA_PTR(obj);
-}
 
 static mrb_value mrb_node_add_node(mrb_state *mrb, mrb_value self)
 {
@@ -310,6 +300,7 @@ static mrb_value mrb_node_unset_texture(mrb_state *mrb, mrb_value self)
 {
   BiNode* node = DATA_PTR(self);
   bi_node_unset_texture(node);
+  mrb_iv_set(mrb,self,MRB_IVSYM(texture),mrb_nil_value());
   return self;
 }
 _GET_BOOL_(BiNode,texture_flip_vertical);
@@ -326,19 +317,27 @@ static mrb_value mrb_bi_node_set_framebuffer(mrb_state *mrb, mrb_value self)
   mrb_get_args(mrb, "o", &fb_obj );
   BiNode* node = DATA_PTR(self);
   node->framebuffer = DATA_PTR(fb_obj);
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@framebuffer"), fb_obj );
+  mrb_iv_set(mrb, self, MRB_IVSYM(framebuffer), fb_obj );
   return self;
 }
 static mrb_value mrb_bi_node_get_framebuffer(mrb_state *mrb, mrb_value self)
 {
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@framebuffer") );
+  return mrb_iv_get(mrb, self, MRB_IVSYM(framebuffer) );
 }
 
 //
 // Extra Data
 //
 static mrb_value mrb_BiNode_set_shader_extra_data(mrb_state *mrb, mrb_value self) {
-  SET_SHADER_EXTRA_DATA(BiNode);
+  mrb_int index;
+  mrb_float value;
+  mrb_get_args(mrb, "if", &index, &value );
+  BiNode *ptr = DATA_PTR(self);
+  if(0<=index&&index<16) {
+      ptr->shader_extra_data[index]=value;
+      return mrb_float_value(mrb,value);
+  }
+  return mrb_nil_value();
 }
 static mrb_value mrb_BiNode_get_shader_extra_data(mrb_state *mrb, mrb_value self) {
   mrb_int i;
@@ -438,8 +437,8 @@ void mrb_init_bi_node(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, node, "visible", mrb_node_get_visible, MRB_ARGS_NONE());
 
   // Texture
-  mrb_define_method(mrb, node, "_set_texture_", mrb_node_set_texture, MRB_ARGS_REQ(5)|MRB_ARGS_OPT(4)); // tex,x,y,w,h, xywh
-  mrb_define_method(mrb, node, "_unset_texture_", mrb_node_unset_texture, MRB_ARGS_NONE()); // tex,x,y,w,h, xywh
+  mrb_define_method(mrb, node, "set_texture", mrb_node_set_texture, MRB_ARGS_REQ(5)|MRB_ARGS_OPT(4)); // tex,x,y,w,h, xywh
+  mrb_define_method(mrb, node, "unset_texture", mrb_node_unset_texture, MRB_ARGS_NONE()); // tex,x,y,w,h, xywh
   mrb_define_method(mrb, node, "flip_vertical", mrb_BiNode_get_texture_flip_vertical, MRB_ARGS_NONE());
   mrb_define_method(mrb, node, "flip_vertical=", mrb_BiNode_set_texture_flip_vertical, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, node, "flip_horizontal", mrb_BiNode_get_texture_flip_horizontal, MRB_ARGS_NONE());

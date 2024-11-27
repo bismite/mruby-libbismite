@@ -2,11 +2,14 @@
 #include <mruby/data.h>
 #include <mruby/class.h>
 #include <mruby/variable.h>
+#include <mruby/array.h>
+#include <mruby/presym.h>
 #include <bi/framebuffer.h>
 #include <bi/texture.h>
 #include <bi_core.h>
 
 static struct mrb_data_type const mrb_bi_framebuffer_data_type = { "Framebuffer", mrb_free };
+static struct mrb_data_type const mrb_bi_texture_data_type = { "Texture", NULL}; // do not free
 
 static mrb_value mrb_bi_framebuffer_init(mrb_state *mrb, mrb_value self)
 {
@@ -15,6 +18,17 @@ static mrb_value mrb_bi_framebuffer_init(mrb_state *mrb, mrb_value self)
   BiFramebuffer *fb = mrb_malloc(mrb, sizeof(BiFramebuffer));
   bi_framebuffer_init_with_texture_num(fb,w,h,num);
   mrb_data_init(self, fb, &mrb_bi_framebuffer_data_type);
+  // Textures
+  if(fb->texture_num>0){
+    struct RClass *tex_klass = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Texture");
+    mrb_value texs[BI_FRAMEBUFFER_TEXTURE_MAX];
+    for(int i=0; i<fb->texture_num; i++){
+      struct RData *tex_data = mrb_data_object_alloc(mrb,tex_klass,&fb->textures[i],&mrb_bi_texture_data_type);
+      texs[i] = mrb_obj_value(tex_data);
+    }
+    mrb_value ary = mrb_ary_new_from_values(mrb,fb->texture_num,texs);
+    mrb_iv_set(mrb,self,MRB_IVSYM(textures),ary);
+  }
   return self;
 }
 
@@ -45,25 +59,6 @@ static mrb_value mrb_bi_framebuffer_clear(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-static mrb_value mrb_bi_framebuffer_to_texture(mrb_state *mrb, mrb_value self)
-{
-  mrb_int num=0;
-  mrb_get_args(mrb, "|i", &num );
-  BiFramebuffer* fb = DATA_PTR(self);
-  BiTexture* tex = mrb_malloc(mrb,sizeof(BiTexture));
-  bi_texture_init_with_texture_id(tex,fb->w,fb->h,fb->texture_ids[num] );
-  return create_bi_texture(mrb, tex);
-}
-
-static mrb_value mrb_bi_framebuffer_save_png(mrb_state *mrb, mrb_value self)
-{
-  char *name;
-  mrb_get_args(mrb, "z", &name );
-  BiFramebuffer* fb = DATA_PTR(self);
-  bi_framebuffer_save_png_image(fb,name);
-  return self;
-}
-
 //
 // gem
 //
@@ -77,6 +72,4 @@ void mrb_init_bi_framebuffer(mrb_state *mrb, struct RClass *bi)
   mrb_define_method(mrb, framebuffer, "w=", mrb_bi_framebuffer_set_w, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, framebuffer, "h=", mrb_bi_framebuffer_set_h, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, framebuffer, "_clear_", mrb_bi_framebuffer_clear, MRB_ARGS_REQ(4)); // r,g,b,a
-  mrb_define_method(mrb, framebuffer, "to_texture", mrb_bi_framebuffer_to_texture, MRB_ARGS_OPT(1)); // num
-  mrb_define_method(mrb, framebuffer, "save_png", mrb_bi_framebuffer_save_png, MRB_ARGS_OPT(1)); // name
 }

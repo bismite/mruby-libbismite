@@ -4,4 +4,5 @@ class Bi::Framebuffer
     color = Bi::Color.transparent unless color
     self._clear_ color.r, color.g, color.b, color.a
   end
+  def textures = @textures
 end

@@ -7,7 +7,6 @@
 #include <bi/context.h>
 #include <bi/shader_node.h>
 #include "_inner_macro.h"
-#include "_shader_macro.h"
 #include "_node_base.h"
 
 //
@@ -34,6 +33,8 @@ static mrb_value mrb_shader_node_initialize(mrb_state *mrb, mrb_value self)
   bi_shader_node_init(shader_node);
   mrb_data_init(self, shader_node, &mrb_shader_node_data_type);
   shader_node->userdata = mrb_ptr(self);
+  // textures
+  mrb_iv_set(mrb,self,MRB_IVSYM(textures),mrb_ary_new(mrb));
   return self;
 }
 
@@ -79,7 +80,7 @@ _SET_INT_(BiShaderNode,camera_y);
 _GET_INT_F_(bi_node_get_z);
 _SET_INT_F_(bi_node_set_z);
 
-static mrb_value mrb_BiShaderNode_set_texture(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_shader_node_set_texture(mrb_state *mrb, mrb_value self)
 {
   mrb_int index;
   mrb_value texture_obj;
@@ -91,6 +92,8 @@ static mrb_value mrb_BiShaderNode_set_texture(mrb_state *mrb, mrb_value self)
     BiTexture* texture = DATA_PTR(texture_obj);
     shader_node->textures[index] = texture;
   }
+  mrb_value texs = mrb_iv_get(mrb,self,MRB_IVSYM(textures));
+  mrb_ary_set(mrb,texs,index,texture_obj);
   return self;
 }
 
@@ -117,19 +120,38 @@ static mrb_value mrb_BiShaderNode_get_blend_factor(mrb_state *mrb, mrb_value sel
 //
 // Shader
 //
+
+static inline void set_shader(mrb_state* mrb, mrb_value self,const char* ivname,BiShader** shader_p,mrb_value shader_obj)
+{
+}
+
 static mrb_value mrb_BiShaderNode_set_shader(mrb_state *mrb, mrb_value self)
 {
   mrb_value shader_obj;
   mrb_get_args(mrb, "o", &shader_obj );
   BiShaderNode* shader_node = DATA_PTR(self);
-  set_shader(mrb,self,"@shader",&shader_node->shader,shader_obj);
+  struct RClass *shader_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Shader");
+  if( mrb_obj_is_kind_of(mrb, shader_obj, shader_class) ) {
+    shader_node->shader = DATA_PTR(shader_obj);
+    mrb_iv_set(mrb, self, MRB_IVSYM(shader), shader_obj);
+  }else{
+    shader_node->shader = NULL;
+    mrb_iv_set(mrb, self, MRB_IVSYM(shader), mrb_nil_value() );
+  }
   return self;
 }
 
 static mrb_value mrb_BiShaderNode_set_shader_extra_data(mrb_state *mrb, mrb_value self)
 {
-  SET_SHADER_EXTRA_DATA(BiShaderNode);
-  return self;
+  mrb_int index;
+  mrb_float value;
+  mrb_get_args(mrb, "if", &index, &value );
+  BiShaderNode *ptr = DATA_PTR(self);
+  if(0<=index&&index<16) {
+      ptr->shader_extra_data[index]=value;
+      return mrb_float_value(mrb,value);
+  }
+  return mrb_nil_value();
 }
 static mrb_value mrb_BiShaderNode_get_shader_extra_data(mrb_state *mrb, mrb_value self)
 {
@@ -162,7 +184,7 @@ void mrb_init_bi_shader_node(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, shader_node, "set_shader_extra_data",mrb_BiShaderNode_set_shader_extra_data, MRB_ARGS_REQ(2)); // index,value
   mrb_define_method(mrb, shader_node, "get_shader_extra_data",mrb_BiShaderNode_get_shader_extra_data, MRB_ARGS_REQ(1)); // index
 
-  mrb_define_method(mrb, shader_node, "_set_texture_",mrb_BiShaderNode_set_texture, MRB_ARGS_REQ(2)); // num,tex
+  mrb_define_method(mrb, shader_node, "set_texture",mrb_shader_node_set_texture, MRB_ARGS_REQ(2)); // num,tex
 
   mrb_define_method(mrb, shader_node, "set_blend_factor", mrb_BiShaderNode_set_blend_factor, MRB_ARGS_REQ(4));
   mrb_define_method(mrb, shader_node, "get_blend_factor", mrb_BiShaderNode_get_blend_factor, MRB_ARGS_NONE());

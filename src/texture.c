@@ -55,8 +55,9 @@ static mrb_value mrb_texture_h(mrb_state *mrb, mrb_value self)
 static mrb_value mrb_bi_texture_save_png(mrb_state *mrb, mrb_value self)
 {
   char *name;
-  mrb_get_args(mrb, "z", &name );
-  bi_texture_save_png_image(DATA_PTR(self),name);
+  bool flip_vertical=true;
+  mrb_get_args(mrb, "z|b", &name, &flip_vertical );
+  bi_texture_save_png_image(DATA_PTR(self),name,flip_vertical);
   return self;
 }
 
@@ -69,5 +70,5 @@ void mrb_init_bi_texture(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, texture, "initialize", mrb_texture_initialize, MRB_ARGS_REQ(1)|MRB_ARGS_OPT(1)); // filename,straight-alpha
   mrb_define_method(mrb, texture, "w", mrb_texture_w, MRB_ARGS_NONE());
   mrb_define_method(mrb, texture, "h", mrb_texture_h, MRB_ARGS_NONE());
-  mrb_define_method(mrb, texture, "save_png", mrb_bi_texture_save_png, MRB_ARGS_OPT(1)); // name
+  mrb_define_method(mrb, texture, "save_png", mrb_bi_texture_save_png, MRB_ARGS_OPT(1)|MRB_ARGS_OPT(1)); // name,flip_vertical
 }

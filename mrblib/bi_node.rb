@@ -68,14 +68,6 @@ class Bi::Node
   # Texture and Color
   #
   def texture = @texture
-  def set_texture(tex,x,y,w,h,crop_x,crop_y,original_w,original_h)
-    @texture = tex
-    self._set_texture_(tex,x,y,w,h,crop_x,crop_y,original_w,original_h)
-  end
-  def unset_texture()
-    @texture = nil
-    self._unset_texture_()
-  end
   def color = @_color_
   def tint =  @_tint_
   def set_color(c) = self._set_color_(c.to_color)
@@ -136,13 +128,5 @@ class Bi::ShaderNode
   def h
     @parent.h
   end
-  def set_texture(n,tex)
-    @textures ||= []
-    _set_texture_ n, tex
-    @textures[n] = tex
-  end
-  def texture(n)
-    @textures ||= []
-    @textures[n]
-  end
+  def textures = @textures
 end
