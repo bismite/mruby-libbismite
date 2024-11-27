@@ -120,11 +120,6 @@ static mrb_value mrb_BiShaderNode_get_blend_factor(mrb_state *mrb, mrb_value sel
 //
 // Shader
 //
-
-static inline void set_shader(mrb_state* mrb, mrb_value self,const char* ivname,BiShader** shader_p,mrb_value shader_obj)
-{
-}
-
 static mrb_value mrb_BiShaderNode_set_shader(mrb_state *mrb, mrb_value self)
 {
   mrb_value shader_obj;

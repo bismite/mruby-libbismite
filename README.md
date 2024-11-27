@@ -3,6 +3,10 @@
 [libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 9.1.0 - 2024/11/28
+- libbismite 12.3.0
+- add TextureMapping class. add Bi::Node#set_texture_mapping()
+- add Bi::Node#children
 ## 9.0.0 - 2024/11/27
 - Bi::ShaderNode#set_texture : can receive nil texture.
 - Bi::Framebuffer: remove save_png() and to_texture(). add textures attribute.

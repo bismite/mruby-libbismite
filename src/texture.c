@@ -57,7 +57,7 @@ static mrb_value mrb_bi_texture_save_png(mrb_state *mrb, mrb_value self)
   char *name;
   bool flip_vertical=true;
   mrb_get_args(mrb, "z|b", &name, &flip_vertical );
-  bi_texture_save_png_image(DATA_PTR(self),name,flip_vertical);
+  bi_texture_save_png(DATA_PTR(self),name,flip_vertical);
   return self;
 }
 

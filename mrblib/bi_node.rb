@@ -1,4 +1,13 @@
 
+TextureMapping = Struct.new(:texture,:x,:y,:w,:h,:cx,:cy,:ow,:oh) do
+  def to_sprite
+    texture.to_sprite x,y,w,h, cx,cy,ow,oh
+  end
+  def dat
+    [x,y,w,h,cx,cy,ow,oh]
+  end
+end
+
 module Bi::NodeBase
   include Bi::TimerRunner
   attr_reader :parent
@@ -46,7 +55,6 @@ module Bi::NodeBase
   end
 end
 
-
 class Bi::Node
   include Bi::NodeBase
   attr_reader :texture
@@ -78,9 +86,20 @@ class Bi::Node
     self.color.a = (o*0xff).to_i
   end
 
+  # Texture Mapping
+  def set_texture_mapping(tex_map)
+    return unless tex_map
+    self.set_texture tex_map.texture,*tex_map.dat
+    self.set_size tex_map.ow, tex_map.oh
+  end
+  def texture_mapping=(tex_map)
+    self.set_texture_mapping tex_map
+  end
+
   #
   # Scene Graph
   #
+  def children = @_children_
   alias :remove :_remove_node_
   def anchor=(anchor)
     raise "unknown anchor alias #{anchor}" unless ANCHOR_ALIAS[anchor]
