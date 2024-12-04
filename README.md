@@ -3,6 +3,8 @@
 [libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 10.0.0 - 2024/12/05
+- rename function Bi::ShaderNode#z_order -> Bi::ShaderNode#z
 ## 9.1.0 - 2024/11/28
 - libbismite 12.3.0
 - add TextureMapping class. add Bi::Node#set_texture_mapping()

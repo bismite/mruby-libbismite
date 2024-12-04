@@ -72,13 +72,12 @@ static mrb_value mrb_BiShaderNode_remove_node(mrb_state *mrb, mrb_value self)
 // define accessors
 //
 
+_GET_INT_F_(bi_node_get_z);
+_SET_INT_F_(bi_node_set_z);
 _GET_INT_(BiShaderNode,camera_x);
 _GET_INT_(BiShaderNode,camera_y);
 _SET_INT_(BiShaderNode,camera_x);
 _SET_INT_(BiShaderNode,camera_y);
-
-_GET_INT_F_(bi_node_get_z);
-_SET_INT_F_(bi_node_set_z);
 
 static mrb_value mrb_shader_node_set_texture(mrb_state *mrb, mrb_value self)
 {
@@ -167,13 +166,12 @@ void mrb_init_bi_shader_node(mrb_state *mrb,struct RClass *bi)
   mrb_define_method(mrb, shader_node, "_add_node_", mrb_BiShaderNode_add_node, MRB_ARGS_REQ(1)); // node
   mrb_define_method(mrb, shader_node, "_remove_node_", mrb_BiShaderNode_remove_node, MRB_ARGS_REQ(1)); // node
 
+  mrb_define_method(mrb, shader_node, "z", mrb_bi_node_get_z, MRB_ARGS_NONE());
+  mrb_define_method(mrb, shader_node, "z=",mrb_bi_node_set_z, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, shader_node, "camera_x", mrb_BiShaderNode_get_camera_x, MRB_ARGS_NONE());
   mrb_define_method(mrb, shader_node, "camera_x=",mrb_BiShaderNode_set_camera_x, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, shader_node, "camera_y", mrb_BiShaderNode_get_camera_y, MRB_ARGS_NONE());
   mrb_define_method(mrb, shader_node, "camera_y=",mrb_BiShaderNode_set_camera_y, MRB_ARGS_REQ(1));
-
-  mrb_define_method(mrb, shader_node, "z_order", mrb_bi_node_get_z, MRB_ARGS_NONE());
-  mrb_define_method(mrb, shader_node, "z_order=",mrb_bi_node_set_z, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, shader_node, "shader=",mrb_BiShaderNode_set_shader, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, shader_node, "set_shader_extra_data",mrb_BiShaderNode_set_shader_extra_data, MRB_ARGS_REQ(2)); // index,value
