@@ -3,6 +3,9 @@
 [libbismite](https://github.com/bismite/libbismite) binding for [mruby](https://github.com/mruby/mruby)
 
 # Changelog
+## 10.1.0 - 2024/12/14
+- add Timer#count
+- fix memory leak when Timer autoremoved.
 ## 10.0.0 - 2024/12/05
 - rename function Bi::ShaderNode#z_order -> Bi::ShaderNode#z
 ## 9.1.0 - 2024/11/28
