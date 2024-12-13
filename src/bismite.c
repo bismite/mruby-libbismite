@@ -55,22 +55,22 @@ static mrb_value mrb_bi_initialize(mrb_state *mrb, mrb_value self)
   struct RClass *framebuffer_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Framebuffer");
   struct RData *framebuffer_data = mrb_data_object_alloc(mrb,framebuffer_class,&c->default_framebuffer,&mrb_framebuffer_data_type);
   mrb_value framebuffer_obj = mrb_obj_value(framebuffer_data);
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@default_framebuffer"),framebuffer_obj);
+  mrb_iv_set(mrb, self, MRB_IVSYM(default_framebuffer),framebuffer_obj);
   // Default Framebuffer Node
   struct RClass *node_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Node");
   struct RData *node_data = mrb_data_object_alloc(mrb,node_class,&c->default_framebuffer_node,&mrb_node_data_type);
   mrb_value node_obj = mrb_obj_value(node_data);
-  mrb_iv_set(mrb, node_obj, mrb_intern_cstr(mrb,"@framebuffer"),framebuffer_obj);
+  mrb_iv_set(mrb, node_obj, MRB_IVSYM(framebuffer),framebuffer_obj);
   c->default_framebuffer_node.userdata = mrb_ptr(node_obj);
-  mrb_iv_set(mrb, node_obj, mrb_intern_cstr(mrb,"@_tint_"), color_obj(mrb,&c->default_framebuffer_node.tint) );
-  mrb_iv_set(mrb, node_obj, mrb_intern_cstr(mrb,"@_color_"), color_obj(mrb,&c->default_framebuffer_node.color) );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@default_framebuffer_node"),node_obj);
+  mrb_iv_set(mrb, node_obj, MRB_IVSYM(_tint_), color_obj(mrb,&c->default_framebuffer_node.tint) );
+  mrb_iv_set(mrb, node_obj, MRB_IVSYM(_color_), color_obj(mrb,&c->default_framebuffer_node.color) );
+  mrb_iv_set(mrb, self, MRB_IVSYM(default_framebuffer_node),node_obj);
 
   // Default shader
   struct RClass *shader_class = mrb_class_get_under(mrb,mrb_class_get(mrb,"Bi"),"Shader");
   struct RData *shader_data = mrb_data_object_alloc(mrb,shader_class,&c->default_shader,&mrb_shader_data_type);
   mrb_value shader_obj = mrb_obj_value(shader_data);
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@default_shader"),shader_obj);
+  mrb_iv_set(mrb, self, MRB_IVSYM(default_shader),shader_obj);
 
   return self;
 }
@@ -110,7 +110,7 @@ static mrb_value mrb_bi_set_title(mrb_state *mrb, mrb_value self)
   mrb_get_args(mrb, "S", &title_obj );
   BiContext* c = DATA_PTR(self);
   bi_set_title( c, mrb_string_value_cstr(mrb,&title_obj) );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@title"), title_obj );
+  mrb_iv_set(mrb, self, MRB_IVSYM(title), title_obj );
   return self;
 }
 

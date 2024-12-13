@@ -3,6 +3,7 @@
 #include <mruby/class.h>
 #include <mruby/string.h>
 #include <mruby/variable.h>
+#include <mruby/presym.h>
 #include <bi/util.h>
 #include <bi/ext/font.h>
 #include <stdlib.h>
@@ -28,7 +29,7 @@ static mrb_value mrb_bi_font_read(mrb_state *mrb, mrb_value self)
   struct RData *data = mrb_data_object_alloc(mrb,klass,font,&mrb_font_data_type);
   mrb_value val = mrb_obj_value(data);
 
-  mrb_iv_set(mrb, val, mrb_intern_cstr(mrb,"@texture"), texture_obj);
+  mrb_iv_set(mrb, val, MRB_IVSYM(texture), texture_obj);
 
   return val;
 }
@@ -55,7 +56,7 @@ static mrb_value mrb_font_initialize(mrb_state *mrb, mrb_value self)
   DATA_PTR(self) = font;
   DATA_TYPE(self) = &mrb_font_data_type;
 
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@texture"), texture_obj);
+  mrb_iv_set(mrb, self, MRB_IVSYM(texture), texture_obj);
 
   return self;
 }

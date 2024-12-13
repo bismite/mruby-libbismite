@@ -3,6 +3,7 @@
 #include <mruby/class.h>
 #include <mruby/string.h>
 #include <mruby/variable.h>
+#include <mruby/presym.h>
 #include <bi/node.h>
 #include <bi/ext/label.h>
 #include <stdlib.h>
@@ -27,12 +28,12 @@ static mrb_value mrb_label_initialize(mrb_state *mrb, mrb_value self)
   BiLabel* label = bi_label_init(mrb_malloc(mrb, sizeof(BiLabel)),font);
   mrb_data_init(self, label, &mrb_label_data_type);
   label->node.userdata = mrb_ptr(self);
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@font"), font_obj);
+  mrb_iv_set(mrb, self, MRB_IVSYM(font), font_obj);
   // Color
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_tint_"), color_obj(mrb,&label->tint) );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_color_"), color_obj(mrb,&label->color) );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_background_color_"), color_obj(mrb,&label->node.color) );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_background_tint_"), color_obj(mrb,&label->node.tint) );
+  mrb_iv_set(mrb, self, MRB_IVSYM(_tint_), color_obj(mrb,&label->tint) );
+  mrb_iv_set(mrb, self, MRB_IVSYM(_color_), color_obj(mrb,&label->color) );
+  mrb_iv_set(mrb, self, MRB_IVSYM(_background_color_), color_obj(mrb,&label->node.color) );
+  mrb_iv_set(mrb, self, MRB_IVSYM(_background_tint_), color_obj(mrb,&label->node.tint) );
   return self;
 }
 
@@ -40,7 +41,7 @@ static mrb_value mrb_label_set_text(mrb_state *mrb, mrb_value self)
 {
   mrb_value text;
   mrb_get_args(mrb, "S", &text );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@text"), text);
+  mrb_iv_set(mrb, self, MRB_IVSYM(text), text);
   BiLabel* n = DATA_PTR(self);
   bi_label_set_text(n,mrb_string_value_cstr(mrb,&text));
   return self;

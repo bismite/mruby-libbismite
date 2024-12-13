@@ -22,14 +22,14 @@ void mrb_action_finish_callback(BiAction* action, void* context)
   mrb_state *mrb = c->mrb;
   mrb_value timer_obj = c->action;
   mrb_value node_obj = mrb_obj_value(action->node->userdata);
-  mrb_value callback = mrb_iv_get(mrb, timer_obj, mrb_intern_cstr(mrb,"@_callback") );
+  mrb_value callback = mrb_iv_get(mrb, timer_obj, MRB_IVSYM(_callback) );
   mrb_value argv[2] = { node_obj, timer_obj };
   if( mrb_symbol_p(callback) ){
     mrb_funcall_argv(mrb,node_obj,mrb_symbol(callback),2,argv);
   }else if( mrb_type(callback) == MRB_TT_PROC ) {
     mrb_yield_argv(mrb,callback,2,argv);
   }
-  mrb_value autoremove = mrb_iv_get(mrb, timer_obj, mrb_intern_cstr(mrb,"@_autoremove"));
+  mrb_value autoremove = mrb_iv_get(mrb, timer_obj, MRB_IVSYM(_autoremove));
   if( mrb_undef_p(autoremove) || mrb_false_p(autoremove) || mrb_nil_p(autoremove) ){
     // nop
   }else{
@@ -58,13 +58,13 @@ static void action_initialize(mrb_state *mrb, mrb_value* self,BiAction* action,m
   c->action = *self;
   action->on_finish_callback_context = c;
   action->on_finish = mrb_action_finish_callback;
-  mrb_iv_set(mrb, *self, mrb_intern_cstr(mrb,"@_callback"), callback );
+  mrb_iv_set(mrb, *self, MRB_IVSYM(_callback), callback );
   // autoremove
   mrb_value autoremove = option[0];
   if ( mrb_undef_p(autoremove) || mrb_nil_p(autoremove) || mrb_false_p(autoremove) ) {
     autoremove = mrb_false_value();
   }
-  mrb_iv_set(mrb, *self, mrb_intern_cstr(mrb,"@_autoremove"), autoremove );
+  mrb_iv_set(mrb, *self, MRB_IVSYM(_autoremove), autoremove );
   // repeat
   mrb_value repeat = option[1];
   if( mrb_fixnum_p(repeat) ){
@@ -238,7 +238,7 @@ static mrb_value mrb_action_sequence_initialize(mrb_state *mrb, mrb_value self)
   BiAction *action;
   BiAction **actions;
   mrb_get_args(mrb, "A:&", &actions_obj, &kw, &callback);
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_actions_"), actions_obj);
+  mrb_iv_set(mrb, self, MRB_IVSYM(_actions_), actions_obj);
   actions = malloc( sizeof(BiAction*) * RARRAY_LEN(actions_obj) );
   for(int i=0; i<RARRAY_LEN(actions_obj); i++ ) {
     actions[i] = DATA_PTR( RARRAY_PTR(actions_obj)[i] );
@@ -264,10 +264,10 @@ static mrb_value mrb_add_action(mrb_state *mrb, mrb_value self)
   node = DATA_PTR(self);
   action = DATA_PTR(action_obj);
   //
-  mrb_value actions = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_actions") );
+  mrb_value actions = mrb_iv_get(mrb, self, MRB_IVSYM(_actions) );
   if( mrb_nil_p(actions) ){
     actions = mrb_ary_new(mrb);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_actions"), actions);
+    mrb_iv_set(mrb, self, MRB_IVSYM(_actions), actions);
   }
   mrb_ary_push(mrb,actions,action_obj);
   //
@@ -283,10 +283,10 @@ static mrb_value mrb_remove_action(mrb_state *mrb, mrb_value self)
   BiNode *node = DATA_PTR(self);
   BiAction *action = DATA_PTR(action_obj);
   //
-  mrb_value actions = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_actions") );
+  mrb_value actions = mrb_iv_get(mrb, self, MRB_IVSYM(_actions) );
   if( mrb_nil_p(actions) ){
     actions = mrb_ary_new(mrb);
-    mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_actions"), actions);
+    mrb_iv_set(mrb, self, MRB_IVSYM(_actions), actions);
   }
   mrb_funcall(mrb, actions, "delete", 1, action_obj);
   //
@@ -298,7 +298,7 @@ static mrb_value mrb_remove_all_actions(mrb_state *mrb, mrb_value self)
 {
   BiNode *node = DATA_PTR(self);
   //
-  mrb_value actions = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_actions") );
+  mrb_value actions = mrb_iv_get(mrb, self, MRB_IVSYM(_actions) );
   if( mrb_nil_p(actions) ){
     return mrb_nil_value();
   }

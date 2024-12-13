@@ -30,7 +30,7 @@ static bool on_click(BiContext* context, BiNode* node, int x, int y, int button,
 {
   mrb_state *mrb = context->userdata;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_click_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, MRB_IVSYM(_on_click_callback_) );
   mrb_value _x = mrb_fixnum_value(x);
   mrb_value _y = mrb_fixnum_value(y);
   mrb_value _button = mrb_fixnum_value(button);
@@ -49,7 +49,7 @@ static bool on_move_cursor(BiContext* context, BiNode* node, int x, int y)
 {
   mrb_state *mrb = context->userdata;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_move_cursor_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, MRB_IVSYM(_on_move_cursor_callback_) );
   mrb_value _x = mrb_fixnum_value(x);
   mrb_value _y = mrb_fixnum_value(y);
   mrb_value argv[3] = { self, _x, _y };
@@ -66,7 +66,7 @@ static bool on_keyinput(BiContext* context, BiNode* node, uint16_t scancode, uin
 {
   mrb_state *mrb = context->userdata;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_keyinput_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, MRB_IVSYM(_on_keyinput_callback_) );
   mrb_value _scancode = mrb_fixnum_value(scancode);
   mrb_value _keycode = mrb_fixnum_value(keycode);
   mrb_value _mod = mrb_fixnum_value(mod);
@@ -85,7 +85,7 @@ static bool on_move_finger(BiContext* context, BiNode* node, float x, float y, i
 {
   mrb_state *mrb = context->userdata;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_move_finger_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, MRB_IVSYM(_on_move_finger_callback_) );
   mrb_value _x = mrb_float_value(mrb,x);
   mrb_value _y = mrb_float_value(mrb,y);
   mrb_value _finger = mrb_fixnum_value(finger);
@@ -103,7 +103,7 @@ static bool on_touch(BiContext* context, BiNode* node, float x, float y, int64_t
 {
   mrb_state *mrb = context->userdata;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_touch_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, MRB_IVSYM(_on_touch_callback_) );
   mrb_value _x = mrb_float_value(mrb,x);
   mrb_value _y = mrb_float_value(mrb,y);
   mrb_value _finger = mrb_fixnum_value(finger);
@@ -122,7 +122,7 @@ static bool on_textinput(BiContext* context, BiNode* node, char* text)
 {
   mrb_state *mrb = context->userdata;
   mrb_value self = mrb_obj_value(node->userdata);
-  mrb_value obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_on_textinput_callback_") );
+  mrb_value obj = mrb_iv_get(mrb, self, MRB_IVSYM(_on_textinput_callback_) );
   mrb_value _text = mrb_str_new_cstr(mrb,text);
   mrb_value argv[2] = { self, _text };
 
@@ -145,8 +145,8 @@ static mrb_value mrb_node_initialize(mrb_state *mrb, mrb_value self)
   mrb_data_init(self, node, &mrb_node_data_type);
   node->userdata = mrb_ptr(self);
   // Color
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_tint_"), color_obj(mrb,&node->tint) );
-  mrb_iv_set(mrb, self, mrb_intern_cstr(mrb,"@_color_"), color_obj(mrb,&node->color) );
+  mrb_iv_set(mrb, self, MRB_IVSYM(_tint_), color_obj(mrb,&node->tint) );
+  mrb_iv_set(mrb, self, MRB_IVSYM(_color_), color_obj(mrb,&node->color) );
   return self;
 }
 
@@ -249,7 +249,7 @@ static mrb_value mrb_node_set_color(mrb_state *mrb, mrb_value self)
   BiColor* color = DATA_PTR(color_obj);
   BiNode* node = DATA_PTR(self);
   node->color = *color;
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_color_") );
+  return mrb_iv_get(mrb, self, MRB_IVSYM(_color_) );
 }
 
 static mrb_value mrb_node_set_tint(mrb_state *mrb, mrb_value self)
@@ -259,7 +259,7 @@ static mrb_value mrb_node_set_tint(mrb_state *mrb, mrb_value self)
   BiColor* color = DATA_PTR(color_obj);
   BiNode* node = DATA_PTR(self);
   node->tint = *color;
-  return mrb_iv_get(mrb, self, mrb_intern_cstr(mrb,"@_tint_") );
+  return mrb_iv_get(mrb, self, MRB_IVSYM(_tint_) );
 }
 
 // Visibility
